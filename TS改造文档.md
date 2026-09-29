@@ -155,6 +155,30 @@ import 显式标注为类型导入（`import type`）。这样 tsc 与 esbuild �
 `src/transporters/tcp/udp-broadcaster.js` 原为 `require("../../../src/utils")`（自引用源码树），
 在 `dist` 下会解析回 `src/`，直接导致 `npm run test:esm` 崩溃；已改为相对当前目录的引用。
 
+### 10. `Middleware.localAction` 里 `next` 的 `this` 类型不可用
+
+原类型为 `localAction?: (this: ServiceBroker, next: ActionHandler<Service>, action: ActionSchema) => ActionHandler<Service>`。
+`ActionHandler<TThis>` 带 `this: TThis` 约束，而中间件包装函数在运行时是**普通函数调用**（真正的 action handler 已在
+`Service._createAction` 中 `bind` 到服务），因此包装函数内调用 `next(ctx)` 会被判定为
+`TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type 'Service<…>'`。
+
+历史上前述配置（`esModuleInterop: false`）因 `skipLibCheck` 让该 d.ts 里的默认导入解析为 `any`，错误被意外掩盖；
+**TS 6.0 强制 `esModuleInterop: true` 后所有用户都会撞上**，因此按运行时语义修正为 `ActionHandler<any>`：
+
+```ts
+localAction?: (
+	this: ServiceBroker,
+	next: ActionHandler<any>,   // 包装函数以普通调用方式执行 next(ctx)
+	action: ActionSchema
+) => ActionHandler<any>;
+```
+
+### 11. 示例与类型测试此前从未被 lint
+
+`eslint.config.js` 原有的覆盖规则只匹配 `**/*.js`，因此 `examples/**/*.ts`、`test/typescript/**/*.ts`
+长期不在 lint 范围内。本次统一为 `test / dev / benchmark / examples` 的 `.js` 与 `.ts` 都使用同一套放宽规则
+（允许 `console`、未使用变量），并对其执行了一次 prettier 规范化。
+
 ---
 
 ## 五、门禁验证（改造后全量运行）
@@ -162,13 +186,15 @@ import 显式标注为类型导入（`import type`）。这样 tsc 与 esbuild �
 | 门禁 | 结果 |
 |---|---|
 | `tsc -p tsconfig.json` | **0 error**（1.4s） |
+| `tsc -p tsconfig.examples.json`（src + examples） | **0 error** |
 | `npx jest` | **136 suites / 2346 passed / 4 skipped** |
 | `npm run test`（含覆盖率） | 通过，All files **96.39%** |
 | `npm run build` | 通过，`dist/` 与 `src` **1:1**（133 js + 133 d.ts + runner-esm.mjs） |
 | `npm run test:ts`（build + tsd + hello-world 编译 + ts-node 运行） | 通过（tsd 0 error，示例服务正常启停） |
 | `npm run test:esm` | 通过（3 个服务启动成功） |
-| ESLint `src` | **0 error / 0 warning** |
-| `tsx examples/client-server/server.ts` + `client.ts` | 通过：16 次 `math.add` 全部成功，3 次事件回声正常 |
+| `npm run test:examples`（build + 示例类型检查） | 通过（4.5s） |
+| ESLint `benchmark bin examples src test` | **0 error / 4 warning**（均为未使用变量；忽略行尾差异口径） |
+| `tsx examples/client-server/server.ts` + `client.ts` | 通过：16 次 `math.add` 全部成功、3 次事件回声正常、0 报错 |
 | `npm run demo simple` | 通过 |
 | `require("./index.js")` / `import from "./index.mjs"` | 正常 |
 
@@ -186,7 +212,16 @@ import 显式标注为类型导入（`import type`）。这样 tsc 与 esbuild �
 | `tsd.compilerOptions` | 增加 `esModuleInterop: true`（不影响 src 配置） |
 | `dev` / `demo` / `bench` / `perf` / `memleak` | 改走 `tsx`，可直接解析 `.ts` |
 | `demo:client-server:server` / `demo:client-server:client` | 新增，运行示例 |
-| `test:ts` / `test:esm` | 前置 `npm run build` |
+| `test:ts` / `test:esm` / `test:examples` | 前置 `npm run build` |
+
+### 示例与类型测试的类型检查门禁
+
+| 文件 | 说明 |
+|---|---|
+| `tsconfig.examples.json`（新增） | 继承根配置，`include` 覆盖 `src/**/*.ts` + `examples/**/*.ts`；因为 `examples/typescript/index.ts` 通过 `"../../"` 引用包根，所以**必须先生成 `dist/`** |
+| `package.json` → `test:examples` | `npm run build && tsc -p tsconfig.examples.json` |
+| `.github/workflows/ci.yml` | 新增 `Type-check examples` 步骤；同时把 `examples/**` 从 `paths-ignore` 移除（否则只改示例的提交不会触发该门禁） |
+| `eslint.config.js` | `test / dev / benchmark / examples` 的 `.js` 与 `.ts` 共用放宽规则块，且置于 `**/*.ts` 规则块**之后**（配置数组后者覆盖前者） |
 
 ### 入口与路径
 
@@ -196,8 +231,8 @@ import 显式标注为类型导入（`import type`）。这样 tsc 与 esbuild �
 ### 工程配置
 
 - **ESLint**：接入 `typescript-eslint`，为 `**/*.ts` 增加规则块；CJS 场景、`any`、`declare namespace`、
-  遗留 `@ts-ignore` 等按原状保留
-- **CI**：`ci.yml` 与 `publish.yml` 增加 Build 步骤
+  遗留 `@ts-ignore` 等按原状保留；`test / dev / benchmark / examples` 的 `.ts` 与 `.js` 共用放宽规则（允许 `console`）
+- **CI**：`ci.yml` 增加 Build 与 `Type-check examples` 步骤；`publish.yml` 增加 Build 步骤
 
 ---
 
@@ -247,5 +282,4 @@ npm run demo:client-server:client
 - 迁移 153 个测试文件到 TypeScript（当前保持 `.js` + `ts-jest`）
 - 把历史 `@ts-ignore`（15 处）逐步替换为真实类型修复
 - `export =` → ESM 导出（会改变公共 `.d.ts` 形态，需同步 `index.d.ts` 与 tsd 用例）
-- 把 `examples/**/*.ts` 纳入类型检查（需先解决 `examples/typescript/index.ts` 依赖 `dist` 的问题）
 - `test/e2e`（shell + docker 驱动）未调整，其内部使用发布包，无需改动

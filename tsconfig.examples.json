@@ -1,0 +1,8 @@
+{
+	// Type-checks the examples together with the library sources.
+	// NOTE: `examples/typescript/index.ts` imports the package root ("../../"),
+	// so `npm run build` must have produced `dist/` before running this config.
+	"extends": "./tsconfig.json",
+	"include": ["types/extends.d.ts", "src/**/*.ts", "examples/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
+}

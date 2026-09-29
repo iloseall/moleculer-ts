@@ -44,7 +44,7 @@ const broker = new ServiceBroker({
 					this.logger.info("Local action middleware", action.name);
 					return next(ctx);
 				};
-			},
+			}
 		}
 	]
 });
@@ -72,7 +72,7 @@ const svc = broker.createService<ServiceSettingSchema, LocalMethods, LocalVars>(
 broker.loadService(path.join(__dirname, "greeter.service.ts"));
 broker.loadService(path.join(__dirname, "posts.service.ts"));
 
-(async function() {
+(async function () {
 	try {
 		await broker.start();
 
@@ -80,19 +80,15 @@ broker.loadService(path.join(__dirname, "posts.service.ts"));
 		//events.forEach(evt => broker.logger.info(`Event: ${evt.name} on ${evt.group}`));
 
 		const lt = svc.localTest(svc.a);
-		if (lt != "Hello World")
-			throw new Error("Local test failed!");
+		if (lt != "Hello World") throw new Error("Local test failed!");
 
 		await broker.call("v2.posts.list", { limit: 10, sort: "title" });
 		await broker.call("greeter.hello");
 		const res = await broker.call("greeter.welcome", { name: "Typescript" });
 		broker.logger.info(`Result: ${res}`);
-		if (res != "Welcome, TYPESCRIPT")
-			throw new Error("Result is mismatch!");
-		else
-			await broker.stop();
-
-	} catch(err) {
+		if (res != "Welcome, TYPESCRIPT") throw new Error("Result is mismatch!");
+		else await broker.stop();
+	} catch (err) {
 		console.log(err);
 		process.exit(1);
 	}

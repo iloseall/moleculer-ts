@@ -45,20 +45,6 @@ module.exports = [
 		ignores: ["benchmark/test.js"]
 	},
 	{
-		files: ["test/**/*.js"],
-		rules: {
-			"no-console": ["off"],
-			"no-unused-vars": ["off"]
-		}
-	},
-	{
-		files: ["dev/**/*.js", "benchmark/**/*.js", "examples/**/*.js"],
-		rules: {
-			"no-console": ["off"],
-			"no-unused-vars": ["off"]
-		}
-	},
-	{
 		files: ["**/*.ts"],
 		rules: {
 			"no-var": ["error"],
@@ -89,6 +75,15 @@ module.exports = [
 			"prefer-rest-params": ["off"],
 			"prefer-spread": ["off"],
 			"@typescript-eslint/no-this-alias": ["off"]
+		}
+	},
+	// Tests, scripts & examples are CLI-ish code: console output and loose vars are expected.
+	// Kept last (after the `**/*.ts` block) so that it also applies to their `.ts` files.
+	{
+		files: ["test/**/*.{js,ts}", "dev/**/*.{js,ts}", "benchmark/**/*.{js,ts}", "examples/**/*.{js,ts}"],
+		rules: {
+			"no-console": ["off"],
+			"no-unused-vars": ["off"]
 		}
 	}
 ];

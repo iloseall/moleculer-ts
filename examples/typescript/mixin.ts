@@ -1,4 +1,4 @@
-import { ServiceSchema } from '../../';
+import { ServiceSchema } from "../../";
 
 export type MixinMethods = {
 	uppercase(text: string): string;
@@ -10,6 +10,6 @@ const myMixin: Partial<ServiceSchema> = {
 			return text.toUpperCase();
 		}
 	}
-}
+};
 
 export default myMixin;

@@ -129,10 +129,7 @@ broker
 				// Remove from pending
 				if (pendingReqs.indexOf(count) !== -1)
 					pendingReqs = pendingReqs.filter(n => n != count);
-				else
-					broker.logger.warn(
-						kleur.red().bold(`Invalid coming request count: ${count}`)
-					);
+				else broker.logger.warn(kleur.red().bold(`Invalid coming request count: ${count}`));
 			}).catch(err => {
 				broker.logger.warn(
 					kleur

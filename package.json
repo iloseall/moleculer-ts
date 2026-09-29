@@ -38,6 +38,7 @@
     "test:leak": "jest --testMatch \"**/leak-detection/**/*.spc.js\" --runInBand",
     "test:ts": "npm run build && tsd && tsc -p test/typescript/hello-world && ts-node -P test/typescript/hello-world/tsconfig.json test/typescript/hello-world/index.ts",
     "test:esm": "npm run build && node bin/moleculer-runner.mjs -c test/esm/moleculer.config.mjs test/esm/*.service.*js",
+    "test:examples": "npm run build && tsc -p tsconfig.examples.json",
     "prepublishOnly": "npm run build",
     "release": "npm publish --access public && git push --follow-tags",
     "release:beta": "npm publish --tag next --access public && git push --follow-tags",

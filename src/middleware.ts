@@ -27,16 +27,21 @@ declare namespace MiddlewareHandler {
 	export interface Middleware {
 		name?: string;
 		created?: (broker: ServiceBroker) => void;
+		// `next` is the next handler of the chain. The innermost action handler is
+		// already bound to its service (`Service._createAction`), and middleware
+		// wrappers invoke `next(ctx)` as a plain function, so `this` must stay
+		// unconstrained here (the service `this` of the action handler itself is
+		// described by `ActionHandler<TThis>`).
 		localAction?: (
 			this: ServiceBroker,
-			next: ActionHandler<Service>,
+			next: ActionHandler<any>,
 			action: ActionSchema
-		) => ActionHandler<Service>;
+		) => ActionHandler<any>;
 		remoteAction?: (
 			this: ServiceBroker,
-			next: ActionHandler<Service>,
+			next: ActionHandler<any>,
 			action: ActionSchema
-		) => ActionHandler<Service>;
+		) => ActionHandler<any>;
 		localEvent?: (next: EventSchemaHandler, event: EventSchema) => EventSchemaHandler;
 		remoteEvent?: (next: EventSchemaHandler, event: EventSchema) => EventSchemaHandler;
 		localMethod?: (next: ServiceMethod, method: ServiceMethod) => ServiceMethod;

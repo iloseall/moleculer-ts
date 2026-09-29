@@ -4,10 +4,12 @@ import { Context, ServiceSettingSchema, ServiceSchema } from "../../../";
 
 declare module "../../../dist/service" {
 	interface ActionSchema {
-		rest?: string | {
-			method?: string;
-			path?: string;
-		}
+		rest?:
+			| string
+			| {
+					method?: string;
+					path?: string;
+			  };
 	}
 }
 
@@ -52,7 +54,7 @@ const GreeterService: ServiceSchema<GreeterSettings, GreeterMethods & GreeterLoc
 					return await Promise.resolve(res);
 				},
 				"anotherHookAfter"
-			],
+			]
 		},
 		error: {
 			welcome(ctx: Context<ActionWelcomeParams>, err: Error): void {
@@ -66,7 +68,7 @@ const GreeterService: ServiceSchema<GreeterSettings, GreeterMethods & GreeterLoc
 	 * Settings
 	 */
 	settings: {
-		defaultName: "Moleculer",
+		defaultName: "Moleculer"
 	},
 
 	/**
@@ -81,7 +83,7 @@ const GreeterService: ServiceSchema<GreeterSettings, GreeterMethods & GreeterLoc
 		hello: {
 			rest: {
 				method: "GET",
-				path: "/hello",
+				path: "/hello"
 			},
 			handler(ctx: Context): string {
 				return `Hello ${this.settings.defaultName}`;
@@ -104,12 +106,12 @@ const GreeterService: ServiceSchema<GreeterSettings, GreeterMethods & GreeterLoc
 		welcome: {
 			rest: "GET /welcome/:name",
 			params: {
-				name: "string",
+				name: "string"
 			},
 			handler(ctx: Context<ActionWelcomeParams>): string {
 				return `Welcome, ${ctx.params.name}`;
-			},
-		},
+			}
+		}
 	},
 
 	/**
@@ -149,7 +151,7 @@ const GreeterService: ServiceSchema<GreeterSettings, GreeterMethods & GreeterLoc
 	 */
 	async stopped() {
 		this.logger.info(`${this.name} service - lifecycle method "stopped" called.`);
-	},
+	}
 };
 
 export default GreeterService;

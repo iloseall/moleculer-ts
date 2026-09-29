@@ -62,5 +62,4 @@ export default {
 	stopped() {
 		this.logger.info("Posts service stopped!");
 	}
-
 } as ServiceSchema<PostSettings>;
