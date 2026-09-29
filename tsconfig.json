@@ -10,18 +10,16 @@
 		"useDefineForClassFields": false,
 		"esModuleInterop": false,
 
-		"allowJs": true,
-		"checkJs": true,
+		// Type-only: lets the declaration output keep the `import type X from "./y"`
+		// form used by the original hand-written .d.ts files. No runtime effect.
+		"allowSyntheticDefaultImports": true,
+
 		"strict": false,
 
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"noEmit": true
 	},
-	// Migrated TS sources. Add every file here when it is converted from `.js` to `.ts`.
-	// (Do NOT use a `src/**/*.ts` include glob: it would pull all hand-written `.d.ts`
-	// files in as root files and switch the JS sources to strict declaration checking.)
-	"files": ["src/constants.ts", "src/errors.ts", "src/lock.ts", "src/packets.ts"],
-	"include": ["types/extends.d.ts", "src/**/*.js", "src/**/*.d.ts"],
-	"exclude": ["node_modules", "dist", "src/**/*.mjs"]
+	"include": ["types/extends.d.ts", "src/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
 }

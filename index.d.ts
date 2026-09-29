@@ -73,7 +73,7 @@ import * as Cachers from "./dist/cachers";
 // --- LOGGERS ---
 
 import * as Loggers from "./dist/loggers";
-import type { LogLevels } from "./dist/loggers";
+import type { LogLevels } from "./dist/loggers/base";
 import type { Logger, LoggerConfig } from "./dist/logger-factory";
 
 // --- METRICS ---
@@ -118,7 +118,7 @@ import * as Transporters from "./dist/transporters";
 // --- VALIDATORS ---
 
 import * as Validators from "./dist/validators";
-import type { ValidatorNames } from "./dist/validators";
+import type { ValidatorNames } from "./dist/validators/base";
 
 declare namespace Moleculer {
 	export {

@@ -5,13 +5,13 @@
  */
 
 class Lock {
-	locked: Map<string, any[]>;
+	locked: Map<any, any[]>;
 
 	constructor() {
 		this.locked = new Map();
 	}
 
-	acquire(key: string, ttl?: number): Promise<any> {
+	acquire(key: string | string[], ttl?: number): Promise<any> {
 		let locked = this.locked.get(key);
 		if (!locked) {
 			// not locked
@@ -23,11 +23,11 @@ class Lock {
 		}
 	}
 
-	isLocked(key: string): boolean {
+	isLocked(key: string | string[]): boolean {
 		return !!this.locked.get(key);
 	}
 
-	release(key: string): Promise<void> {
+	release(key: string | string[]): Promise<void> {
 		const locked = this.locked.get(key);
 		if (locked) {
 			if (locked.length > 0) {

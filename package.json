@@ -14,7 +14,7 @@
   "types": "./index.d.ts",
   "scripts": {
     "bench": "tsx benchmark/index.js",
-    "build": "tsc -p tsconfig.build.json && node -e \"const fs=require('fs'),p=require('path');(function w(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const f=p.join(d,e.name);if(e.isDirectory())w(f);else if(e.name.endsWith('.d.ts'))fs.copyFileSync(f,p.join('dist',p.relative('src',f)))}})('src');fs.copyFileSync('src/runner-esm.mjs','dist/runner-esm.mjs')\"",
+    "build": "tsc -p tsconfig.build.json && node -e \"require('fs').copyFileSync('src/runner-esm.mjs','dist/runner-esm.mjs')\"",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "ci": "jest --watch",
     "ci:leak": "jest --testMatch \"**/leak-detection/index.spc.js\" --runInBand --watch",
@@ -36,6 +36,7 @@
     "test:leak": "jest --testMatch \"**/leak-detection/**/*.spc.js\" --runInBand",
     "test:ts": "npm run build && tsd && tsc -p test/typescript/hello-world && ts-node -P test/typescript/hello-world/tsconfig.json test/typescript/hello-world/index.ts",
     "test:esm": "npm run build && node bin/moleculer-runner.mjs -c test/esm/moleculer.config.mjs test/esm/*.service.*js",
+    "prepublishOnly": "npm run build",
     "release": "npm publish --access public && git push --follow-tags",
     "release:beta": "npm publish --tag next --access public && git push --follow-tags",
     "tsc": "tsc",

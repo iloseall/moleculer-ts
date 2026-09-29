@@ -2,8 +2,6 @@
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
 		"noEmit": false,
-		// Emit only: JS sources are type-checked by `npm run tsc` (tsconfig.json).
-		"checkJs": false,
 
 		"rootDir": "src",
 		"outDir": "dist",
@@ -13,6 +11,6 @@
 		"sourceMap": true
 	},
 	"files": [],
-	"include": ["types/extends.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.d.ts"],
-	"exclude": ["node_modules", "dist", "src/**/*.mjs"]
+	"include": ["types/extends.d.ts", "src/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
 }

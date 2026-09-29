@@ -1,0 +1,318 @@
+/*
+ * moleculer
+ * Copyright (c) 2019 MoleculerJS (https://github.com/moleculerjs/moleculer)
+ * MIT Licensed
+ */
+
+import MetricRegistry = require("../registry");
+import MetricBaseReporter = require("./base");
+import { Server, IncomingMessage, ServerResponse } from "http";
+
+declare namespace PrometheusReporter {
+	export interface PrometheusReporterOptions extends MetricBaseReporter.MetricReporterOptions {
+		host?: string;
+		port?: number;
+		path?: string;
+		defaultLabels?: (registry: MetricRegistry) => Record<string, any>;
+	}
+}
+
+import BaseReporter = require("./base");
+import _ = require("lodash");
+import http = require("http");
+import zlib = require("zlib");
+import { MoleculerError } from "../../errors";
+import METRIC = require("../constants");
+import { isFunction } from "../../utils";
+
+/**
+ * Prometheus reporter for Moleculer.
+ *
+ * 		https://prometheus.io/
+ *
+ * Running Prometheus & Grafana in Docker:
+ *
+ * 		git clone https://github.com/vegasbrianc/prometheus.git
+ * 		cd prometheus
+ *
+ * 	Please note, don't forget add your endpoint to static targets in prometheus/prometheus.yml file.
+ *  The default port is 3030.
+ *
+ *     static_configs:
+ *       - targets: ['localhost:9090', 'moleculer-hostname:3030']
+ *
+ *  Start containers:
+ *
+ * 		docker compose up -d
+ *
+ * Grafana dashboard: http://<docker-ip>:3000
+ *
+ * @class DatadogReporter
+ * @extends {BaseReporter}
+ */
+class PrometheusReporter extends BaseReporter {
+	defaultLabels: any;
+	opts: PrometheusReporter.PrometheusReporterOptions;
+	server: Server<typeof IncomingMessage, typeof ServerResponse>;
+	/**
+	 * Constructor of PrometheusReporters
+	 * @param {PrometheusReporterOptions} opts
+	 * @memberof PrometheusReporter
+	 */
+	constructor(opts?: PrometheusReporter.PrometheusReporterOptions) {
+		super(opts);
+
+		/** @type {PrometheusReporterOptions} */
+		this.opts = _.defaultsDeep(this.opts, {
+			host: null,
+			port: 3030,
+			path: "/metrics",
+			defaultLabels: registry => ({
+				namespace: registry.broker.namespace,
+				nodeID: registry.broker.nodeID
+			})
+		});
+
+		if (!this.opts.host && this.opts.port !== 0) {
+			this.opts.host = "0.0.0.0";
+		}
+		if (this.opts.port === 0) {
+			// host can not be used in combination with port 0 = auto port assignment
+			delete this.opts.host;
+		}
+	}
+
+	/**
+	 * Initialize reporter
+	 * @param {MetricRegistry} registry
+	 * @memberof PrometheusReporter
+	 */
+	init(registry: MetricRegistry) {
+		super.init(registry);
+
+		this.server = http.createServer();
+		this.server.on("request", this.handler.bind(this));
+		(this.server as any).listen(this.opts.port, this.opts.host, (err: any) => {
+			if (err) {
+				/* istanbul ignore next */
+				return this.registry.broker.fatal(
+					err.message,
+					new MoleculerError("Prometheus metric reporter listening error: " + err.message)
+				);
+			}
+
+			const addr = this.server.address() as import("net").AddressInfo;
+			this.logger.info(
+				`Prometheus metric reporter listening on http://${addr.address}:${addr.port}${this.opts.path} address.`
+			);
+		});
+		this.defaultLabels = isFunction(this.opts.defaultLabels)
+			? this.opts.defaultLabels.call(this, registry)
+			: this.opts.defaultLabels;
+	}
+
+	/**
+	 * Stop reporter
+	 *
+	 * @memberof PrometheusReporter
+	 */
+	stop(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.server.close(err => {
+				/* istanbul ignore next */
+				if (err) reject(err);
+
+				resolve();
+			});
+		});
+	}
+
+	/**
+	 * HTTP request handler. Support GZip compressing.
+	 *
+	 * @param {IncomingMessage} req
+	 * @param {ServerResponse} res
+	 * @memberof PrometheusReporter
+	 */
+	handler(req: IncomingMessage, res: ServerResponse) {
+		if (req.url == this.opts.path) {
+			try {
+				const content = this.generatePrometheusResponse();
+
+				const resHeader = {
+					"Content-Type": "text/plain; version=0.0.4; charset=utf-8"
+				};
+
+				const compressing =
+					req.headers["accept-encoding"] &&
+					req.headers["accept-encoding"].includes("gzip");
+				if (compressing) {
+					resHeader["Content-Encoding"] = "gzip";
+					zlib.gzip(content, (err, buffer) => {
+						/* istanbul ignore next */
+						if (err) {
+							this.logger.error("Unable to compress response: " + err.message);
+							res.writeHead(500);
+							res.end(err.message);
+						} else {
+							res.writeHead(200, resHeader);
+							res.end(buffer);
+						}
+					});
+				} else {
+					res.writeHead(200, resHeader);
+					res.end(content);
+				}
+			} catch (err) {
+				this.logger.error("Unable to generate Prometheus response", err);
+				res.writeHead(500, http.STATUS_CODES[500], {});
+				res.end();
+			}
+		} else {
+			res.writeHead(404, http.STATUS_CODES[404], {});
+			res.end();
+		}
+	}
+
+	/**
+	 * Generate Prometheus response.
+	 * @returns {String}
+	 * @memberof PrometheusReporter
+	 */
+	generatePrometheusResponse(): string {
+		const content = [];
+
+		const val = value => (value == null ? "NaN" : value);
+
+		this.registry.store.forEach(metric => {
+			// Filtering
+			if (!this.matchMetricName(metric.name)) return;
+			// Skip datetime metrics (register too much labels)
+			if (metric.name.startsWith("os.datetime")) return;
+
+			const metricName = this.formatMetricName(metric.name).replace(/[.-]/g, "_");
+			const metricDesc = metric.description
+				? metric.description
+				: metric.name + (metric.unit ? ` (${metric.unit})` : "");
+			const metricType = metric.type;
+
+			const snapshot = metric.snapshot();
+			if (snapshot.length === 0) return;
+
+			switch (metric.type) {
+				case METRIC.TYPE_COUNTER:
+				case METRIC.TYPE_GAUGE: {
+					content.push(`# HELP ${metricName} ${metricDesc}`);
+					content.push(`# TYPE ${metricName} ${metricType}`);
+					snapshot.forEach(item => {
+						const labelStr = this.labelsToStr(item.labels);
+						content.push(`${metricName}${labelStr} ${val(item.value)}`);
+
+						if (item.rate) {
+							content.push(`${metricName}_rate${labelStr} ${val(item.rate)}`);
+						}
+					});
+					content.push("");
+
+					break;
+				}
+				case METRIC.TYPE_INFO: {
+					content.push(`# HELP ${metricName} ${metricDesc}`);
+					content.push(`# TYPE ${metricName} gauge`);
+					snapshot.forEach(item => {
+						const labelStr = this.labelsToStr(item.labels, { value: item.value });
+						content.push(`${metricName}${labelStr} 1`);
+					});
+					content.push("");
+
+					break;
+				}
+				case METRIC.TYPE_HISTOGRAM: {
+					content.push(`# HELP ${metricName} ${metricDesc}`);
+					content.push(`# TYPE ${metricName} ${metricType}`);
+					snapshot.forEach(item => {
+						if (item.buckets) {
+							Object.keys(item.buckets).forEach(le => {
+								const labelStr = this.labelsToStr(item.labels, { le });
+								content.push(
+									`${metricName}_bucket${labelStr} ${val(item.buckets[le])}`
+								);
+							});
+							// +Inf
+							const labelStr = this.labelsToStr(item.labels, { le: "+Inf" });
+							content.push(`${metricName}_bucket${labelStr} ${val(item.count)}`);
+						}
+
+						if (item.quantiles) {
+							Object.keys(item.quantiles).forEach(key => {
+								const labelStr = this.labelsToStr(item.labels, { quantile: key });
+								content.push(
+									`${metricName}${labelStr} ${val(item.quantiles[key])}`
+								);
+							});
+
+							// Add other calculated values
+							const labelStr = this.labelsToStr(item.labels);
+							content.push(`${metricName}_sum${labelStr} ${val(item.sum)}`);
+							content.push(`${metricName}_count${labelStr} ${val(item.count)}`);
+							content.push(`${metricName}_min${labelStr} ${val(item.min)}`);
+							content.push(`${metricName}_mean${labelStr} ${val(item.mean)}`);
+							content.push(`${metricName}_variance${labelStr} ${val(item.variance)}`);
+							content.push(`${metricName}_stddev${labelStr} ${val(item.stdDev)}`);
+							content.push(`${metricName}_max${labelStr} ${val(item.max)}`);
+						}
+
+						if (item.rate) {
+							const labelStr = this.labelsToStr(item.labels);
+							content.push(`${metricName}_rate${labelStr} ${val(item.rate)}`);
+						}
+					});
+					content.push("");
+					break;
+				}
+			}
+		});
+
+		return content.join("\n");
+	}
+
+	/**
+	 * Escape label value characters.
+	 * @param {String} str
+	 * @returns {String}
+	 * @memberof PrometheusReporter
+	 */
+	escapeLabelValue(str: string): string {
+		if (typeof str == "string") return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+		return str;
+	}
+
+	/**
+	 * Convert labels to Prometheus label string
+	 *
+	 * @param {Object} itemLabels
+	 * @param {Object?} extraLabels
+	 * @returns {String}
+	 * @memberof PrometheusReporter
+	 */
+	labelsToStr(itemLabels: any, extraLabels?: any) {
+		const labels = Object.assign(
+			{},
+			this.defaultLabels || {},
+			itemLabels || {},
+			extraLabels || {}
+		);
+		const keys = Object.keys(labels);
+		if (keys.length === 0) return "";
+
+		return (
+			"{" +
+			keys
+				.map(key => `${this.formatLabelName(key)}="${this.escapeLabelValue(labels[key])}"`)
+				.join(",") +
+			"}"
+		);
+	}
+}
+
+export = PrometheusReporter;

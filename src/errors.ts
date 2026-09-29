@@ -94,9 +94,10 @@ export class MoleculerRetryableError extends MoleculerError {
  * @extends {MoleculerRetryableError}
  */
 export class BrokerDisconnectedError extends MoleculerRetryableError {
-	constructor() {
+	constructor(message?: string) {
 		super(
-			"The broker's transporter has disconnected. Please try again when a connection is reestablished.",
+			message ||
+				"The broker's transporter has disconnected. Please try again when a connection is reestablished.",
 			502,
 			"BAD_GATEWAY"
 		);
@@ -464,7 +465,10 @@ export class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	extractPlainError(plainErr: Record<string, any> /*, payload*/): PlainMoleculerError {
+	extractPlainError(
+		plainErr: Record<string, any>,
+		payload?: Record<string, any>
+	): PlainMoleculerError {
 		return {
 			name: plainErr.name,
 			message: plainErr.message,

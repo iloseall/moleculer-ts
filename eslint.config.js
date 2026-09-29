@@ -78,7 +78,17 @@ module.exports = [
 			"@typescript-eslint/no-empty-object-type": ["off"],
 			"@typescript-eslint/no-wrapper-object-types": ["off"],
 			"@typescript-eslint/no-unsafe-function-type": ["off"],
-			"@typescript-eslint/no-unused-expressions": ["off"]
+			"@typescript-eslint/no-unused-expressions": ["off"],
+
+			// `declare namespace X` is the public type-surface pattern used to merge
+			// extra types into an `export =` value (mirrors the original hand-written .d.ts).
+			"@typescript-eslint/no-namespace": ["off"],
+			// `@ts-ignore` comments were already present in the original sources.
+			"@typescript-eslint/ban-ts-comment": ["off"],
+			// Legacy patterns kept as-is to avoid changing runtime behaviour.
+			"prefer-rest-params": ["off"],
+			"prefer-spread": ["off"],
+			"@typescript-eslint/no-this-alias": ["off"]
 		}
 	}
 ];
