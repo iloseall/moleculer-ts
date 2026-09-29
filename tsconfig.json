@@ -1,19 +1,27 @@
 {
 	"compilerOptions": {
 		"lib": ["ES2023"],
+		"module": "commonjs",
 		"moduleResolution": "node",
 		"target": "ES2022",
 
+		// Keep ES2021 class field semantics (assignment instead of `Object.defineProperty`)
+		// so the emitted runtime behaviour stays identical to the previous JS sources.
+		"useDefineForClassFields": false,
+		"esModuleInterop": false,
+
 		"allowJs": true,
-		"strict": false,
 		"checkJs": true,
-		"declaration": true,
+		"strict": false,
+
 		"skipLibCheck": true,
-		"declarationDir": "generated-types",
-		"outDir": "dist",
-		"noEmit": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"noEmit": true
 	},
+	// Migrated TS sources. Add every file here when it is converted from `.js` to `.ts`.
+	// (Do NOT use a `src/**/*.ts` include glob: it would pull all hand-written `.d.ts`
+	// files in as root files and switch the JS sources to strict declaration checking.)
+	"files": ["src/constants.ts", "src/errors.ts", "src/lock.ts", "src/packets.ts"],
 	"include": ["types/extends.d.ts", "src/**/*.js", "src/**/*.d.ts"],
-	"exclude": ["node_modules", ".eslintrc.js", "prettier.config.js"]
+	"exclude": ["node_modules", "dist", "src/**/*.mjs"]
 }

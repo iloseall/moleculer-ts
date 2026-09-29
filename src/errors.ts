@@ -4,22 +4,18 @@
  * MIT Licensed
  */
 
-"use strict";
-
-/**
- * Import types
- *
- * @typedef {import("./service-broker")} ServiceBroker
- * @typedef {import("./errors").Regenerator} RegeneratorClass
- * @typedef {import("./errors").PlainMoleculerError} PlainMoleculerError
- */
+import type ServiceBroker = require("./service-broker");
 
 /**
  * Extendable errors class.
  *
  * Credits: https://github.com/bjyoungblood/es6-error/blob/master/src/index.js
  */
-class ExtendableError extends Error {
+export class ExtendableError extends Error {
+	message: string;
+	name: string;
+	stack?: string;
+
 	constructor(message = "") {
 		super(message);
 
@@ -52,7 +48,7 @@ class ExtendableError extends Error {
 	}
 }
 
-class TimeoutError extends ExtendableError {}
+export class TimeoutError extends ExtendableError {}
 
 /**
  * Custom Moleculer Error class
@@ -60,18 +56,13 @@ class TimeoutError extends ExtendableError {}
  * @class MoleculerError
  * @extends {ExtendableError}
  */
-class MoleculerError extends ExtendableError {
-	/**
-	 * Creates an instance of MoleculerError.
-	 *
-	 * @param {String=} message
-	 * @param {Number=} code
-	 * @param {String=} type
-	 * @param {any=} data
-	 *
-	 * @memberof MoleculerError
-	 */
-	constructor(message, code, type, data) {
+export class MoleculerError extends ExtendableError {
+	code: number;
+	type: string;
+	data: any;
+	retryable: boolean;
+
+	constructor(message?: string, code?: number, type?: string, data?: any) {
 		super(message);
 		this.code = code || 500;
 		this.type = type;
@@ -86,18 +77,8 @@ class MoleculerError extends ExtendableError {
  * @class MoleculerRetryableError
  * @extends {MoleculerError}
  */
-class MoleculerRetryableError extends MoleculerError {
-	/**
-	 * Creates an instance of MoleculerRetryableError.
-	 *
-	 * @param {String?} message
-	 * @param {Number?} code
-	 * @param {String?} type
-	 * @param {any?} data
-	 *
-	 * @memberof MoleculerRetryableError
-	 */
-	constructor(message, code, type, data) {
+export class MoleculerRetryableError extends MoleculerError {
+	constructor(message?: string, code?: number, type?: string, data?: any) {
 		super(message);
 		this.code = code || 500;
 		this.type = type;
@@ -112,7 +93,7 @@ class MoleculerRetryableError extends MoleculerError {
  * @class MoleculerServerError
  * @extends {MoleculerRetryableError}
  */
-class BrokerDisconnectedError extends MoleculerRetryableError {
+export class BrokerDisconnectedError extends MoleculerRetryableError {
 	constructor() {
 		super(
 			"The broker's transporter has disconnected. Please try again when a connection is reestablished.",
@@ -130,7 +111,7 @@ class BrokerDisconnectedError extends MoleculerRetryableError {
  * @class MoleculerServerError
  * @extends {MoleculerRetryableError}
  */
-class MoleculerServerError extends MoleculerRetryableError {}
+export class MoleculerServerError extends MoleculerRetryableError {}
 
 /**
  * Moleculer Error class for client errors which are not retryable.
@@ -138,18 +119,8 @@ class MoleculerServerError extends MoleculerRetryableError {}
  * @class MoleculerClientError
  * @extends {MoleculerError}
  */
-class MoleculerClientError extends MoleculerError {
-	/**
-	 * Creates an instance of MoleculerClientError.
-	 *
-	 * @param {String?} message
-	 * @param {Number?} code
-	 * @param {String?} type
-	 * @param {any} data
-	 *
-	 * @memberof MoleculerClientError
-	 */
-	constructor(message, code, type, data) {
+export class MoleculerClientError extends MoleculerError {
+	constructor(message?: string, code?: number, type?: string, data?: any) {
 		super(message, code || 400, type, data);
 	}
 }
@@ -160,15 +131,8 @@ class MoleculerClientError extends MoleculerError {
  * @class ServiceNotFoundError
  * @extends {MoleculerRetryableError}
  */
-class ServiceNotFoundError extends MoleculerRetryableError {
-	/**
-	 * Creates an instance of ServiceNotFoundError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof ServiceNotFoundError
-	 */
-	constructor(data = {}) {
+export class ServiceNotFoundError extends MoleculerRetryableError {
+	constructor(data: Record<string, any> = {}) {
 		let msg;
 		if (data.nodeID && data.action)
 			msg = `Service '${data.action}' is not found on '${data.nodeID}' node.`;
@@ -188,15 +152,8 @@ class ServiceNotFoundError extends MoleculerRetryableError {
  * @class ServiceNotAvailableError
  * @extends {MoleculerRetryableError}
  */
-class ServiceNotAvailableError extends MoleculerRetryableError {
-	/**
-	 * Creates an instance of ServiceNotAvailableError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof ServiceNotAvailableError
-	 */
-	constructor(data) {
+export class ServiceNotAvailableError extends MoleculerRetryableError {
+	constructor(data: Record<string, any>) {
 		let msg;
 		if (data.nodeID)
 			msg = `Service '${data.action}' is not available on '${data.nodeID}' node.`;
@@ -212,15 +169,8 @@ class ServiceNotAvailableError extends MoleculerRetryableError {
  * @class RequestTimeoutError
  * @extends {MoleculerRetryableError}
  */
-class RequestTimeoutError extends MoleculerRetryableError {
-	/**
-	 * Creates an instance of RequestTimeoutError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof RequestTimeoutError
-	 */
-	constructor(data) {
+export class RequestTimeoutError extends MoleculerRetryableError {
+	constructor(data: Record<string, any>) {
 		super(
 			`Request is timed out when call '${data.action}' action on '${data.nodeID}' node.`,
 			504,
@@ -236,15 +186,8 @@ class RequestTimeoutError extends MoleculerRetryableError {
  * @class RequestSkippedError
  * @extends {MoleculerError}
  */
-class RequestSkippedError extends MoleculerError {
-	/**
-	 * Creates an instance of RequestSkippedError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof RequestSkippedError
-	 */
-	constructor(data) {
+export class RequestSkippedError extends MoleculerError {
+	constructor(data: Record<string, any>) {
 		super(
 			`Calling '${data.action}' is skipped because timeout reached on '${data.nodeID}' node.`,
 			514,
@@ -261,15 +204,8 @@ class RequestSkippedError extends MoleculerError {
  * @class RequestRejectedError
  * @extends {MoleculerRetryableError}
  */
-class RequestRejectedError extends MoleculerRetryableError {
-	/**
-	 * Creates an instance of RequestRejectedError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof RequestRejectedError
-	 */
-	constructor(data) {
+export class RequestRejectedError extends MoleculerRetryableError {
+	constructor(data: Record<string, any>) {
 		super(
 			`Request is rejected when call '${data.action}' action on '${data.nodeID}' node.`,
 			503,
@@ -285,15 +221,8 @@ class RequestRejectedError extends MoleculerRetryableError {
  * @class QueueIsFullError
  * @extends {MoleculerRetryableError}
  */
-class QueueIsFullError extends MoleculerRetryableError {
-	/**
-	 * Creates an instance of QueueIsFullError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof QueueIsFullError
-	 */
-	constructor(data) {
+export class QueueIsFullError extends MoleculerRetryableError {
+	constructor(data: Record<string, any>) {
 		super(
 			`Queue is full. Request '${data.action}' action on '${data.nodeID}' node is rejected.`,
 			429,
@@ -309,17 +238,8 @@ class QueueIsFullError extends MoleculerRetryableError {
  * @class ValidationError
  * @extends {MoleculerClientError}
  */
-class ValidationError extends MoleculerClientError {
-	/**
-	 * Creates an instance of ValidationError.
-	 *
-	 * @param {String} message
-	 * @param {String} type
-	 * @param {any} data
-	 *
-	 * @memberof ValidationError
-	 */
-	constructor(message, type, data) {
+export class ValidationError extends MoleculerClientError {
+	constructor(message: string, type?: string, data?: any) {
 		super(message, 422, type || "VALIDATION_ERROR", data);
 	}
 }
@@ -330,15 +250,8 @@ class ValidationError extends MoleculerClientError {
  * @class MaxCallLevelError
  * @extends {MoleculerError}
  */
-class MaxCallLevelError extends MoleculerError {
-	/**
-	 * Creates an instance of MaxCallLevelError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof MaxCallLevelError
-	 */
-	constructor(data) {
+export class MaxCallLevelError extends MoleculerError {
+	constructor(data: Record<string, any>) {
 		super(
 			`Request level is reached the limit (${data.level}) on '${data.nodeID}' node.`,
 			500,
@@ -355,15 +268,8 @@ class MaxCallLevelError extends MoleculerError {
  * @class ServiceSchemaError
  * @extends {MoleculerError}
  */
-class ServiceSchemaError extends MoleculerError {
-	/**
-	 * Creates an instance of ServiceSchemaError.
-	 *
-	 * @param {String} msg
-	 * @param {Object} data
-	 * @memberof ServiceSchemaError
-	 */
-	constructor(msg, data) {
+export class ServiceSchemaError extends MoleculerError {
+	constructor(msg: string, data?: any) {
 		super(msg, 500, "SERVICE_SCHEMA_ERROR", data);
 	}
 }
@@ -374,15 +280,8 @@ class ServiceSchemaError extends MoleculerError {
  * @class BrokerOptionsError
  * @extends {MoleculerError}
  */
-class BrokerOptionsError extends MoleculerError {
-	/**
-	 * Creates an instance of BrokerOptionsError.
-	 *
-	 * @param {String} msg
-	 * @param {Object} data
-	 * @memberof BrokerOptionsError
-	 */
-	constructor(msg, data) {
+export class BrokerOptionsError extends MoleculerError {
+	constructor(msg: string, data?: any) {
 		super(msg, 500, "BROKER_OPTIONS_ERROR", data);
 	}
 }
@@ -393,14 +292,8 @@ class BrokerOptionsError extends MoleculerError {
  * @class GracefulStopTimeoutError
  * @extends {MoleculerError}
  */
-class GracefulStopTimeoutError extends MoleculerError {
-	/**
-	 * Creates an instance of GracefulStopTimeoutError.
-	 *
-	 * @param {Object?} data
-	 * @memberof GracefulStopTimeoutError
-	 */
-	constructor(data) {
+export class GracefulStopTimeoutError extends MoleculerError {
+	constructor(data?: Record<string, any>) {
 		if (data && data.service) {
 			super(
 				`Unable to stop '${data.service.name}' service gracefully.`,
@@ -425,15 +318,8 @@ class GracefulStopTimeoutError extends MoleculerError {
  * @class ProtocolVersionMismatchError
  * @extends {MoleculerError}
  */
-class ProtocolVersionMismatchError extends MoleculerError {
-	/**
-	 * Creates an instance of ProtocolVersionMismatchError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof ProtocolVersionMismatchError
-	 */
-	constructor(data) {
+export class ProtocolVersionMismatchError extends MoleculerError {
+	constructor(data?: Record<string, any>) {
 		super("Protocol version mismatch.", 500, "PROTOCOL_VERSION_MISMATCH", data);
 	}
 }
@@ -444,18 +330,39 @@ class ProtocolVersionMismatchError extends MoleculerError {
  * @class InvalidPacketDataError
  * @extends {MoleculerError}
  */
-class InvalidPacketDataError extends MoleculerError {
-	/**
-	 * Creates an instance of InvalidPacketDataError.
-	 *
-	 * @param {Object} data
-	 *
-	 * @memberof InvalidPacketDataError
-	 */
-	constructor(data) {
+export class InvalidPacketDataError extends MoleculerError {
+	constructor(data?: Record<string, any>) {
 		super("Invalid packet data.", 500, "INVALID_PACKET_DATA", data);
 	}
 }
+
+export interface PlainMoleculerError extends MoleculerError {
+	nodeID?: string;
+}
+
+/** Error classes which can be recreated from a transferred payload. */
+const recreatableClasses: Record<string, any> = {
+	MoleculerError,
+	MoleculerRetryableError,
+	MoleculerServerError,
+	MoleculerClientError,
+
+	ValidationError,
+
+	ServiceNotFoundError,
+	ServiceNotAvailableError,
+	RequestTimeoutError,
+	RequestSkippedError,
+	RequestRejectedError,
+	QueueIsFullError,
+	MaxCallLevelError,
+	GracefulStopTimeoutError,
+	ProtocolVersionMismatchError,
+	InvalidPacketDataError,
+
+	ServiceSchemaError,
+	BrokerOptionsError
+};
 
 /**
  * Recreate an error from a transferred payload `err`
@@ -463,8 +370,8 @@ class InvalidPacketDataError extends MoleculerError {
  * @param {MoleculerError} err
  * @returns {MoleculerError}
  */
-function recreateError(err) {
-	const Class = module.exports[err.name];
+export function recreateError(err: Record<string, any>) {
+	const Class = recreatableClasses[err.name];
 	if (Class) {
 		switch (err.name) {
 			case "MoleculerError":
@@ -510,9 +417,10 @@ function recreateError(err) {
 /**
  * Error Regenerator
  * @class Regenerator
- * @implements {RegeneratorClass}
  */
-class Regenerator {
+export class Regenerator {
+	broker: ServiceBroker;
+
 	/**
 	 * Initializes Regenerator
 	 *
@@ -520,7 +428,7 @@ class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	init(broker) {
+	init(broker: ServiceBroker): void {
 		this.broker = broker;
 	}
 
@@ -533,15 +441,15 @@ class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	restore(plainError, payload) {
-		let err = this.restoreCustomError(plainError, payload);
+	restore(plainError: PlainMoleculerError, payload: Record<string, any>): Error {
+		let err: Error = this.restoreCustomError(plainError, payload);
 		if (!err) {
 			err = recreateError(plainError);
 		}
 		if (!err) {
 			err = this._createDefaultError(plainError);
 		}
-		this._restoreExternalFields(plainError, err, payload);
+		this._restoreExternalFields(plainError, err as PlainMoleculerError, payload);
 		this._restoreStack(plainError, err);
 
 		return err;
@@ -556,7 +464,7 @@ class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	extractPlainError(plainErr /*, payload*/) {
+	extractPlainError(plainErr: Record<string, any> /*, payload*/): PlainMoleculerError {
 		return {
 			name: plainErr.name,
 			message: plainErr.message,
@@ -578,7 +486,7 @@ class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	restoreCustomError(/*plainError, payload*/) {
+	restoreCustomError(plainError?: PlainMoleculerError, payload?: Record<string, any>): Error {
 		return undefined;
 	}
 
@@ -591,9 +499,8 @@ class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	_createDefaultError(plainError) {
-		/** @type {any} */
-		const err = new Error(plainError.message);
+	_createDefaultError(plainError: PlainMoleculerError): Error {
+		const err: any = new Error(plainError.message);
 		err.name = plainError.name;
 		err.code = plainError.code;
 		err.type = plainError.type;
@@ -613,7 +520,11 @@ class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	_restoreExternalFields(plainError, err, payload) {
+	_restoreExternalFields(
+		plainError: PlainMoleculerError,
+		err: PlainMoleculerError,
+		payload: Record<string, any>
+	): void {
 		err.retryable = plainError.retryable;
 		err.nodeID = plainError.nodeID || payload.sender;
 	}
@@ -627,7 +538,7 @@ class Regenerator {
 	 *
 	 * @memberof Regenerator
 	 */
-	_restoreStack(plainError, err) {
+	_restoreStack(plainError: PlainMoleculerError, err: Error): void {
 		if (plainError.stack) err.stack = plainError.stack;
 	}
 }
@@ -638,43 +549,10 @@ class Regenerator {
  * @param {Regenerator=} opt
  * @return {Regenerator}
  */
-function resolveRegenerator(opt) {
+export function resolveRegenerator(opt?: Regenerator): Regenerator {
 	if (opt instanceof Regenerator) {
 		return opt;
 	}
 
 	return new Regenerator();
 }
-
-module.exports = {
-	ExtendableError,
-	TimeoutError,
-
-	MoleculerError,
-	MoleculerRetryableError,
-	MoleculerServerError,
-	MoleculerClientError,
-
-	ServiceNotFoundError,
-	ServiceNotAvailableError,
-
-	ValidationError,
-	RequestTimeoutError,
-	RequestSkippedError,
-	RequestRejectedError,
-	QueueIsFullError,
-	MaxCallLevelError,
-
-	ServiceSchemaError,
-	BrokerOptionsError,
-	GracefulStopTimeoutError,
-
-	ProtocolVersionMismatchError,
-	InvalidPacketDataError,
-
-	BrokerDisconnectedError,
-
-	recreateError,
-	resolveRegenerator,
-	Regenerator
-};

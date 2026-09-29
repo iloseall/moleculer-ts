@@ -1,6 +1,6 @@
 // --- SERVICE BROKER ---
 
-import ServiceBroker = require("./src/service-broker");
+import ServiceBroker = require("./dist/service-broker");
 import type {
 	BrokerOptions,
 	CallingOptions,
@@ -10,11 +10,11 @@ import type {
 	ReplOptions,
 	NodeHealthStatus,
 	MCallCallingOptions
-} from "./src/service-broker";
+} from "./dist/service-broker";
 
 // --- SERVICE ---
 
-import Service = require("./src/service");
+import Service = require("./dist/service");
 import type {
 	ActionSchema,
 	ActionHooks,
@@ -33,29 +33,29 @@ import type {
 	ServiceAction,
 	ServiceActions,
 	ServiceMethods
-} from "./src/service";
+} from "./dist/service";
 
 // --- CONTEXT ---
 
-import Context = require("./src/context");
+import Context = require("./dist/context");
 
 // --- TRANSIT ---
 
-import Transit = require("./src/transit");
-import * as Packet from "./src/packets";
+import Transit = require("./dist/transit");
+import * as Packet from "./dist/packets";
 
 // --- RUNNER ---
 
-import Runner = require("./src/runner");
-import type { RunnerFlags } from "./src/runner";
+import Runner = require("./dist/runner");
+import type { RunnerFlags } from "./dist/runner";
 
 // --- ERRORS ---
 
-import * as Errors from "./src/errors";
+import * as Errors from "./dist/errors";
 
 // --- UTILS ---
 
-import * as Utils from "./src/utils";
+import * as Utils from "./dist/utils";
 
 // --- CONSTANTS ---
 
@@ -64,61 +64,61 @@ import type {
 	CIRCUIT_HALF_OPEN,
 	CIRCUIT_HALF_OPEN_WAIT,
 	CIRCUIT_OPEN
-} from "./src/constants";
+} from "./dist/constants";
 
 // --- CACHERS ---
 
-import * as Cachers from "./src/cachers";
+import * as Cachers from "./dist/cachers";
 
 // --- LOGGERS ---
 
-import * as Loggers from "./src/loggers";
-import type { LogLevels } from "./src/loggers";
-import type { Logger, LoggerConfig } from "./src/logger-factory";
+import * as Loggers from "./dist/loggers";
+import type { LogLevels } from "./dist/loggers";
+import type { Logger, LoggerConfig } from "./dist/logger-factory";
 
 // --- METRICS ---
 
-import * as MetricTypes from "./src/metrics/types";
-import * as MetricReporters from "./src/metrics/reporters";
-import MetricRegistry = require("./src/metrics/registry");
-import * as METRIC from "./src/metrics/constants";
+import * as MetricTypes from "./dist/metrics/types";
+import * as MetricReporters from "./dist/metrics/reporters";
+import MetricRegistry = require("./dist/metrics/registry");
+import * as METRIC from "./dist/metrics/constants";
 
 // --- MIDDLEWARES ---
 
-import type { CallMiddlewareHandler, Middleware } from "./src/middleware";
+import type { CallMiddlewareHandler, Middleware } from "./dist/middleware";
 
 // --- SERVICE REGISTRY ---
 
-import Registry = require("./src/registry");
+import Registry = require("./dist/registry");
 
-import type EndpointList = require("./src/registry/endpoint-list");
-import type Endpoint = require("./src/registry/endpoint");
-import type ActionEndpoint = require("./src/registry/endpoint-action");
-import type EventEndpoint = require("./src/registry/endpoint-event");
+import type EndpointList = require("./dist/registry/endpoint-list");
+import type Endpoint = require("./dist/registry/endpoint");
+import type ActionEndpoint = require("./dist/registry/endpoint-action");
+import type EventEndpoint = require("./dist/registry/endpoint-event");
 
-import * as Discoverers from "./src/registry/discoverers";
+import * as Discoverers from "./dist/registry/discoverers";
 
 // --- SERIALIZERS ---
 
-import * as Serializers from "./src/serializers";
+import * as Serializers from "./dist/serializers";
 
 // --- STRATEGIES ---
 
-import * as Strategies from "./src/strategies";
+import * as Strategies from "./dist/strategies";
 
 // --- TRACING ---
 
-import type { Tracer, Span, TracerOptions } from "./src/tracing";
-import * as TracerExporters from "./src/tracing/exporters";
+import type { Tracer, Span, TracerOptions } from "./dist/tracing";
+import * as TracerExporters from "./dist/tracing/exporters";
 
 // --- TRANSPORTERS ---
 
-import * as Transporters from "./src/transporters";
+import * as Transporters from "./dist/transporters";
 
 // --- VALIDATORS ---
 
-import * as Validators from "./src/validators";
-import type { ValidatorNames } from "./src/validators";
+import * as Validators from "./dist/validators";
+import type { ValidatorNames } from "./dist/validators";
 
 declare namespace Moleculer {
 	export {

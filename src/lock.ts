@@ -4,21 +4,14 @@
  * MIT Licensed
  */
 
-"use strict";
-
-/**
- * @typedef {import("./lock")} LockClass
- */
-
-/**
- * @implements {LockClass}
- */
 class Lock {
+	locked: Map<string, any[]>;
+
 	constructor() {
 		this.locked = new Map();
 	}
 
-	acquire(key /*, ttl*/) {
+	acquire(key: string, ttl?: number): Promise<any> {
 		let locked = this.locked.get(key);
 		if (!locked) {
 			// not locked
@@ -26,19 +19,19 @@ class Lock {
 			this.locked.set(key, locked);
 			return Promise.resolve();
 		} else {
-			return new Promise(resolve => locked.push(resolve));
+			return new Promise(resolve => locked!.push(resolve));
 		}
 	}
 
-	isLocked(key) {
+	isLocked(key: string): boolean {
 		return !!this.locked.get(key);
 	}
 
-	release(key) {
-		let locked = this.locked.get(key);
+	release(key: string): Promise<void> {
+		const locked = this.locked.get(key);
 		if (locked) {
 			if (locked.length > 0) {
-				locked.shift()(); // Release the lock
+				locked.shift()!(); // Release the lock
 			} else {
 				this.locked.delete(key);
 			}
@@ -47,4 +40,4 @@ class Lock {
 	}
 }
 
-module.exports = Lock;
+export = Lock;

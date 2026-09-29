@@ -11,7 +11,7 @@ const {
 	CIRCUIT_HALF_OPEN,
 	CIRCUIT_HALF_OPEN_WAIT,
 	CIRCUIT_OPEN
-} = require("./src/constants");
+} = require("./dist/constants");
 
 /**
  * !!! PLEASE NOTE !!!
@@ -20,40 +20,40 @@ const {
  */
 
 module.exports = {
-	ServiceBroker: require("./src/service-broker"),
-	Loggers: require("./src/loggers"),
-	Service: require("./src/service"),
-	Context: require("./src/context"),
+	ServiceBroker: require("./dist/service-broker"),
+	Loggers: require("./dist/loggers"),
+	Service: require("./dist/service"),
+	Context: require("./dist/context"),
 
-	Cachers: require("./src/cachers"),
+	Cachers: require("./dist/cachers"),
 
-	Transporters: require("./src/transporters"),
-	Serializers: require("./src/serializers"),
-	Strategies: require("./src/strategies"),
-	Validators: require("./src/validators"),
-	TracerExporters: require("./src/tracing/exporters"),
-	MetricTypes: require("./src/metrics/types"),
-	MetricReporters: require("./src/metrics/reporters"),
-	METRIC: require("./src/metrics/constants"),
+	Transporters: require("./dist/transporters"),
+	Serializers: require("./dist/serializers"),
+	Strategies: require("./dist/strategies"),
+	Validators: require("./dist/validators"),
+	TracerExporters: require("./dist/tracing/exporters"),
+	MetricTypes: require("./dist/metrics/types"),
+	MetricReporters: require("./dist/metrics/reporters"),
+	METRIC: require("./dist/metrics/constants"),
 
-	Transit: require("./src/transit"),
+	Transit: require("./dist/transit"),
 
-	Registry: require("./src/registry"),
-	Discoverers: require("./src/registry/discoverers"),
+	Registry: require("./dist/registry"),
+	Discoverers: require("./dist/registry/discoverers"),
 
-	Middlewares: require("./src/middlewares"),
+	Middlewares: require("./dist/middlewares"),
 
-	Errors: require("./src/errors"),
+	Errors: require("./dist/errors"),
 
-	Runner: require("./src/runner"),
-	Utils: require("./src/utils"),
+	Runner: require("./dist/runner"),
+	Utils: require("./dist/utils"),
 
 	CIRCUIT_CLOSE,
 	CIRCUIT_HALF_OPEN,
 	CIRCUIT_HALF_OPEN_WAIT,
 	CIRCUIT_OPEN,
 
-	MOLECULER_VERSION: require("./src/service-broker").MOLECULER_VERSION,
-	PROTOCOL_VERSION: require("./src/service-broker").PROTOCOL_VERSION,
-	INTERNAL_MIDDLEWARES: require("./src/service-broker").INTERNAL_MIDDLEWARES
+	MOLECULER_VERSION: require("./dist/service-broker").MOLECULER_VERSION,
+	PROTOCOL_VERSION: require("./dist/service-broker").PROTOCOL_VERSION,
+	INTERNAL_MIDDLEWARES: require("./dist/service-broker").INTERNAL_MIDDLEWARES
 };

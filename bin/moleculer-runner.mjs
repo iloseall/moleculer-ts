@@ -5,7 +5,7 @@
  * MIT Licensed
  */
 
-import MoleculerRunner from "../src/runner-esm.mjs";
+import MoleculerRunner from "../dist/runner-esm.mjs";
 
 const runner = new MoleculerRunner();
 runner.start(process.argv);

@@ -1,22 +1,29 @@
-export declare const PACKET_UNKNOWN = "???";
-export declare const PACKET_EVENT = "EVENT";
-export declare const PACKET_REQUEST = "REQ";
-export declare const PACKET_RESPONSE = "RES";
-export declare const PACKET_DISCOVER = "DISCOVER";
-export declare const PACKET_INFO = "INFO";
-export declare const PACKET_DISCONNECT = "DISCONNECT";
-export declare const PACKET_HEARTBEAT = "HEARTBEAT";
-export declare const PACKET_PING = "PING";
-export declare const PACKET_PONG = "PONG";
+/*
+ * moleculer
+ * Copyright (c) 2023 MoleculerJS (https://github.com/moleculerjs/moleculer)
+ * MIT Licensed
+ */
 
-export declare const PACKET_GOSSIP_REQ = "GOSSIP_REQ";
-export declare const PACKET_GOSSIP_RES = "GOSSIP_RES";
-export declare const PACKET_GOSSIP_HELLO = "GOSSIP_HELLO";
+// Packet types
+export const PACKET_UNKNOWN = "???";
+export const PACKET_EVENT = "EVENT";
+export const PACKET_REQUEST = "REQ";
+export const PACKET_RESPONSE = "RES";
+export const PACKET_DISCOVER = "DISCOVER";
+export const PACKET_INFO = "INFO";
+export const PACKET_DISCONNECT = "DISCONNECT";
+export const PACKET_HEARTBEAT = "HEARTBEAT";
+export const PACKET_PING = "PING";
+export const PACKET_PONG = "PONG";
 
-export declare const DATATYPE_UNDEFINED = 0;
-export declare const DATATYPE_NULL = 1;
-export declare const DATATYPE_JSON = 2;
-export declare const DATATYPE_BUFFER = 3;
+export const PACKET_GOSSIP_REQ = "GOSSIP_REQ";
+export const PACKET_GOSSIP_RES = "GOSSIP_RES";
+export const PACKET_GOSSIP_HELLO = "GOSSIP_HELLO";
+
+export const DATATYPE_UNDEFINED = 0;
+export const DATATYPE_NULL = 1;
+export const DATATYPE_JSON = 2;
+export const DATATYPE_BUFFER = 3;
 
 export type PacketType =
 	| typeof PACKET_UNKNOWN
@@ -39,6 +46,7 @@ export interface PacketPayload {
 }
 
 export interface PacketDiscoverPayload extends PacketPayload {}
+
 export interface PacketInfoPayload extends PacketPayload {
 	services: [Record<string, any>];
 	config: Record<string, any>;
@@ -113,12 +121,17 @@ export interface PacketPongPayload extends PacketPayload {
 
 export interface PacketDisconnectPayload extends PacketPayload {}
 
-export declare class Packet<T extends PacketPayload> {
+/**
+ * Packet for transporters
+ */
+export class Packet<T extends PacketPayload> {
 	type: PacketType;
-
 	target?: string;
-
 	payload: T;
 
-	constructor(type: string, target?: string | null, payload?: any);
+	constructor(type: string, target?: string | null, payload?: any) {
+		this.type = (type || PACKET_UNKNOWN) as PacketType;
+		this.target = target as string | undefined;
+		this.payload = payload || {};
+	}
 }

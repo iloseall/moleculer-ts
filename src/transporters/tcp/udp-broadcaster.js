@@ -10,7 +10,7 @@ const EventEmitter = require("events");
 const os = require("os");
 const dgram = require("dgram");
 const ipaddr = require("ipaddr.js");
-const { randomInt } = require("../../../src/utils");
+const { randomInt } = require("../../utils");
 
 /**
  * Import types

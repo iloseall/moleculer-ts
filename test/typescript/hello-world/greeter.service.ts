@@ -2,7 +2,7 @@
 
 import { Context, ServiceSettingSchema, ServiceSchema } from "../../../";
 
-declare module "../../../src/service" {
+declare module "../../../dist/service" {
 	interface ActionSchema {
 		rest?: string | {
 			method?: string;

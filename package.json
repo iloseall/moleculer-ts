@@ -13,27 +13,29 @@
   },
   "types": "./index.d.ts",
   "scripts": {
-    "bench": "node benchmark/index.js",
+    "bench": "tsx benchmark/index.js",
+    "build": "tsc -p tsconfig.build.json && node -e \"const fs=require('fs'),p=require('path');(function w(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const f=p.join(d,e.name);if(e.isDirectory())w(f);else if(e.name.endsWith('.d.ts'))fs.copyFileSync(f,p.join('dist',p.relative('src',f)))}})('src');fs.copyFileSync('src/runner-esm.mjs','dist/runner-esm.mjs')\"",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "ci": "jest --watch",
     "ci:leak": "jest --testMatch \"**/leak-detection/index.spc.js\" --runInBand --watch",
     "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "demo": "node examples/index.js",
+    "demo": "tsx examples/index.js",
     "demo:ts": "tsx --watch examples/typescript/index.ts",
     "deps": "ncu -i --format group",
     "postdeps": "npm test",
-    "dev": "nodemon dev/index.js",
+    "dev": "tsx watch dev/index.js",
     "lint": "eslint benchmark bin examples src test",
     "lint:fix": "eslint --fix benchmark bin examples src test",
-    "perf": "nodemon --allow-natives-syntax benchmark/perf-runner.js",
+    "perf": "nodemon --allow-natives-syntax --exec tsx benchmark/perf-runner.js",
     "pperf": "node --inspect --expose-gc benchmark/perf-runner.js",
-    "memleak": "node benchmark/memleak-test.js",
+    "memleak": "tsx benchmark/memleak-test.js",
     "test": "jest --coverage --forceExit",
     "test:unit": "jest --testMatch \"**/unit/**/*.spec.js\" --coverage",
     "test:int": "jest --testMatch \"**/integration/**/*.spec.js\" --coverage",
     "test:e2e": "cd test/e2e && ./start.sh",
     "test:leak": "jest --testMatch \"**/leak-detection/**/*.spc.js\" --runInBand",
-    "test:ts": "tsd && tsc -p test/typescript/hello-world && ts-node -P test/typescript/hello-world/tsconfig.json test/typescript/hello-world/index.ts",
-    "test:esm": "node bin/moleculer-runner.mjs -c test/esm/moleculer.config.mjs test/esm/*.service.*js",
+    "test:ts": "npm run build && tsd && tsc -p test/typescript/hello-world && ts-node -P test/typescript/hello-world/tsconfig.json test/typescript/hello-world/index.ts",
+    "test:esm": "npm run build && node bin/moleculer-runner.mjs -c test/esm/moleculer.config.mjs test/esm/*.service.*js",
     "release": "npm publish --access public && git push --follow-tags",
     "release:beta": "npm publish --tag next --access public && git push --follow-tags",
     "tsc": "tsc",
@@ -55,7 +57,7 @@
   ],
   "files": [
     "bin",
-    "src",
+    "dist",
     "types",
     "index.js",
     "index.mjs",
@@ -124,10 +126,12 @@
     "redlock": "^4.2.0",
     "rhea-promise": "^3.0.3",
     "supertest": "^7.2.2",
+    "ts-jest": "^29.4.14",
     "ts-node": "^10.9.2",
     "tsd": "^0.33.0",
     "tsx": "^4.23.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.71.0",
     "v8-natives": "^1.2.5",
     "winston": "^3.19.0",
     "winston-context": "^0.0.7"
@@ -225,7 +229,8 @@
   "tsd": {
     "directory": "test/typescript/tsd",
     "compilerOptions": {
-      "noImplicitThis": true
+      "noImplicitThis": true,
+      "esModuleInterop": true
     }
   },
   "jest": {
@@ -236,7 +241,25 @@
       "/test/typescript/",
       "/test/unit/utils.js"
     ],
-    "transform": {},
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "isolatedModules": true,
+          "diagnostics": false,
+          "tsconfig": "<rootDir>/../tsconfig.json"
+        }
+      ]
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "mjs",
+      "cjs",
+      "json",
+      "node"
+    ],
     "testEnvironment": "node",
     "rootDir": "./src",
     "roots": [

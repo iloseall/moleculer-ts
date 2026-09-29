@@ -1,5 +1,5 @@
 import mod from "./index.js";
-import RunnerESM from "./src/runner-esm.mjs";
+import RunnerESM from "./dist/runner-esm.mjs";
 
 export default mod;
 export const CIRCUIT_CLOSE = mod.CIRCUIT_CLOSE;

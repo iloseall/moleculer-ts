@@ -2,13 +2,15 @@ const js = require("@eslint/js");
 const globals = require("globals");
 const pluginSecurity = require("eslint-plugin-security");
 const eslintPluginPrettierRecommended = require("eslint-plugin-prettier/recommended");
+const tseslint = require("typescript-eslint");
 
 /** @type {import('eslint').Linter.Config[]} */
 module.exports = [
-	{ ignores: ["test/typescript/hello-world/out/*.js"] },
+	{ ignores: ["test/typescript/hello-world/out/*.js", "dist", "src/**/*.d.ts"] },
 	js.configs.recommended,
 	pluginSecurity.configs.recommended,
 	eslintPluginPrettierRecommended,
+	...tseslint.configs.recommended.map(config => ({ ...config, files: ["**/*.ts"] })),
 	{
 		files: ["**/*.js", "**/*.mjs"],
 		languageOptions: {
@@ -54,6 +56,29 @@ module.exports = [
 		rules: {
 			"no-console": ["off"],
 			"no-unused-vars": ["off"]
+		}
+	},
+	{
+		files: ["**/*.ts"],
+		rules: {
+			"no-var": ["error"],
+			"no-console": ["error"],
+			"no-unused-vars": ["off"],
+			"@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],
+			"no-trailing-spaces": ["error"],
+			"security/detect-object-injection": ["off"],
+			"security/detect-non-literal-require": ["off"],
+			"security/detect-non-literal-fs-filename": ["off"],
+			"no-process-exit": ["off"],
+
+			// The codebase is CJS-first: `import X = require("y")` / `export =` must stay allowed.
+			"@typescript-eslint/no-require-imports": ["off"],
+			// `any` is used extensively by design (dynamic service schemas, payloads).
+			"@typescript-eslint/no-explicit-any": ["off"],
+			"@typescript-eslint/no-empty-object-type": ["off"],
+			"@typescript-eslint/no-wrapper-object-types": ["off"],
+			"@typescript-eslint/no-unsafe-function-type": ["off"],
+			"@typescript-eslint/no-unused-expressions": ["off"]
 		}
 	}
 ];
