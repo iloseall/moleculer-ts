@@ -4,13 +4,13 @@
  * MIT Licensed
  */
 
-import Node = require("./node");
-import ServiceItem = require("./service-item");
+import type Node from "./node";
+import type ServiceItem from "./service-item";
 import type { EventSchema } from "../service";
-import ServiceBroker = require("../service-broker");
-import Registry = require("./registry");
-import Context = require("../context");
-import Strategy = require("../strategies/base");
+import type ServiceBroker from "../service-broker";
+import type Registry from "./registry";
+import type Context from "../context";
+import type Strategy from "../strategies/base";
 
 declare namespace EventCatalog {
 	export interface EventCatalogListOptions {
@@ -37,11 +37,11 @@ declare namespace EventCatalog {
 	}
 }
 
-import _ = require("lodash");
-import utils = require("../utils");
-import Strategies = require("../strategies");
-import EndpointList = require("./endpoint-list");
-import EventEndpoint = require("./endpoint-event");
+import _ from "lodash";
+import * as utils from "../utils";
+import Strategies from "../strategies";
+import EndpointList from "./endpoint-list";
+import EventEndpoint from "./endpoint-event";
 
 /**
  * Catalog for events

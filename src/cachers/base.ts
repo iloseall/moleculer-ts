@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import type Context = require("../context");
+import type Context from "../context";
 import type { Logger } from "../logger-factory";
-import type ServiceBroker = require("../service-broker");
-import type Service = require("../service");
+import type ServiceBroker from "../service-broker";
+import type Service from "../service";
 
 declare namespace Cacher {
 	export type CacherKeygen<TParams = unknown, TMeta extends object = object> = (
@@ -33,10 +33,9 @@ declare namespace Cacher {
 	}
 }
 
-import _ = require("lodash");
-import crypto = require("crypto");
-import _0 = require("../metrics");
-const { METRIC } = _0;
+import _ from "lodash";
+import crypto from "crypto";
+import { METRIC } from "../metrics";
 import { isObject, isFunction, isDate } from "../utils";
 
 /**

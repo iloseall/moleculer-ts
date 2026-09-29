@@ -4,12 +4,11 @@
  * MIT Licensed
  */
 
-import _ = require("lodash");
-import kleur = require("kleur");
-import fs = require("fs");
-import path = require("path");
-import _mul9z = require("../../utils");
-const { makeDirs, safetyObject } = _mul9z;
+import _ from "lodash";
+import kleur from "kleur";
+import fs from "fs";
+import path from "path";
+import { makeDirs, safetyObject } from "../../utils";
 
 function TransitLoggerMiddleware(opts) {
 	opts = _.defaultsDeep(opts, {

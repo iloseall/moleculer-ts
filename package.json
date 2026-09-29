@@ -21,6 +21,8 @@
     "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "demo": "tsx examples/index.js",
     "demo:ts": "tsx --watch examples/typescript/index.ts",
+    "demo:client-server:client": "tsx examples/client-server/client.ts",
+    "demo:client-server:server": "tsx examples/client-server/server.ts",
     "deps": "ncu -i --format group",
     "postdeps": "npm test",
     "dev": "tsx watch dev/index.js",

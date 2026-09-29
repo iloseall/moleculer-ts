@@ -7,16 +7,16 @@
 import { isObject, isString, isInheritedClass } from "../utils";
 import { BrokerOptionsError } from "../errors";
 
-import Base = require("./base");
-import Formatted = require("./formatted");
-import Bunyan = require("./bunyan");
-import Console = require("./console");
-import Datadog = require("./datadog");
-import Debug = require("./debug");
-import File = require("./file");
-import Log4js = require("./log4js");
-import Pino = require("./pino");
-import Winston = require("./winston");
+import Base from "./base";
+import Formatted from "./formatted";
+import Bunyan from "./bunyan";
+import Console from "./console";
+import Datadog from "./datadog";
+import Debug from "./debug";
+import File from "./file";
+import Log4js from "./log4js";
+import Pino from "./pino";
+import Winston from "./winston";
 
 const Loggers = {
 	Base,

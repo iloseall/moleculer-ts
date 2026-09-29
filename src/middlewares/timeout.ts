@@ -4,12 +4,9 @@
  * MIT Licensed
  */
 
-import _m0iyo = require("../errors");
-const { TimeoutError, RequestTimeoutError } = _m0iyo;
-import _maeh6 = require("stream");
-const { Stream } = _maeh6;
-import _mcw0p = require("../metrics");
-const { METRIC } = _mcw0p;
+import { TimeoutError, RequestTimeoutError } from "../errors";
+import { Stream } from "stream";
+import { METRIC } from "../metrics";
 
 function timeoutMiddleware(broker) {
 	function wrapTimeoutMiddleware(handler, action) {

@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import MetricBaseReporter = require("./base");
-import type BaseMetric = require("../types/base");
+import MetricBaseReporter from "./base";
+import type BaseMetric from "../types/base";
 import type { Logger } from "../../logger-factory";
 
 declare namespace ConsoleReporter {
@@ -25,10 +25,10 @@ declare namespace ConsoleReporter {
 	}
 }
 
-import BaseReporter = require("./base");
-import _ = require("lodash");
-import kleur = require("kleur");
-import METRIC = require("../constants");
+import BaseReporter from "./base";
+import _ from "lodash";
+import kleur from "kleur";
+import * as METRIC from "../constants";
 import { isFunction } from "../../utils";
 
 /**

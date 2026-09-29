@@ -4,13 +4,13 @@
  * MIT Licensed
  */
 
-import type Transit = require("../transit");
+import type Transit from "../transit";
 import type { Packet, PacketRequestPayload, PacketEventPayload } from "../packets";
-import ServiceBroker = require("../service-broker");
-import { Logger } from "../logger-factory";
+import type ServiceBroker from "../service-broker";
+import type { Logger } from "../logger-factory";
 
-import _ = require("lodash");
-import P = require("../packets");
+import _ from "lodash";
+import * as P from "../packets";
 import { flatten } from "../utils";
 import { BrokerDisconnectedError } from "../errors";
 

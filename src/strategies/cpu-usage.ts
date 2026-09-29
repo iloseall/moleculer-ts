@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import type Endpoint = require("../registry/endpoint");
+import type Endpoint from "../registry/endpoint";
 
 declare namespace CpuUsageStrategy {
 	export interface CpuUsageStrategyOptions {
@@ -13,10 +13,10 @@ declare namespace CpuUsageStrategy {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 
 const { random } = _;
-import BaseStrategy = require("./base");
+import BaseStrategy from "./base";
 
 /**
  * Lowest CPU usage invocation strategy

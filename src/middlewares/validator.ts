@@ -4,8 +4,7 @@
  * MIT Licensed
  */
 
-import _mbo0s = require("../utils");
-const { isFunction } = _mbo0s;
+import { isFunction } from "../utils";
 
 function ValidatorMiddleware(broker) {
 	if (broker.validator && isFunction(broker.validator.middleware)) {

@@ -14,7 +14,7 @@ declare type CpuUsageResponse = {
  *
  * Based on: https://github.com/icebob/cpu
  */
-import os = require("os");
+import os from "os";
 
 /* istanbul ignore next */
 function getCpuUsage(sampleTime = 100): Promise<CpuUsageResponse> {

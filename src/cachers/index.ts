@@ -7,10 +7,10 @@
 import { isObject, isString, isInheritedClass } from "../utils";
 import { BrokerOptionsError } from "../errors";
 
-import BaseCacher = require("./base");
-import MemoryCacher = require("./memory");
-import MemoryLRUCacher = require("./memory-lru");
-import RedisCacher = require("./redis");
+import BaseCacher from "./base";
+import MemoryCacher from "./memory";
+import MemoryLRUCacher from "./memory-lru";
+import RedisCacher from "./redis";
 
 /**
  * Mutable registry of the built-in cachers.

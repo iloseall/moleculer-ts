@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import ServiceBroker = require("./service-broker");
+import type ServiceBroker from "./service-broker";
 
-import asyncHooks = require("async_hooks");
+import asyncHooks from "async_hooks";
 const executionAsyncId = asyncHooks.executionAsyncId;
 
 class AsyncStorage {

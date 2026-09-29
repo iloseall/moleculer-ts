@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import type ServiceBroker = require("../service-broker");
+import type ServiceBroker from "../service-broker";
 
-import BaseSerializer = require("./base");
+import BaseSerializer from "./base";
 
 /**
  * MessagePack serializer for Moleculer

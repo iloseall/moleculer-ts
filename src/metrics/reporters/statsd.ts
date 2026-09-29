@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import BaseMetric = require("../types/base");
-import MetricRegistry = require("../registry");
-import MetricBaseReporter = require("./base");
+import type BaseMetric from "../types/base";
+import type MetricRegistry from "../registry";
+import MetricBaseReporter from "./base";
 
 declare namespace StatsDReporter {
 	export interface StatsDReporterOptions extends MetricBaseReporter.MetricReporterOptions {
@@ -18,10 +18,10 @@ declare namespace StatsDReporter {
 	}
 }
 
-import BaseReporter = require("./base");
-import _ = require("lodash");
-import dgram = require("dgram");
-import METRIC = require("../constants");
+import BaseReporter from "./base";
+import _ from "lodash";
+import dgram from "dgram";
+import * as METRIC from "../constants";
 
 /**
  * UDP (StatsD) reporter for Moleculer.

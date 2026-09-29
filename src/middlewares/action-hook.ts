@@ -8,9 +8,8 @@
  * @typedef {import("../service")} Service
  */
 
-import _ = require("lodash");
-import _mx92z = require("../utils");
-const { isFunction, isString, match } = _mx92z;
+import _ from "lodash";
+import { isFunction, isString, match } from "../utils";
 
 function actionHookMiddleware(broker) {
 	function callHook(hook, service, ctx, res?) {

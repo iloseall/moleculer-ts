@@ -1,6 +1,6 @@
 import type { BaseTraceExporterOptions } from "./base";
-import type Span = require("../span");
-import type Tracer = require("../tracer");
+import type Span from "../span";
+import type Tracer from "../tracer";
 
 declare namespace DatadogSimpleTraceExporter {
 	export interface DatadogSimpleTraceExporterOptions extends BaseTraceExporterOptions {
@@ -10,8 +10,8 @@ declare namespace DatadogSimpleTraceExporter {
 	}
 }
 
-import _ = require("lodash");
-import BaseTraceExporter = require("./base");
+import _ from "lodash";
+import BaseTraceExporter from "./base";
 import { isFunction } from "../../utils";
 
 /*

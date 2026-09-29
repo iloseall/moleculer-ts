@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import type MetricRegistry = require("../registry");
+import type MetricRegistry from "../registry";
 
 declare namespace BaseMetric {
 	export interface BaseMetricOptions {

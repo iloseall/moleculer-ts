@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import LoggerFactory = require("../logger-factory");
-import ServiceBroker = require("../service-broker");
+import type LoggerFactory from "../logger-factory";
+import type ServiceBroker from "../service-broker";
 
 declare namespace BaseLogger {
 	export type LogLevels = "fatal" | "error" | "warn" | "info" | "debug" | "trace";
@@ -20,7 +20,7 @@ declare namespace BaseLogger {
 	// export const BaseLogger;
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 import { match, isObject, isString } from "../utils";
 
 const LEVELS = ["fatal", "error", "warn", "info", "debug", "trace"];

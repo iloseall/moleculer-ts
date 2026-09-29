@@ -13,16 +13,14 @@ declare namespace MemoryLRUCacher {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 import { isObject } from "../utils";
-const utilsMatch = require("../utils").match;
-import BaseCacher = require("./base");
-import _0 = require("lru-cache");
-const { LRUCache } = _0;
-import _1 = require("../metrics");
-const { METRIC } = _1;
+import { match as utilsMatch } from "../utils";
+import BaseCacher from "./base";
+import { LRUCache } from "lru-cache";
+import { METRIC } from "../metrics";
 
-import Lock = require("../lock");
+import Lock from "../lock";
 
 /**
  * Cacher factory for memory cache

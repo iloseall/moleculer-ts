@@ -6,24 +6,24 @@
 
 import { EventEmitter2 } from "eventemitter2";
 import type { ContextParentSpan } from "./context";
-import type BaseCacher = require("./cachers/base");
-import type BaseLogger = require("./loggers/base");
+import type BaseCacher from "./cachers/base";
+import type BaseLogger from "./loggers/base";
 import type { LogLevels, LoggerOptions } from "./loggers/base";
 import type { Logger, LoggerConfig } from "./logger-factory";
 import type { MetricRegistryOptions } from "./metrics/registry";
 import type { Middleware, MiddlewareCallHandlerOptions } from "./middleware";
-import type ServiceRegistry = require("./registry");
-import type BaseSerializer = require("./serializers/base");
+import type ServiceRegistry from "./registry";
+import type BaseSerializer from "./serializers/base";
 import type { ServiceSchema, ServiceSettingSchema } from "./service";
 import type { TracerOptions } from "./tracing/tracer";
-import type BaseTransporter = require("./transporters/base");
-import type BaseValidator = require("./validators/base");
+import type BaseTransporter from "./transporters/base";
+import type BaseValidator from "./validators/base";
 import type { ValidatorNames, ValidatorOptions } from "./validators/base";
-import type Context = require("./context");
-import type ActionEndpoint = require("./registry/endpoint-action");
-import type EventEndpoint = require("./registry/endpoint-event");
-import type Service = require("./service");
-import type Runner = require("./runner");
+import type Context from "./context";
+import type ActionEndpoint from "./registry/endpoint-action";
+import type EventEndpoint from "./registry/endpoint-event";
+import type Service from "./service";
+import type Runner from "./runner";
 import type { ServiceDependency } from "./service";
 import type { TcpTransporterOptions } from "./transporters/tcp";
 import type { NatsTransporterOptions } from "./transporters/nats";
@@ -37,7 +37,7 @@ import type { MemoryLRUCacherOptions } from "./cachers/memory-lru";
 import type { RedisCacherOptions } from "./cachers/redis";
 import type { JSONExtSerializerOptions } from "./serializers/json-extended";
 import type { CborSerializerOptions } from "./serializers/cbor";
-import type ServiceItem = require("./registry/service-item");
+import type ServiceItem from "./registry/service-item";
 import type { UserInfo } from "os";
 import type { MoleculerError, Regenerator as ErrorRegenerator } from "./errors";
 import type { Readable } from "stream";
@@ -347,34 +347,31 @@ declare namespace ServiceBroker {
 	}
 }
 
-import _ = require("lodash");
-import _0 = require("glob");
-const { globSync } = _0;
-import path = require("path");
-import _1 = require("util");
-const { format } = _1;
+import _ from "lodash";
+import { globSync } from "glob";
+import path from "path";
+import { format } from "util";
 
-import Transit = require("./transit");
-import Registry = require("./registry");
-import E = require("./errors");
-import utils = require("./utils");
-import LoggerFactory = require("./logger-factory");
-import Validators = require("./validators");
+import Transit from "./transit";
+import Registry from "./registry";
+import * as E from "./errors";
+import * as utils from "./utils";
+import LoggerFactory from "./logger-factory";
+import Validators from "./validators";
 //const AsyncStorage 			= require("./async-storage");
 
-import Cachers = require("./cachers");
-import Transporters = require("./transporters");
-import Serializers = require("./serializers");
-import Errors = require("./errors");
-import H = require("./health");
-import MiddlewareHandler = require("./middleware");
-import cpuUsage = require("./cpu-usage");
+import Cachers from "./cachers";
+import Transporters from "./transporters";
+import Serializers from "./serializers";
+import * as Errors from "./errors";
+import * as H from "./health";
+import MiddlewareHandler from "./middleware";
+import cpuUsage from "./cpu-usage";
 
-import MetricRegistry = require("./metrics/registry");
-import _2 = require("./metrics");
-const { METRIC } = _2;
-import Tracer = require("./tracing/tracer");
-import C = require("./constants");
+import MetricRegistry from "./metrics/registry";
+import { METRIC } from "./metrics";
+import Tracer from "./tracing/tracer";
+import * as C from "./constants";
 
 /**
  * Default broker options

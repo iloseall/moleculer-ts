@@ -4,12 +4,11 @@
  * MIT Licensed
  */
 
-import _ = require("lodash");
-import kleur = require("kleur");
-import fs = require("fs");
-import path = require("path");
-import _mbadv = require("../../utils");
-const { makeDirs, match, isObject, safetyObject } = _mbadv;
+import _ from "lodash";
+import kleur from "kleur";
+import fs from "fs";
+import path from "path";
+import { makeDirs, match, isObject, safetyObject } from "../../utils";
 
 function ActionLoggerMiddleware(opts) {
 	opts = _.defaultsDeep(opts, {

@@ -50,20 +50,19 @@ declare namespace MoleculerRunner {
 	}
 }
 
-import ServiceBroker = require("./service-broker");
-import utils = require("./utils");
-import fs = require("fs");
-import path = require("path");
-import _0 = require("glob");
-const { globSync } = _0;
-const inspect = require("util").inspect;
-import _ = require("lodash");
-import Args = require("args");
-import os = require("os");
+import ServiceBroker from "./service-broker";
+import * as utils from "./utils";
+import fs from "fs";
+import path from "path";
+import { globSync } from "glob";
+import { inspect } from "util";
+import _ from "lodash";
+import Args from "args";
+import os from "os";
 /** @type {Cluster} */
 // @ts-ignore
-import cluster = require("cluster");
-import kleur = require("kleur");
+import cluster from "cluster";
+import kleur from "kleur";
 
 /**
  * Import types

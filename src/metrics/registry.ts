@@ -4,15 +4,15 @@
  * MIT Licensed
  */
 
-import ServiceBroker = require("../service-broker");
+import type ServiceBroker from "../service-broker";
 import type { BaseMetricPOJO, BaseMetricOptions } from "./types/base";
 import type { Logger } from "../logger-factory";
-import MetricBaseReporter = require("./reporters/base");
-import { ConsoleReporterOptions } from "./reporters/console";
-import { DatadogReporterOptions } from "./reporters/datadog";
-import { EventReporterOptions } from "./reporters/event";
-import { PrometheusReporterOptions } from "./reporters/prometheus";
-import { StatsDReporterOptions } from "./reporters/statsd";
+import type MetricBaseReporter from "./reporters/base";
+import type { ConsoleReporterOptions } from "./reporters/console";
+import type { DatadogReporterOptions } from "./reporters/datadog";
+import type { EventReporterOptions } from "./reporters/event";
+import type { PrometheusReporterOptions } from "./reporters/prometheus";
+import type { StatsDReporterOptions } from "./reporters/statsd";
 
 declare namespace MetricRegistry {
 	export interface MetricListOptions {
@@ -86,11 +86,11 @@ declare namespace MetricRegistry {
 	};
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 import { match, isFunction, isPlainObject, isString } from "../utils";
-import METRIC = require("./constants");
-import Types = require("./types");
-import Reporters = require("./reporters");
+import * as METRIC from "./constants";
+import Types from "./types";
+import Reporters from "./reporters";
 import { registerCommonMetrics, updateCommonMetrics } from "./commons";
 
 const METRIC_NAME_REGEXP = /^[a-zA-Z_][a-zA-Z0-9-_:.]*$/;

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import type MetricRegistry = require("../registry");
+import type MetricRegistry from "../registry";
 
 declare namespace GaugeMetric {
 	export interface GaugeMetricOptions extends BaseMetric.BaseMetricOptions {
@@ -19,11 +19,10 @@ declare namespace GaugeMetric {
 	}
 }
 
-import _0 = require("lodash");
-const { pick } = _0;
-import BaseMetric = require("./base");
-import METRIC = require("../constants");
-import MetricRate = require("../rates");
+import { pick } from "lodash";
+import BaseMetric from "./base";
+import * as METRIC from "../constants";
+import MetricRate from "../rates";
 
 /**
  * Gauge metric class.

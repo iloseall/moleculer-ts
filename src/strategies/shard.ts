@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import type Context = require("../context");
-import type Endpoint = require("../registry/endpoint");
+import type Context from "../context";
+import type Endpoint from "../registry/endpoint";
 
 declare namespace ShardStrategy {
 	export interface ShardStrategyOptions {
@@ -16,11 +16,10 @@ declare namespace ShardStrategy {
 	}
 }
 
-import _ = require("lodash");
-import BaseStrategy = require("./base");
-import crypto = require("crypto");
-import _0 = require("lru-cache");
-const { LRUCache } = _0;
+import _ from "lodash";
+import BaseStrategy from "./base";
+import crypto from "crypto";
+import { LRUCache } from "lru-cache";
 type LRUCacheInstance = InstanceType<typeof LRUCache>;
 import { isFunction, randomInt } from "../utils";
 

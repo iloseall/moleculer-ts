@@ -11,8 +11,8 @@ declare namespace CborSerializer {
 	}
 }
 
-import BaseSerializer = require("./base");
-import _ = require("lodash");
+import BaseSerializer from "./base";
+import _ from "lodash";
 
 /**
  * CBOR serializer for Moleculer

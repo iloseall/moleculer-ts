@@ -4,8 +4,7 @@
  * MIT Licensed
  */
 
-import _mbbji = require("../errors");
-const { MoleculerError } = _mbbji;
+import { MoleculerError } from "../errors";
 
 function wrapActionErrorHandler(handler) {
 	return function errorHandlerMiddleware(ctx) {

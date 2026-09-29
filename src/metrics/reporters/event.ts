@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import BaseMetric = require("../types/base");
-import MetricBaseReporter = require("./base");
-import MetricRegistry = require("../registry");
+import type BaseMetric from "../types/base";
+import MetricBaseReporter from "./base";
+import type MetricRegistry from "../registry";
 
 declare namespace EventReporter {
 	export interface EventReporterOptions extends MetricBaseReporter.MetricReporterOptions {
@@ -21,8 +21,8 @@ declare namespace EventReporter {
 	}
 }
 
-import BaseReporter = require("./base");
-import _ = require("lodash");
+import BaseReporter from "./base";
+import _ from "lodash";
 
 /**
  * Event reporter for Moleculer Metrics

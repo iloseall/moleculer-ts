@@ -14,9 +14,9 @@ declare namespace NatsTransporter {
 	}
 }
 
-import Transporter = require("./base");
+import Transporter from "./base";
 import { PACKET_REQUEST, PACKET_EVENT } from "../packets";
-import C = require("../constants");
+import * as C from "../constants";
 
 /**
  * Transporter for NATS

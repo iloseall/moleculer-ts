@@ -4,11 +4,10 @@
  * MIT Licensed
  */
 
-import type Endpoint = require("../registry/endpoint");
+import type Endpoint from "../registry/endpoint";
 
-import _0 = require("lodash");
-const { random } = _0;
-import BaseStrategy = require("./base");
+import { random } from "lodash";
+import BaseStrategy from "./base";
 
 /**
  * Random strategy class

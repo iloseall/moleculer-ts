@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import Context = require("./context");
-import ServiceBroker = require("./service-broker");
-import Strategy = require("./strategies/base");
+import type Context from "./context";
+import type ServiceBroker from "./service-broker";
+import type Strategy from "./strategies/base";
 import type { Logger } from "./logger-factory";
 import type { CacherKeygen } from "./cachers/base";
 import type {
@@ -214,7 +214,7 @@ declare namespace Service {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 import { ServiceSchemaError, MoleculerError } from "./errors";
 import { isObject, isFunction, flatten, uniq } from "./utils";
 

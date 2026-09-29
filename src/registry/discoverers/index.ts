@@ -7,10 +7,10 @@
 import { BrokerOptionsError } from "../../errors";
 import { isObject, isString, isInheritedClass } from "../../utils";
 
-import BaseDiscoverer = require("./base");
-import LocalDiscoverer = require("./local");
-import Etcd3Discoverer = require("./etcd3");
-import RedisDiscoverer = require("./redis");
+import BaseDiscoverer from "./base";
+import LocalDiscoverer from "./local";
+import Etcd3Discoverer from "./etcd3";
+import RedisDiscoverer from "./redis";
 
 const Discoverers = {
 	Base: BaseDiscoverer,

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import Node = require("./node");
+import type Node from "./node";
 import type { ActionSchema } from "../service";
 import type { EventSchema } from "../service";
 

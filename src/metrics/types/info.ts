@@ -13,10 +13,9 @@ declare namespace InfoMetric {
 	}
 }
 
-import _0 = require("lodash");
-const { pick } = _0;
-import BaseMetric = require("./base");
-import METRIC = require("../constants");
+import { pick } from "lodash";
+import BaseMetric from "./base";
+import * as METRIC from "../constants";
 
 /**
  * Information metric.

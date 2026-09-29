@@ -16,9 +16,10 @@ declare namespace JSONExtSerializer {
 	}
 }
 
-import BaseSerializer = require("./base");
+import BaseSerializer from "./base";
 //const { isDate } = require("../utils");
-const { isDate, isRegExp, isMap, isSet } = require("util").types;
+import { types } from "util";
+const { isDate, isRegExp, isMap, isSet } = types;
 
 const PREFIX_BIGINT = "[[BI]]";
 const PREFIX_MAP = "[[MP]]";

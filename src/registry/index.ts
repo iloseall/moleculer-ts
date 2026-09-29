@@ -4,6 +4,6 @@
  * MIT Licensed
  */
 
-import Registry = require("./registry");
+import Registry from "./registry";
 
 export = Registry;

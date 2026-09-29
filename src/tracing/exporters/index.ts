@@ -7,14 +7,14 @@
 import { isObject, isString, isInheritedClass } from "../../utils";
 import { BrokerOptionsError } from "../../errors";
 
-import Base = require("./base");
-import Console = require("./console");
-import Datadog = require("./datadog");
+import Base from "./base";
+import Console from "./console";
+import Datadog from "./datadog";
 // import DatadogSimple = require("./datadog-simple");
-import Event = require("./event");
-import Jaeger = require("./jaeger");
-import Zipkin = require("./zipkin");
-import NewRelic = require("./newrelic");
+import Event from "./event";
+import Jaeger from "./jaeger";
+import Zipkin from "./zipkin";
+import NewRelic from "./newrelic";
 
 const Exporters = {
 	Base,

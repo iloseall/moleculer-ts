@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import { EventEmitter } from "stream";
+import type { EventEmitter } from "stream";
 
-import Transporter = require("./base");
-const EventEmitter2 = require("eventemitter2").EventEmitter2;
+import Transporter from "./base";
+import { EventEmitter2 } from "eventemitter2";
 
 // Put to global to transfer messages between brokers in the same process
 global.bus = new EventEmitter2({

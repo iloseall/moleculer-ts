@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import ServiceBroker = require("../../service-broker");
-import type MetricRegistry = require("../registry");
+import type ServiceBroker from "../../service-broker";
+import type MetricRegistry from "../registry";
 import type { Logger } from "../../logger-factory";
 
 declare namespace MetricBaseReporter {
@@ -21,7 +21,7 @@ declare namespace MetricBaseReporter {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 import { match, isString } from "../../utils";
 
 /**

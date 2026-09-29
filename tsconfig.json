@@ -1,20 +1,24 @@
 {
 	"compilerOptions": {
 		"lib": ["ES2023"],
-		"module": "commonjs",
-		"moduleResolution": "node",
 		"target": "ES2022",
+
+		// TypeScript 6.0 locks `esModuleInterop` to `true` and deprecates
+		// `moduleResolution: "node"` (node10), so target the post-6.0 defaults now.
+		// The sources use standard ESM `import` syntax and rely on the interop
+		// helpers for CommonJS / `export =` modules.
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"esModuleInterop": true,
 
 		// Keep ES2021 class field semantics (assignment instead of `Object.defineProperty`)
 		// so the emitted runtime behaviour stays identical to the previous JS sources.
 		"useDefineForClassFields": false,
-		"esModuleInterop": false,
-
-		// Type-only: lets the declaration output keep the `import type X from "./y"`
-		// form used by the original hand-written .d.ts files. No runtime effect.
-		"allowSyntheticDefaultImports": true,
 
 		"strict": false,
+
+		// TypeScript 6.0 defaults `types` to an empty array, so list it explicitly.
+		"types": ["node"],
 
 		"skipLibCheck": true,
 		"resolveJsonModule": true,

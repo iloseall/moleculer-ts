@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import type BaseMetric = require("./types/base");
+import type BaseMetric from "./types/base";
 
 const INTERVAL = 5;
 const SECONDS_PER_MINUTE = 60.0;

@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import ServiceBroker = require("../service-broker");
-import Registry = require("./registry");
-import Node = require("./node");
+import type ServiceBroker from "../service-broker";
+import type Registry from "./registry";
+import type Node from "./node";
 
 /**
  * Endpoint class

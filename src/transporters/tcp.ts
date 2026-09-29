@@ -5,9 +5,9 @@
  */
 
 import type { Packet } from "../packets";
-import type Registry = require("../registry/registry");
-import type BaseDiscoverer = require("../registry/discoverers/base");
-import type NodeCatalog = require("../registry/node-catalog");
+import type Registry from "../registry/registry";
+import type BaseDiscoverer from "../registry/discoverers/base";
+import type NodeCatalog from "../registry/node-catalog";
 import type { Socket } from "net";
 
 declare namespace TcpTransporter {
@@ -39,20 +39,20 @@ declare namespace TcpTransporter {
 	}
 }
 
-import Transporter = require("./base");
-import _ = require("lodash");
+import Transporter from "./base";
+import _ from "lodash";
 import { isObject, isString } from "../utils";
-import fs = require("fs");
-import kleur = require("kleur");
+import fs from "fs";
+import kleur from "kleur";
 
-import Node = require("../registry/node");
-import P = require("../packets");
+import Node from "../registry/node";
+import * as P from "../packets";
 import { resolvePacketID } from "./tcp/constants";
 import { MoleculerServerError } from "../errors";
 
-import UdpServer = require("./tcp/udp-broadcaster");
-import TcpReader = require("./tcp/tcp-reader");
-import TcpWriter = require("./tcp/tcp-writer");
+import UdpServer from "./tcp/udp-broadcaster";
+import TcpReader from "./tcp/tcp-reader";
+import TcpWriter from "./tcp/tcp-writer";
 
 /**
  * TCP Transporter with optional UDP discovery ("zero configuration") module.

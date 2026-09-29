@@ -4,16 +4,16 @@
  * MIT Licensed
  */
 
-import METRIC = require("./constants");
+import * as METRIC from "./constants";
 
-import MetricRegistry = require("./registry");
-import BaseMetric = require("./types/base");
-import CounterMetric = require("./types/counter");
-import GaugeMetric = require("./types/gauge");
-import HistrogramMetric = require("./types/histogram");
-import InfoMetric = require("./types/info");
+import MetricRegistry from "./registry";
+import BaseMetric from "./types/base";
+import CounterMetric from "./types/counter";
+import GaugeMetric from "./types/gauge";
+import HistrogramMetric from "./types/histogram";
+import InfoMetric from "./types/info";
 
-import Reporters = require("./reporters");
+import Reporters from "./reporters";
 
 export {
 	METRIC,

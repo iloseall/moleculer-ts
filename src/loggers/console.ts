@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import LoggerFactory = require("../logger-factory");
+import type LoggerFactory from "../logger-factory";
 import type { LogHandler } from "./base";
 import type { FormattedLoggerOptions } from "./formatted";
 
@@ -14,8 +14,8 @@ declare namespace ConsoleLogger {
 
 /* eslint-disable no-console */
 
-import FormattedLogger = require("./formatted");
-import kleur = require("kleur");
+import FormattedLogger from "./formatted";
+import kleur from "kleur";
 
 /**
  * Console logger for Moleculer

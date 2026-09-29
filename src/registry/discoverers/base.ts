@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import type ServiceBroker = require("../../service-broker");
-import type Transit = require("../../transit");
-import type Registry = require("../registry");
-import type Node = require("../node");
+import type ServiceBroker from "../../service-broker";
+import type Transit from "../../transit";
+import type Registry from "../registry";
+import type Node from "../node";
 import type { Logger } from "../../logger-factory";
 
 declare namespace BaseDiscoverer {
@@ -26,7 +26,7 @@ declare namespace BaseDiscoverer {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 
 /**
  * Abstract Discoverer class

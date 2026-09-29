@@ -13,16 +13,10 @@ declare namespace FastestValidator {
 		extends ValidatorConstructorOptions, BaseValidator.ValidatorOptions {}
 }
 
-import FVModule = require("fastest-validator");
+import Validator from "fastest-validator";
 import { ValidationError } from "../errors";
-import BaseValidator = require("./base");
-import _ = require("lodash");
-
-/**
- * `fastest-validator` ships ESM-style type definitions, but its CommonJS entry
- * exports the class directly, so it has to be unwrapped manually.
- */
-const Validator = FVModule as unknown as typeof FVModule.default;
+import BaseValidator from "./base";
+import _ from "lodash";
 
 /**
  * Fastest validator class
@@ -30,7 +24,7 @@ const Validator = FVModule as unknown as typeof FVModule.default;
  */
 class FastestValidator extends BaseValidator {
 	opts: FastestValidator.FastestValidatorOptions;
-	validator: FVModule.default;
+	validator: Validator;
 	/**
 	 * Creates an instance of FastestValidator.
 	 *

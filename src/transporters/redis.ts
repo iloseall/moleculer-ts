@@ -16,9 +16,9 @@ declare namespace RedisTransporter {
 }
 
 import { MoleculerError } from "../errors";
-import Transporter = require("./base");
+import Transporter from "./base";
 import { BrokerOptionsError } from "../errors";
-import C = require("../constants");
+import * as C from "../constants";
 import { isObject } from "../utils";
 
 /**

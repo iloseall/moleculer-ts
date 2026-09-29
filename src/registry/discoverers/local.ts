@@ -4,14 +4,14 @@
  * MIT Licensed
  */
 
-import type Registry = require("../registry");
-import type Node = require("../node");
+import type Registry from "../registry";
+import type Node from "../node";
 
 declare namespace LocalDiscoverer {
 	export interface LocalDiscovererOptions extends BaseDiscoverer.DiscovererOptions {}
 }
 
-import BaseDiscoverer = require("./base");
+import BaseDiscoverer from "./base";
 
 /**
  * Local (built-in) Discoverer class

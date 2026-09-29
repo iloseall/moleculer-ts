@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import MetricRegistry = require("../registry");
-import MetricBaseReporter = require("./base");
+import type MetricRegistry from "../registry";
+import MetricBaseReporter from "./base";
 
 declare namespace DatadogReporter {
 	export interface DatadogReporterOptions extends MetricBaseReporter.MetricReporterOptions {
@@ -19,11 +19,11 @@ declare namespace DatadogReporter {
 	}
 }
 
-import BaseReporter = require("./base");
-import _ = require("lodash");
-import os = require("os");
+import BaseReporter from "./base";
+import _ from "lodash";
+import os from "os";
 import { MoleculerError } from "../../errors";
-import METRIC = require("../constants");
+import * as METRIC from "../constants";
 import { isFunction } from "../../utils";
 
 const BASE_URL = "https://api.datadoghq.com/api/";

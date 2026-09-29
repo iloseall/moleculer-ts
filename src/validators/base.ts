@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import type ServiceBroker = require("../service-broker");
+import type ServiceBroker from "../service-broker";
 
 declare namespace BaseValidator {
 	export type ValidatorNames = "Fastest";
@@ -21,7 +21,7 @@ declare namespace BaseValidator {
 }
 
 import { ValidationError } from "../errors";
-import _ = require("lodash");
+import _ from "lodash";
 
 /**
  * Abstract validator class

@@ -13,13 +13,12 @@ declare namespace MemoryCacher {
 	}
 }
 
-import _ = require("lodash");
-import utils = require("../utils");
-import BaseCacher = require("./base");
-import _0 = require("../metrics");
-const { METRIC } = _0;
+import _ from "lodash";
+import * as utils from "../utils";
+import BaseCacher from "./base";
+import { METRIC } from "../metrics";
 
-import Lock = require("../lock");
+import Lock from "../lock";
 
 /**
  * Cacher factory for memory cache

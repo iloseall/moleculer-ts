@@ -1,6 +1,6 @@
 import type { BaseTraceExporterOptions } from "./base";
-import type Span = require("../span");
-import type Tracer = require("../tracer");
+import type Span from "../span";
+import type Tracer from "../tracer";
 
 declare namespace DatadogTraceExporter {
 	export interface DatadogTraceExporterOptions extends BaseTraceExporterOptions {
@@ -13,9 +13,9 @@ declare namespace DatadogTraceExporter {
 	}
 }
 
-import _ = require("lodash");
-import BaseTraceExporter = require("./base");
-import asyncHooks = require("async_hooks");
+import _ from "lodash";
+import BaseTraceExporter from "./base";
+import asyncHooks from "async_hooks";
 import { isFunction } from "../../utils";
 
 let DatadogSpanContext;

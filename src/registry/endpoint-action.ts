@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import type Service = require("../service");
+import type Service from "../service";
 import type { ActionSchema } from "../service";
 
-import Endpoint = require("./endpoint");
+import Endpoint from "./endpoint";
 
 /**
  * Endpoint class for actions

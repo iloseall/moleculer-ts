@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import GaugeMetric = require("./gauge");
-import METRIC = require("../constants");
+import GaugeMetric from "./gauge";
+import * as METRIC from "../constants";
 
 /**
  * Counter metric class.

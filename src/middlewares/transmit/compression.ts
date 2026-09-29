@@ -4,13 +4,10 @@
  * MIT Licensed
  */
 
-import _m83mx = require("lodash");
-const { defaultsDeep } = _m83mx;
-import _metve = require("../../utils");
-const { parseByteString } = _metve;
-import zlib = require("zlib");
-import _mt001 = require("util");
-const { promisify } = _mt001;
+import { defaultsDeep } from "lodash";
+import { parseByteString } from "../../utils";
+import zlib from "zlib";
+import { promisify } from "util";
 
 /**
  * This is a transmission compression middleware. It supports

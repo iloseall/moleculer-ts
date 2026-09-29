@@ -10,7 +10,7 @@ declare namespace RateLimiter {
 	};
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 
 /**
  * Rate Limiter class for Tracing.

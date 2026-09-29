@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import type ServiceBroker = require("./service-broker");
+import type ServiceBroker from "./service-broker";
 import type { LogLevels } from "./loggers/base";
 import type { Logger } from "./logger-factory";
 
@@ -27,9 +27,9 @@ declare namespace LoggerFactory {
 	};
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 import { isPlainObject, isString } from "./utils";
-import Loggers = require("./loggers");
+import Loggers from "./loggers";
 
 const noop = () => {};
 const cwd = process.cwd();

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import os = require("os");
+import os from "os";
 import { getIpList } from "./utils";
 const MOLECULER_VERSION = require("../package.json").version;
 

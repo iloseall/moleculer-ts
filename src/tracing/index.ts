@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import Span = require("./span");
-import Tracer = require("./tracer");
-import Exporters = require("./exporters");
+import Span from "./span";
+import Tracer from "./tracer";
+import Exporters from "./exporters";
 
 export { Tracer, Span, Exporters };
 export { type TracerOptions } from "./tracer";

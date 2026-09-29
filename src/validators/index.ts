@@ -7,8 +7,8 @@
 import { isObject, isString, isInheritedClass } from "../utils";
 import { BrokerOptionsError } from "../errors";
 
-import Validator = require("./base");
-import FastestValidator = require("./fastest");
+import Validator from "./base";
+import FastestValidator from "./fastest";
 
 const Validators = {
 	Base: Validator,

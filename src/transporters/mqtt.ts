@@ -11,10 +11,9 @@ declare namespace MqttTransporter {
 	}
 }
 
-import Transporter = require("./base");
-import _0 = require("lodash");
-const { isObject } = _0;
-import C = require("../constants");
+import Transporter from "./base";
+import { isObject } from "lodash";
+import * as C from "../constants";
 
 /**
  * Transporter for MQTT

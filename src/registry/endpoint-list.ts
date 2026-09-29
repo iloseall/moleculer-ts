@@ -4,15 +4,15 @@
  * MIT Licensed
  */
 
-import type BaseStrategy = require("../strategies/base");
-import type Node = require("./node");
-import type Endpoint = require("./endpoint");
-import type ServiceBroker = require("../service-broker");
-import type Registry = require("./registry");
-import type ServiceItem = require("./service-item");
-import type Context = require("../context");
+import type BaseStrategy from "../strategies/base";
+import type Node from "./node";
+import type Endpoint from "./endpoint";
+import type ServiceBroker from "../service-broker";
+import type Registry from "./registry";
+import type ServiceItem from "./service-item";
+import type Context from "../context";
 
-import _ = require("lodash");
+import _ from "lodash";
 import { MoleculerServerError } from "../errors";
 
 /**

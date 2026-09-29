@@ -13,9 +13,9 @@ import type {
 } from "./service";
 import type { CallingOptions } from "./service-broker";
 import type Service from "./service";
-import type ServiceBroker = require("./service-broker");
-import type Transit = require("./transit");
-import type BaseTransporter = require("./transporters/base");
+import type ServiceBroker from "./service-broker";
+import type Transit from "./transit";
+import type BaseTransporter from "./transporters/base";
 
 declare namespace MiddlewareHandler {
 	export type CallMiddlewareHandler = (
@@ -83,8 +83,8 @@ declare namespace MiddlewareHandler {
 	}
 }
 
-import _ = require("lodash");
-import Middlewares = require("./middlewares");
+import _ from "lodash";
+import Middlewares from "./middlewares";
 import { BrokerOptionsError } from "./errors";
 import { isObject, isFunction, isString } from "./utils";
 

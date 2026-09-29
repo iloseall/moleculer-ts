@@ -4,9 +4,8 @@
  * MIT Licensed
  */
 
-import _ = require("lodash");
-import _mqzi5 = require("../utils");
-const { isFunction, isPlainObject, safetyObject } = _mqzi5;
+import _ from "lodash";
+import { isFunction, isPlainObject, safetyObject } from "../utils";
 
 function TracingMiddleware(broker) {
 	const tracer = broker.tracer;

@@ -6,9 +6,9 @@
 
 "use strict";
 
-import os = require("os");
-import METRIC = require("./constants");
-import cpuUsage = require("../cpu-usage");
+import os from "os";
+import * as METRIC from "./constants";
+import cpuUsage from "../cpu-usage";
 
 let v8: any;
 

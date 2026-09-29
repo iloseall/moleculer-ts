@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import BaseMetric = require("../types/base");
-import MetricBaseReporter = require("./base");
+import type BaseMetric from "../types/base";
+import MetricBaseReporter from "./base";
 
 declare namespace CSVReporter {
 	export interface CSVReporterOptions extends MetricBaseReporter.MetricReporterOptions {
@@ -28,12 +28,12 @@ declare namespace CSVReporter {
 	}
 }
 
-import BaseReporter = require("./base");
+import BaseReporter from "./base";
 import { makeDirs } from "../../utils";
-import _ = require("lodash");
-import path = require("path");
-import fs = require("fs");
-import METRIC = require("../constants");
+import _ from "lodash";
+import path from "path";
+import fs from "fs";
+import * as METRIC from "../constants";
 
 const MODE_METRIC = "metric";
 const MODE_LABEL = "label";

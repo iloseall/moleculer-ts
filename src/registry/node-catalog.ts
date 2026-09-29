@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import ServiceBroker = require("../service-broker");
-import Registry = require("./registry");
+import type ServiceBroker from "../service-broker";
+import type Registry from "./registry";
 
 declare namespace NodeCatalog {
 	export interface NodeCatalogListOptions {
@@ -16,9 +16,9 @@ declare namespace NodeCatalog {
 	export type NodeCatalogListResult = Omit<Node, "rawInfo">;
 }
 
-import _ = require("lodash");
-import os = require("os");
-import Node = require("./node");
+import _ from "lodash";
+import os from "os";
+import Node from "./node";
 import { getIpList } from "../utils";
 
 /**

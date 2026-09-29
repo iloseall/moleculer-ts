@@ -7,12 +7,12 @@
 import { isObject, isString } from "../utils";
 import { BrokerOptionsError } from "../errors";
 
-import BaseStrategy = require("./base");
-import RoundRobinStrategy = require("./round-robin");
-import RandomStrategy = require("./random");
-import CpuUsageStrategy = require("./cpu-usage");
-import LatencyStrategy = require("./latency");
-import ShardStrategy = require("./shard");
+import BaseStrategy from "./base";
+import RoundRobinStrategy from "./round-robin";
+import RandomStrategy from "./random";
+import CpuUsageStrategy from "./cpu-usage";
+import LatencyStrategy from "./latency";
+import ShardStrategy from "./shard";
 
 const Strategies = {
 	Base: BaseStrategy,

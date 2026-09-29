@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import ServiceBroker = require("../service-broker");
-import Context = require("../context");
-import BaseTraceExporter = require("./exporters/base");
+import type ServiceBroker from "../service-broker";
+import type Context from "../context";
+import type BaseTraceExporter from "./exporters/base";
 import type { Logger } from "../logger-factory";
 import type { ConsoleTraceExporterOptions } from "./exporters/console";
 import type { DatadogTraceExporterOptions } from "./exporters/datadog";
@@ -96,11 +96,11 @@ declare namespace Tracer {
 	}
 }
 
-import _ = require("lodash");
-import Exporters = require("./exporters");
+import _ from "lodash";
+import Exporters from "./exporters";
 //const AsyncStorage = require("../async-storage");
-import RateLimiter = require("./rate-limiter");
-import Span = require("./span");
+import RateLimiter from "./rate-limiter";
+import Span from "./span";
 import { isFunction } from "../utils";
 
 /**

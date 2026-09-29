@@ -7,12 +7,12 @@
 import { isObject, isString, isInheritedClass } from "../utils";
 import { BrokerOptionsError } from "../errors";
 
-import Serializer = require("./base");
-import JSONSerializer = require("./json");
-import JSONExtSerializer = require("./json-extended");
-import MsgPackSerializer = require("./msgpack");
-import NotepackSerializer = require("./notepack");
-import CborSerializer = require("./cbor");
+import Serializer from "./base";
+import JSONSerializer from "./json";
+import JSONExtSerializer from "./json-extended";
+import MsgPackSerializer from "./msgpack";
+import NotepackSerializer from "./notepack";
+import CborSerializer from "./cbor";
 
 const Serializers = {
 	Base: Serializer,

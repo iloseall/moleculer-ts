@@ -16,10 +16,9 @@ declare namespace KafkaTransporter {
 	}
 }
 
-import _0 = require("lodash");
-const { defaultsDeep } = _0;
-import Transporter = require("./base");
-import C = require("../constants");
+import { defaultsDeep } from "lodash";
+import Transporter from "./base";
+import * as C from "../constants";
 
 /**
  * Transporter for Kafka

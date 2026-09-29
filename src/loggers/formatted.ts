@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import LoggerFactory = require("../logger-factory");
+import type LoggerFactory from "../logger-factory";
 import type { LoggerOptions } from "./base";
 
 declare namespace FormattedLogger {
@@ -19,10 +19,10 @@ declare namespace FormattedLogger {
 	}
 }
 
-import BaseLogger = require("./base");
-import _ = require("lodash");
-import kleur = require("kleur");
-import util = require("util");
+import BaseLogger from "./base";
+import _ from "lodash";
+import kleur from "kleur";
+import util from "util";
 import { isObject, isFunction } from "../utils";
 
 function getColor(type) {

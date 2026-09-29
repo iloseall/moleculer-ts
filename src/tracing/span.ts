@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import Tracer = require("./tracer");
+import type Tracer from "./tracer";
 import type { Logger } from "../logger-factory";
 
 declare namespace Span {
@@ -42,7 +42,7 @@ declare namespace Span {
 	}
 }
 
-const perf = require("perf_hooks").performance;
+import { performance as perf } from "perf_hooks";
 
 function defProp(instance, propName, value, readOnly = false) {
 	Object.defineProperty(instance, propName, {

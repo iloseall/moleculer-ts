@@ -19,12 +19,12 @@ declare namespace AmqpTransporter {
 	}
 }
 
-import url = require("url");
-import Transporter = require("./base");
+import url from "url";
+import Transporter from "./base";
 import { isPromise } from "../utils";
-import C = require("../constants");
+import * as C from "../constants";
 
-const {
+import {
 	PACKET_REQUEST,
 	PACKET_RESPONSE,
 	PACKET_UNKNOWN,
@@ -35,7 +35,7 @@ const {
 	PACKET_HEARTBEAT,
 	PACKET_PING,
 	PACKET_PONG
-} = require("../packets");
+} from "../packets";
 
 /**
  * Transporter for AMQP

@@ -6,9 +6,9 @@
 
 import type { ActionSchema } from "../service";
 import type { EventSchema, ServiceDependency } from "../service";
-import Node = require("./node");
-import ServiceBroker = require("../service-broker");
-import Registry = require("./registry");
+import type Node from "./node";
+import type ServiceBroker from "../service-broker";
+import type Registry from "./registry";
 
 declare namespace ServiceCatalog {
 	export interface ServiceCatalogListOptions {
@@ -49,8 +49,8 @@ declare namespace ServiceCatalog {
 	}
 }
 
-import _ = require("lodash");
-import ServiceItem = require("./service-item");
+import _ from "lodash";
+import ServiceItem from "./service-item";
 import { removeFromArray } from "../utils";
 
 /**

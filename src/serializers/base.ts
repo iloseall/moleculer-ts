@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import type ServiceBroker = require("../service-broker");
+import type ServiceBroker from "../service-broker";
 
-import P = require("../packets");
+import * as P from "../packets";
 
 /**
  * Abstract serializer class

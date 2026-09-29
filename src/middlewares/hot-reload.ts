@@ -4,14 +4,13 @@
  * MIT Licensed
  */
 
-import fs = require("fs");
-import kleur = require("kleur");
-import path = require("path");
-import watch = require("recursive-watch");
-import _ = require("lodash");
+import fs from "fs";
+import kleur from "kleur";
+import path from "path";
+import watch from "recursive-watch";
+import _ from "lodash";
 
-import _mg666 = require("../utils");
-const { clearRequireCache, makeDirs, isFunction, isString, uniq } = _mg666;
+import { clearRequireCache, makeDirs, isFunction, isString, uniq } from "../utils";
 
 /* istanbul ignore next */
 function HotReloadMiddleware(broker) {

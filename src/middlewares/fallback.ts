@@ -4,12 +4,9 @@
  * MIT Licensed
  */
 
-import _mvt4h = require("../errors");
-const { MoleculerError } = _mvt4h;
-import _mv3h0 = require("../metrics");
-const { METRIC } = _mv3h0;
-import _m2jq8 = require("../utils");
-const { isFunction, isString } = _m2jq8;
+import { MoleculerError } from "../errors";
+import { METRIC } from "../metrics";
+import { isFunction, isString } from "../utils";
 
 function FallbackMiddleware(broker) {
 	function handleContextFallback(ctx, err) {

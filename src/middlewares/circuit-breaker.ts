@@ -11,9 +11,8 @@
  * @typedef {import("../service").ActionSchema} ActionSchema
  */
 
-import C = require("../constants");
-import _mnmyx = require("../metrics");
-const { METRIC } = _mnmyx;
+import * as C from "../constants";
+import { METRIC } from "../metrics";
 
 function circuitBreakerMiddleware(broker) {
 	let windowTimer;

@@ -7,15 +7,15 @@
 import { isObject, isString, isInheritedClass } from "../utils";
 import { BrokerOptionsError } from "../errors";
 
-import Base = require("./base");
-import Fake = require("./fake");
-import NATS = require("./nats");
-import MQTT = require("./mqtt");
-import Redis = require("./redis");
-import AMQP = require("./amqp");
-import AMQP10 = require("./amqp10");
-import Kafka = require("./kafka");
-import TCP = require("./tcp");
+import Base from "./base";
+import Fake from "./fake";
+import NATS from "./nats";
+import MQTT from "./mqtt";
+import Redis from "./redis";
+import AMQP from "./amqp";
+import AMQP10 from "./amqp10";
+import Kafka from "./kafka";
+import TCP from "./tcp";
 
 const Transporters = {
 	Base,

@@ -6,9 +6,9 @@
 
 import type { Server, Socket } from "net";
 
-import net = require("net");
-import EventEmitter = require("events");
-import Parser = require("./parser");
+import net from "net";
+import EventEmitter from "events";
+import Parser from "./parser";
 
 /**
  * TCP Reader for TcpTransporter

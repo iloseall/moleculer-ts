@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import type Context = require("../context");
-import type ServiceBroker = require("../service-broker");
-import type Registry = require("../registry/registry");
-import type Endpoint = require("../registry/endpoint");
+import type Context from "../context";
+import type ServiceBroker from "../service-broker";
+import type Registry from "../registry/registry";
+import type Endpoint from "../registry/endpoint";
 
 /**
  * Base strategy class

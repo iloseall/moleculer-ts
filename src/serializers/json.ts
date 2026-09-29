@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import BaseSerializer = require("./base");
+import BaseSerializer from "./base";
 
 /**
  * JSON serializer for Moleculer

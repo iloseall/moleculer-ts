@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import LoggerFactory = require("../logger-factory");
+import type LoggerFactory from "../logger-factory";
 import type { LogHandler } from "./base";
 import type { FormattedLoggerOptions } from "./formatted";
 
@@ -17,12 +17,12 @@ declare namespace FileLogger {
 	}
 }
 
-import FormattedLogger = require("./formatted");
-import _ = require("lodash");
+import FormattedLogger from "./formatted";
+import _ from "lodash";
 
-import fs = require("fs/promises");
-import path = require("path");
-import os = require("os");
+import fs from "fs/promises";
+import path from "path";
+import os from "os";
 import { makeDirs } from "../utils";
 
 /**

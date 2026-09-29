@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import type ServiceBroker = require("../service-broker");
-import type BaseStrategy = require("../strategies/base");
-import type BaseDiscoverer = require("./discoverers/base");
+import type ServiceBroker from "../service-broker";
+import type BaseStrategy from "../strategies/base";
+import type BaseDiscoverer from "./discoverers/base";
 import type { LocalDiscovererOptions } from "./discoverers/local";
 import type { Etcd3DiscovererOptions } from "./discoverers/etcd3";
 import type { RedisDiscovererOptions } from "./discoverers/redis";
@@ -49,18 +49,17 @@ declare namespace Registry {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 
-import utils = require("../utils");
-import Strategies = require("../strategies");
-import Discoverers = require("./discoverers");
-import NodeCatalog = require("./node-catalog");
-import ServiceCatalog = require("./service-catalog");
-import EventCatalog = require("./event-catalog");
-import ActionCatalog = require("./action-catalog");
-import ActionEndpoint = require("./endpoint-action");
-import _0 = require("../metrics");
-const { METRIC } = _0;
+import * as utils from "../utils";
+import Strategies from "../strategies";
+import Discoverers from "./discoverers";
+import NodeCatalog from "./node-catalog";
+import ServiceCatalog from "./service-catalog";
+import EventCatalog from "./event-catalog";
+import ActionCatalog from "./action-catalog";
+import ActionEndpoint from "./endpoint-action";
+import { METRIC } from "../metrics";
 
 /**
  * Service Registry

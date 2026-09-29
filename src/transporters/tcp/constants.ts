@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import P = require("../../packets");
+import * as P from "../../packets";
 
 export const PACKET_EVENT_ID = 1;
 export const PACKET_REQUEST_ID = 2;

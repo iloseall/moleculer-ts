@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import EventEmitter = require("events");
-import os = require("os");
-import dgram = require("dgram");
-import ipaddr = require("ipaddr.js");
+import EventEmitter from "events";
+import os from "os";
+import dgram from "dgram";
+import ipaddr from "ipaddr.js";
 import { randomInt } from "../../utils";
 
 /**

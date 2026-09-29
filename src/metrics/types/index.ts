@@ -6,11 +6,11 @@
 
 import { BrokerOptionsError } from "../../errors";
 
-import Base = require("./base");
-import Counter = require("./counter");
-import Gauge = require("./gauge");
-import Histogram = require("./histogram");
-import Info = require("./info");
+import Base from "./base";
+import Counter from "./counter";
+import Gauge from "./gauge";
+import Histogram from "./histogram";
+import Info from "./info";
 
 const Types = {
 	Base,

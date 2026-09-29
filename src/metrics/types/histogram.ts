@@ -39,10 +39,10 @@ declare namespace HistogramMetric {
 	}
 }
 
-import BaseMetric = require("./base");
-import _ = require("lodash");
-import METRIC = require("../constants");
-import MetricRate = require("../rates");
+import BaseMetric from "./base";
+import _ from "lodash";
+import * as METRIC from "../constants";
+import MetricRate from "../rates";
 import { isPlainObject } from "../../utils";
 const sortAscending = (a, b) => a - b;
 const setProp = (o, k, v) => {

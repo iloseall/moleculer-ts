@@ -4,10 +4,8 @@
  * MIT Licensed
  */
 
-import _muh2h = require("../errors");
-const { QueueIsFullError } = _muh2h;
-import _m7nho = require("../metrics");
-const { METRIC } = _m7nho;
+import { QueueIsFullError } from "../errors";
+import { METRIC } from "../metrics";
 
 function bulkheadMiddleware(broker) {
 	function wrapActionBulkheadMiddleware(handler, action) {

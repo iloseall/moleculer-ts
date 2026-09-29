@@ -4,14 +4,14 @@
  * MIT Licensed
  */
 
-import ActionEndpoint = require("./registry/endpoint-action");
-import EventEndpoint = require("./registry/endpoint-event");
+import type ActionEndpoint from "./registry/endpoint-action";
+import type EventEndpoint from "./registry/endpoint-event";
 import type { CallingOptions } from "./service-broker";
-import Service = require("./service");
-import Span = require("./tracing/span");
+import Service from "./service";
+import type Span from "./tracing/span";
 import type { ActionSchema, EventSchema } from "./service";
-import type ServiceBroker = require("./service-broker");
-import { Stream } from "stream";
+import type ServiceBroker from "./service-broker";
+import type { Stream } from "stream";
 
 declare namespace Context {
 	export interface ContextParentSpan {
@@ -21,9 +21,8 @@ declare namespace Context {
 	}
 }
 
-import util = require("util");
-import _0 = require("lodash");
-const { pick } = _0;
+import util from "util";
+import { pick } from "lodash";
 import { RequestSkippedError, MaxCallLevelError } from "./errors";
 
 /**

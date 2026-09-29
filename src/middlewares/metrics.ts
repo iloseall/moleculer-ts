@@ -4,8 +4,7 @@
  * MIT Licensed
  */
 
-import _ma83v = require("../metrics");
-const { METRIC } = _ma83v;
+import { METRIC } from "../metrics";
 
 function MetricsMiddleware(broker) {
 	const metrics = broker.metrics;

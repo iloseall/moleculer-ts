@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import type ServiceBroker = require("./service-broker");
+import type ServiceBroker from "./service-broker";
 
 /**
  * Extendable errors class.

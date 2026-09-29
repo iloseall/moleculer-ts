@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-const Writable = require("stream").Writable;
+import { Writable } from "stream";
 import { resolvePacketType } from "./constants";
 
 // Size of the packet header: 1 byte CRC + 4 bytes length + 1 byte type

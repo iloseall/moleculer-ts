@@ -6,15 +6,11 @@
 
 import { Socket } from "net";
 
-import net = require("net");
-import EventEmitter = require("events");
+import net from "net";
+import EventEmitter from "events";
 
 import { MoleculerError } from "../../errors";
-const {
-	PACKET_GOSSIP_REQ_ID,
-	PACKET_GOSSIP_RES_ID,
-	PACKET_GOSSIP_HELLO_ID
-} = require("./constants");
+import { PACKET_GOSSIP_REQ_ID, PACKET_GOSSIP_RES_ID, PACKET_GOSSIP_HELLO_ID } from "./constants";
 
 const HEADER_SIZE = 6;
 

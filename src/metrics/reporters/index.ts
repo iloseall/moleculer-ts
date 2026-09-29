@@ -7,13 +7,13 @@
 import { isObject, isString, isInheritedClass } from "../../utils";
 import { BrokerOptionsError } from "../../errors";
 
-import Base = require("./base");
-import Console = require("./console");
-import CSV = require("./csv");
-import Event = require("./event");
-import Datadog = require("./datadog");
-import Prometheus = require("./prometheus");
-import StatsD = require("./statsd");
+import Base from "./base";
+import Console from "./console";
+import CSV from "./csv";
+import Event from "./event";
+import Datadog from "./datadog";
+import Prometheus from "./prometheus";
+import StatsD from "./statsd";
 
 const Reporters = {
 	Base,

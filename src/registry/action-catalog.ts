@@ -5,11 +5,11 @@
  */
 
 import type { ActionSchema } from "../service";
-import type Node = require("./node");
-import type ServiceItem = require("./service-item");
-import type ServiceBroker = require("../service-broker");
-import type Registry = require("./registry");
-import type Strategy = require("../strategies/base");
+import type Node from "./node";
+import type ServiceItem from "./service-item";
+import type ServiceBroker from "../service-broker";
+import type Registry from "./registry";
+import type Strategy from "../strategies/base";
 
 declare namespace ActionCatalog {
 	export interface ActionCatalogListOptions {
@@ -35,10 +35,10 @@ declare namespace ActionCatalog {
 	}
 }
 
-import _ = require("lodash");
-import Strategies = require("../strategies");
-import EndpointList = require("./endpoint-list");
-import ActionEndpoint = require("./endpoint-action");
+import _ from "lodash";
+import Strategies from "../strategies";
+import EndpointList from "./endpoint-list";
+import ActionEndpoint from "./endpoint-action";
 
 /**
  * Catalog class to store service actions

@@ -1,7 +1,7 @@
 import type { Logger } from "../../logger-factory";
-import type Span = require("../span");
-import type Tracer = require("../tracer");
-import type ServiceBroker = require("../../service-broker");
+import type Span from "../span";
+import type Tracer from "../tracer";
+import type ServiceBroker from "../../service-broker";
 
 declare namespace BaseTraceExporter {
 	export interface BaseTraceExporterOptions {
@@ -10,7 +10,7 @@ declare namespace BaseTraceExporter {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 import { isObject, safetyObject } from "../../utils";
 
 /**

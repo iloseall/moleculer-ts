@@ -4,17 +4,17 @@
  * MIT Licensed
  */
 
-import BaseTransporter = require("./transporters/base");
-import Context = require("./context");
-import Node = require("./registry/node");
+import BaseTransporter from "./transporters/base";
+import type Context from "./context";
+import type Node from "./registry/node";
 import { Packet } from "./packets";
 import type { Logger } from "./logger-factory";
-import ServiceBroker = require("./service-broker");
-import Transporter = require("./transporters/base");
-import BaseDiscoverer = require("./registry/discoverers/base");
-import MetricRegistry = require("./metrics/registry");
+import type ServiceBroker from "./service-broker";
+import Transporter from "./transporters/base";
+import type BaseDiscoverer from "./registry/discoverers/base";
+import type MetricRegistry from "./metrics/registry";
 import type { Regenerator as ErrorRegenerator } from "./errors";
-import { NodeRawInfo } from "./registry";
+import type { NodeRawInfo } from "./registry";
 
 declare namespace Transit {
 	export interface TransitOptions {
@@ -35,14 +35,12 @@ declare namespace Transit {
 	}
 }
 
-import P = require("./packets");
-import E = require("./errors");
+import * as P from "./packets";
+import * as E from "./errors";
 
-import _0 = require("stream");
-const { Transform } = _0;
-import _1 = require("./metrics");
-const { METRIC } = _1;
-import C = require("./constants");
+import { Transform } from "stream";
+import { METRIC } from "./metrics";
+import * as C from "./constants";
 
 /**
  */

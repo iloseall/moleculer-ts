@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-const { MoleculerClientError } = require("./errors");
-const utils = require("./utils");
+import { MoleculerClientError } from "./errors";
+import * as utils from "./utils";
 
 /**
  * Internal service ($node.*)

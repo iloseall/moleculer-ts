@@ -4,8 +4,7 @@
  * MIT Licensed
  */
 
-import _mz7to = require("../errors");
-const { GracefulStopTimeoutError } = _mz7to;
+import { GracefulStopTimeoutError } from "../errors";
 
 function ContextTrackerMiddleware(broker) {
 	function addContext(ctx) {

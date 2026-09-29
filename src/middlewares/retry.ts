@@ -4,8 +4,7 @@
  * MIT Licensed
  */
 
-import _m83eq = require("../metrics");
-const { METRIC } = _m83eq;
+import { METRIC } from "../metrics";
 
 function RetryMiddleware(broker) {
 	function wrapRetryMiddleware(handler, action) {

@@ -1,7 +1,7 @@
 import type { BaseTraceExporterOptions } from "./base";
 import type { Logger } from "../../logger-factory";
-import type Span = require("../span");
-import type Tracer = require("../tracer");
+import type Span from "../span";
+import type Tracer from "../tracer";
 import { Color } from "kleur";
 
 declare namespace ConsoleTraceExporter {
@@ -13,12 +13,12 @@ declare namespace ConsoleTraceExporter {
 	}
 }
 
-import _ = require("lodash");
+import _ from "lodash";
 const r = _.repeat;
-import kleur = require("kleur");
+import kleur from "kleur";
 import { humanize, isFunction } from "../../utils";
 
-import BaseTraceExporter = require("./base");
+import BaseTraceExporter from "./base";
 
 /**
  * Console Trace Exporter only for debugging

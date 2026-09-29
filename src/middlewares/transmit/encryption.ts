@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import crypto = require("crypto");
+import crypto from "crypto";
 
 /**
  * This is a AES encryption middleware to protect the whole

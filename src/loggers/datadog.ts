@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import LoggerFactory = require("../logger-factory");
+import type LoggerFactory from "../logger-factory";
 import type { LoggerOptions } from "./base";
 
 declare namespace DatadogLogger {
@@ -19,12 +19,12 @@ declare namespace DatadogLogger {
 	}
 }
 
-import BaseLogger = require("./base");
-import _ = require("lodash");
-import os = require("os");
+import BaseLogger from "./base";
+import _ from "lodash";
+import os from "os";
 import { MoleculerError } from "../errors";
 
-import util = require("util");
+import util from "util";
 import { isObject } from "../utils";
 
 /*

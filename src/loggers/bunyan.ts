@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import LoggerFactory = require("../logger-factory");
+import type LoggerFactory from "../logger-factory";
 import type { LoggerOptions } from "./base";
 import type { LoggerOptions as BunyanNativeLoggerOptions } from "bunyan";
 
@@ -14,8 +14,8 @@ declare namespace BunyanLogger {
 	}
 }
 
-import BaseLogger = require("./base");
-import _ = require("lodash");
+import BaseLogger from "./base";
+import _ from "lodash";
 import { isFunction } from "../utils";
 
 /**

@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import MetricRegistry = require("../registry");
-import MetricBaseReporter = require("./base");
+import type MetricRegistry from "../registry";
+import MetricBaseReporter from "./base";
 import { Server, IncomingMessage, ServerResponse } from "http";
 
 declare namespace PrometheusReporter {
@@ -17,12 +17,12 @@ declare namespace PrometheusReporter {
 	}
 }
 
-import BaseReporter = require("./base");
-import _ = require("lodash");
-import http = require("http");
-import zlib = require("zlib");
+import BaseReporter from "./base";
+import _ from "lodash";
+import http from "http";
+import zlib from "zlib";
 import { MoleculerError } from "../../errors";
-import METRIC = require("../constants");
+import * as METRIC from "../constants";
 import { isFunction } from "../../utils";
 
 /**

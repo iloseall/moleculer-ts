@@ -4,11 +4,11 @@
  * MIT Licensed
  */
 
-const kleur = require("kleur");
-const os = require("os");
-const path = require("path");
-const fs = require("fs");
-const { TimeoutError } = require("./errors");
+import kleur from "kleur";
+import os from "os";
+import path from "path";
+import fs from "fs";
+import { TimeoutError } from "./errors";
 
 const lut = [];
 for (let i = 0; i < 256; i++) {

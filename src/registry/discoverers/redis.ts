@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import type Registry = require("../registry");
-import type Node = require("../node");
+import type Registry from "../registry";
+import type Node from "../node";
 
 declare namespace RedisDiscoverer {
 	export interface RedisDiscovererOptions extends BaseDiscoverer.DiscovererOptions {
@@ -17,16 +17,15 @@ declare namespace RedisDiscoverer {
 	}
 }
 
-import _ = require("lodash");
-import kleur = require("kleur");
+import _ from "lodash";
+import kleur from "kleur";
 import { BrokerOptionsError } from "../../errors";
-import BaseDiscoverer = require("./base");
-import _0 = require("../../metrics");
-const { METRIC } = _0;
-import Serializers = require("../../serializers");
+import BaseDiscoverer from "./base";
+import { METRIC } from "../../metrics";
+import Serializers from "../../serializers";
 import { removeFromArray, isFunction, randomInt } from "../../utils";
-import P = require("../../packets");
-import C = require("../../constants");
+import * as P from "../../packets";
+import * as C from "../../constants";
 
 let Redis;
 

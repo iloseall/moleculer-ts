@@ -20,13 +20,12 @@ declare namespace RedisCacher {
 
 let R;
 
-import BaseCacher = require("./base");
-import _ = require("lodash");
-import _0 = require("../metrics");
-const { METRIC } = _0;
+import BaseCacher from "./base";
+import _ from "lodash";
+import { METRIC } from "../metrics";
 import { BrokerOptionsError } from "../errors";
-import Serializers = require("../serializers");
-import C = require("../constants");
+import Serializers from "../serializers";
+import * as C from "../constants";
 
 /**
  * Cacher factory for Redis
