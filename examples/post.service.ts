@@ -1,11 +1,12 @@
-"use strict";
+import _ from "lodash";
+import fakeratorFactory from "fakerator";
 
-let _ = require("lodash");
-let fakerator = require("fakerator")();
+import { randomInt } from "../src/utils";
+import type { ServiceSchema } from "../src/service";
 
-const { randomInt } = require("../src/utils");
+const fakerator = fakeratorFactory();
 
-module.exports = function () {
+export default function (): ServiceSchema {
 	const posts = fakerator.times(fakerator.entity.post, 10);
 
 	for (let i = 0; i < posts.length; i++) {
@@ -56,7 +57,7 @@ module.exports = function () {
 					keys: ["id"]
 				},
 				handler(ctx) {
-					let post = _.cloneDeep(posts.find(post => post.id == ctx.params.id));
+					const post = _.cloneDeep(posts.find(post => post.id == ctx.params.id));
 					return ctx
 						.call("v2.users.get", { id: post.author, withPostCount: true })
 						.then(user => {
@@ -84,7 +85,7 @@ module.exports = function () {
 			},
 
 			slowGet(ctx) {
-				let post = _.cloneDeep(posts.find(post => post.id == ctx.params.id));
+				const post = _.cloneDeep(posts.find(post => post.id == ctx.params.id));
 				return this.Promise.delay(2000)
 					.then(() =>
 						ctx.call("v2.users.slowGet", { id: post.author, withPostCount: true })
@@ -104,4 +105,4 @@ module.exports = function () {
 			}
 		}
 	};
-};
+}

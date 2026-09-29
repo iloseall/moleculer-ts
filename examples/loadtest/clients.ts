@@ -1,22 +1,22 @@
-"use strict";
+import os from "os";
+import cluster from "cluster";
 
-const os = require("os"),
-	cluster = require("cluster"),
-	stopSignals = [
-		"SIGHUP",
-		"SIGINT",
-		"SIGQUIT",
-		"SIGILL",
-		"SIGTRAP",
-		"SIGABRT",
-		"SIGBUS",
-		"SIGFPE",
-		"SIGUSR1",
-		"SIGSEGV",
-		"SIGUSR2",
-		"SIGTERM"
-	],
-	production = true; //process.env.NODE_ENV == "production";
+const stopSignals = [
+	"SIGHUP",
+	"SIGINT",
+	"SIGQUIT",
+	"SIGILL",
+	"SIGTRAP",
+	"SIGABRT",
+	"SIGBUS",
+	"SIGFPE",
+	"SIGUSR1",
+	"SIGSEGV",
+	"SIGUSR2",
+	"SIGTERM"
+];
+
+const production = true; //process.env.NODE_ENV == "production";
 
 let stopping = false;
 
@@ -29,10 +29,10 @@ cluster.on("disconnect", function (worker) {
 });
 
 if (cluster.isMaster) {
-	const workerCount = process.env.NODE_CLUSTER_WORKERS || os.cpus().length;
+	const workerCount = Number(process.env.NODE_CLUSTER_WORKERS) || os.cpus().length;
 	console.log(`Starting ${workerCount} workers...`);
 	for (let i = 0; i < workerCount; i++) {
-		let worker = cluster.fork();
+		const worker = cluster.fork();
 	}
 
 	if (production) {
@@ -48,10 +48,10 @@ if (cluster.isMaster) {
 		});
 	}
 } else {
-	let worker = cluster.worker;
+	const worker = cluster.worker;
 	//console.log(worker);
-	let hostname = os.hostname();
-	worker.process.argv.push(hostname + "-client-" + worker.id);
+	const hostname = os.hostname();
+	(worker.process as any).argv.push(hostname + "-client-" + worker.id);
 
-	require("./client.js");
+	require("./client.ts");
 }

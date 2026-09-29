@@ -56,7 +56,11 @@ declare namespace MetricRegistry {
 		reporter?:
 			| MetricsReporterTypes
 			| MetricsReporter
-			| (MetricsReporter | MetricsReporterTypes)[]
+			// `Reporters.resolve()` accepts an already instantiated reporter
+			// (`isInheritedClass(opt, Reporters.Base)`), so custom reporters can be
+			// passed directly instead of by name.
+			| MetricBaseReporter
+			| (MetricsReporter | MetricsReporterTypes | MetricBaseReporter)[]
 			| null;
 		defaultBuckets?: number[];
 		defaultQuantiles?: number[];

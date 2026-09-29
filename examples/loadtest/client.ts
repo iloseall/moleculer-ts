@@ -1,18 +1,18 @@
-"use strict";
+import { times, random, padStart } from "lodash";
+import type { TransporterType } from "../../src/service-broker";
+import type { DiscovererType } from "../../src/registry/registry";
 
-let { times, random, padStart } = require("lodash");
+import kleur from "kleur";
+import ServiceBroker from "../../src/service-broker";
+import { short as humanize } from "tiny-human-time";
 
-let kleur = require("kleur");
-let ServiceBroker = require("../../src/service-broker");
-const humanize = require("tiny-human-time").short;
-
-let transporter = process.env.TRANSPORTER || "TCP";
+const transporter = (process.env.TRANSPORTER || "TCP") as TransporterType;
 
 let sumTime = 0;
 let maxTime = null;
 
 // Create broker
-let broker = new ServiceBroker({
+const broker = new ServiceBroker({
 	namespace: "loadtest",
 	nodeID: process.argv[2] || "client",
 	transporter,
@@ -25,7 +25,7 @@ let broker = new ServiceBroker({
 		retries: 3
 	},
 	registry: {
-		discoverer: process.env.DISCOVERER || "Local"
+		discoverer: (process.env.DISCOVERER || "Local") as DiscovererType
 	}
 });
 
@@ -58,11 +58,11 @@ function work() {
 let counter = 0;
 let errorCount = 0;
 
-const flood = process.env.FLOOD || 0;
+const flood = Number(process.env.FLOOD || 0);
 
 function work() {
 	const startTime = process.hrtime();
-	let payload = { c: ++counter };
+	const payload = { c: ++counter };
 	const p = broker
 		.call("perf.reply", payload)
 		.then(() => {
@@ -103,10 +103,10 @@ broker
 
 			setInterval(() => {
 				if (callCount > 0) {
-					let rps = callCount / ((Date.now() - startTime) / 1000);
+					const rps = callCount / ((Date.now() - startTime) / 1000);
 
-					let queueSize = broker.transit.pendingRequests.size;
-					let latency = sumTime / callCount;
+					const queueSize = broker.transit.pendingRequests.size;
+					const latency = sumTime / callCount;
 
 					console.log(
 						broker.nodeID,

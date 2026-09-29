@@ -17,10 +17,10 @@
  * `ctx.nodeID` is the sender node).
  */
 
-import _ = require("lodash");
-import kleur = require("kleur");
-import ServiceBroker = require("../../src/service-broker");
-import Context = require("../../src/context");
+import _ from "lodash";
+import kleur from "kleur";
+import ServiceBroker from "../../src/service-broker";
+import type Context from "../../src/context";
 import { randomInt } from "../../src/utils";
 import type { LogLevels } from "../../src/loggers/base";
 import type { TransporterType } from "../../src/service-broker";

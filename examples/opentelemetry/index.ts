@@ -1,13 +1,13 @@
-"use strict";
-
 // Instead use `-r ./tracing.js` // require("./tracing");
 
-const path = require("path");
+import path from "path";
 
-const ServiceBroker = require("../../src/service-broker");
-const { api } = require("@opentelemetry/sdk-node");
+import ServiceBroker from "../../src/service-broker";
+import type { BrokerOptions } from "../../src/service-broker";
+import opentelemetryMiddleware from "./opentelemetry.middleware";
+import { api } from "@opentelemetry/sdk-node";
 
-const brokerOpts = {
+const brokerOpts: BrokerOptions = {
 	logger: console,
 	logLevel: "info",
 	transporter: "Redis",
@@ -37,7 +37,7 @@ const brokerOpts = {
 		"Retry",
 		"Fallback",
 		"ErrorHandler",
-		require("./opentelemetry.middleware"),
+		opentelemetryMiddleware,
 		"Metrics",
 		"Debounce",
 		"Throttle"
@@ -55,8 +55,8 @@ const broker2 = new ServiceBroker({
 	...brokerOpts
 });
 
-broker2.loadService(path.join(__dirname, "..", "post.service.js"));
-broker2.loadService(path.join(__dirname, "..", "user.service.js"));
+broker2.loadService(path.join(__dirname, "..", "post.service.ts"));
+broker2.loadService(path.join(__dirname, "..", "user.service.ts"));
 
 Promise.all([broker.start(), broker2.start()]).then(async () => {
 	await broker.waitForServices("posts");

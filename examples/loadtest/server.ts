@@ -1,19 +1,19 @@
-"use strict";
+import ServiceBroker from "../../src/service-broker";
+import { padStart } from "lodash";
+import type { TransporterType } from "../../src/service-broker";
+import type { DiscovererType } from "../../src/registry/registry";
 
-let ServiceBroker = require("../../src/service-broker");
-let { padStart } = require("lodash");
+import os from "os";
+const hostname = os.hostname();
 
-let os = require("os");
-let hostname = os.hostname();
-
-let transporter = process.env.TRANSPORTER || "TCP";
+const transporter = (process.env.TRANSPORTER || "TCP") as TransporterType;
 
 let count = 0;
-let sum = 0;
-let maxTime = null;
+const sum = 0;
+const maxTime = null;
 
 // Create broker
-let broker = new ServiceBroker({
+const broker = new ServiceBroker({
 	namespace: "loadtest",
 	nodeID: process.argv[2] || hostname + "-server",
 	transporter,
@@ -21,7 +21,7 @@ let broker = new ServiceBroker({
 	logLevel: "warn",
 	//metrics: true,
 	registry: {
-		discoverer: process.env.DISCOVERER || "Local"
+		discoverer: (process.env.DISCOVERER || "Local") as DiscovererType
 	}
 });
 

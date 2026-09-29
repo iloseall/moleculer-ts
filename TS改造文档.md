@@ -15,6 +15,8 @@ dist/         133 个 .js + 133 个 .d.ts + runner-esm.mjs（与 src 严格 1:1�
 
 - 源文件删除：248 个（133 个 `.js` + 115 个 `.d.ts`）
 - `src` 下残留 `.js` / `.d.ts`：**0**
+- `examples/`：**27 个 `.js` → `.ts`**（跳过 `examples/esm/`——本身就是 ESM 示范；`examples/docker/`——独立的 Docker 消费者工程；
+  `examples/runner/*.js`——仓库已自带同名 `.ts` 版本），`examples/` 下已无 `.js`
 - `require()` 残留：**43 处，全部为刻意保留**（见第三节）
 - `dist/` 已被 `.gitignore` 忽略，通过 `npm run build` 生成，CI / 发布流程前置执行
 
@@ -179,24 +181,65 @@ localAction?: (
 长期不在 lint 范围内。本次统一为 `test / dev / benchmark / examples` 的 `.js` 与 `.ts` 都使用同一套放宽规则
 （允许 `console`、未使用变量），并对其执行了一次 prettier 规范化。
 
+### 12. 示例类型检查暴露的公开类型缺口（5 处，均已修库而非绕开）
+
+把 `examples/**` 纳入类型检查后，暴露出**运行时支持但公开类型没声明**的配置形态。
+这些不是示例的问题，而是所有用户都会撞上的类型缺口，因此统一在 `src` 侧补齐：
+
+| 位置 | 缺口 | 依据（运行时确实支持） |
+|---|---|---|
+| `service-broker.ts` / `logger-factory.ts` | `logger: console` 不被接受 | `logger-factory.init()` 里有 `opts === true \|\| opts === console` 分支，且源码原本就得写 `(opts as any) === console` |
+| 同上 | `logger: "Console"`（字符串）不被接受 | `init()` 中 `isString(o)` → `Loggers.resolve({ type: o })` |
+| 同上 | `logger: ["Console"]`（字符串数组）不被接受 | `init()` 对数组元素逐个 `isString(o)` 处理 |
+| `metrics/registry.ts` | `metrics.reporter` 不接受 reporter **实例** | `Reporters.resolve()` 中 `isInheritedClass(opt, Reporters.Base)` 直接放行实例 |
+| `service.ts` → `ActionSchema` | `action.protected` 未声明 | `service-catalog.ts` 读 `action.protected === true` |
+| `service.ts` → `ActionSchema` | `action.description` 未声明 | REPL / API 网关 / 文档工具依赖该元数据 |
+| `registry/registry.ts` | `DiscovererType` 未 `export` | 与已导出的 `TransporterType` 对称，环境变量写法需要它 |
+| `utils.ts` | `uniq()` 返回 `any[]`（此前推断成 `unknown[]`） | 调用点普遍按数组使用 |
+
+配套：`BrokerOptions.logger` / `LoggerFactory.init()` 的联合类型补上 `Console`、`string`、`(LoggerConfig | string)[]`、`BaseLogger<LoggerOptions>`。
+
+### 13. 示例里已经跑不通的 API 用法（迁移时顺手修正）
+
+| 文件 | 旧写法 | 问题与修正 |
+|---|---|---|
+| `stat.service.js` | `"metrics.trace.span.finish"(payload)` | 新版事件回调收到的是 **Context**；改为 `(ctx)` + `const payload = ctx.params` |
+| `es6.class.service.js` | `meta: { scalable: true }` | 核心只读 `schema.metadata`（`Service.metadata = schema.metadata`），`meta` 全库无引用 → 改 `metadata` |
+| `master.js` | repl 命令里的 `types: {}` | 内容全被注释掉，且不在类型里 → 删除（空对象，无行为影响） |
+
+### 14. 第三方依赖已升级、示例仍停留在旧 API（保留原样 + 注释说明）
+
+| 文件 | 情况 | 处理 |
+|---|---|---|
+| `loadtest/nats.ts` | 面向 nats v1（`connect()` 同步返回连接），现装的是 v2（返回 Promise） | 保持原逻辑，连接变量标注为 `any`，文件头加 NOTE |
+| `opentelemetry/tracing.ts` | 面向旧 OTel API（`NodeTracerProvider` + `addSpanProcessor` + `resources.Resource`），现装的是新版 SDK | 保持原逻辑，三处最小 `as any` 转换 + NOTE |
+
+两者**改造前就已无法运行**，属于示例陈旧，不属于本次迁移目标；已用注释标注，留待独立任务处理。
+
 ---
 
 ## 五、门禁验证（改造后全量运行）
 
 | 门禁 | 结果 |
 |---|---|
-| `tsc -p tsconfig.json` | **0 error**（1.4s） |
-| `tsc -p tsconfig.examples.json`（src + examples） | **0 error** |
+| `tsc -p tsconfig.json` | **0 error**（1.5s） |
+| `tsc -p tsconfig.examples.json`（src + 全部 examples） | **0 error** |
 | `npx jest` | **136 suites / 2346 passed / 4 skipped** |
-| `npm run test`（含覆盖率） | 通过，All files **96.39%** |
 | `npm run build` | 通过，`dist/` 与 `src` **1:1**（133 js + 133 d.ts + runner-esm.mjs） |
 | `npm run test:ts`（build + tsd + hello-world 编译 + ts-node 运行） | 通过（tsd 0 error，示例服务正常启停） |
 | `npm run test:esm` | 通过（3 个服务启动成功） |
-| `npm run test:examples`（build + 示例类型检查） | 通过（4.5s） |
-| ESLint `benchmark bin examples src test` | **0 error / 4 warning**（均为未使用变量；忽略行尾差异口径） |
+| `npm run test:examples`（build + 示例类型检查） | 通过 |
+| ESLint `examples src` | **0 error / 15 warning**（均为未使用变量；忽略行尾差异口径） |
+| `tsx examples/index.ts simple`（`npm run demo simple`） | 通过：4 次调用成功 + 1 次预期中的除零报错 |
+| `tsx examples/index.ts middlewares` | 通过：中间件链 mw1/mw2/mw3 全执行、缓存命中演示正常、0 报错 |
+| `tsx examples/start-es6.ts` | 通过：`v2.greeter`（class 版服务）正常启动 |
+| `tsx examples/loadtest/local.ts` | 通过：吞吐循环正常（约 2.1~2.5M req/s） |
+| 12 个服务文件逐个 `broker.loadService()` | **11 个 OK**（`dummy.service.ts` 按设计抛「Service name can't be empty」） |
 | `tsx examples/client-server/server.ts` + `client.ts` | 通过：16 次 `math.add` 全部成功、3 次事件回声正常、0 报错 |
-| `npm run demo simple` | 通过 |
 | `require("./index.js")` / `import from "./index.mjs"` | 正常 |
+
+> 类型检查口径：从最初的 **152 处错误**（示例中）降到 **0**，其中大部分并非语法问题，而是
+> 「类型收紧后暴露的真实问题」——见第四节第 12~14 条。
 
 ---
 
@@ -259,6 +302,34 @@ npm run demo:client-server:server
 # 终端 2
 npm run demo:client-server:client
 ```
+
+### 其余示例：27 个 `.js` → `.ts`
+
+`examples/` 下除 `esm/`（ESM 示范本身）、`docker/`（独立 Docker 消费者工程，用 `node:8-alpine` + 发布包，
+里面没有 TS 运行时）、`runner/*.js`（仓库已自带同名 `.ts` 版本）外，全部完成 TS 化。
+
+**迁移形态映射**（codemod 处理，再逐个修类型错误）：
+
+| 原形态 | 转换结果 | 例 |
+|---|---|---|
+| `const X = require("../../src/y")` | `import X from "../../src/y"` | `simple/index.ts` |
+| `const { a, b } = require("x")` | `import { a, b } from "x"` | `loadtest/client.ts` |
+| `module.exports = { … }` | `const XxxSchema: ServiceSchema = { … }; export default XxxSchema;` | `math.service.ts` 等 8 个服务 |
+| `module.exports = function (…) { … }` | `export default function (…): ServiceSchema { … }` | `post/user/user.v1.service.ts` |
+| `module.exports = class` | `export default class` | `es6.class.service.ts` |
+| 类里构造函数动态挂字段 | 补字段声明（同 `src` 的处理方式） | `stat.service.ts` 两个类 |
+| 自定义 `settings` | 声明 `interface XxxSettings extends ServiceSettingSchema` | `es6.class` / `silent` / `node-controller` |
+| 环境变量字符串 → 联合类型 | `as TransporterType` / `as DiscovererType` / `as LogLevels` | `multi-nodes` / `loadtest` |
+
+**服务文件的加载路径同步改后缀**：`loadService("…/math.service.js")` → `"…/math.service.ts"`；
+`require("./master.js")` → `require("./master.ts")`（cluster 分支加载，必须保持惰性）。
+调度器 `examples/index.ts` 的 `require("./" + moduleName)` 保持不变——`tsx` 能正确把目录解析到 `index.ts`（已实测）。
+
+**刻意跳过/无法运行的部分**：
+
+- `examples/multi-nodes/*`：默认 transporter 是 NATS（`nats` 未作为依赖安装），本机无法实跑，仅保证类型通过
+- `examples/opentelemetry/*`：需要 Redis transporter + OTel collector，本机无法实跑，仅保证类型通过
+- `examples/loadtest/{client,server}.ts`：需要实际传输器与多节点，同上
 
 ---
 

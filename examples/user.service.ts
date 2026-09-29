@@ -1,11 +1,10 @@
-"use strict";
+import _ from "lodash";
+import fakeratorFactory from "fakerator";
+import Service from "../src/service";
+import { ValidationError } from "../src/errors";
 
-let _ = require("lodash");
-let fakerator = require("fakerator")();
-let Service = require("../src/service");
-let { ValidationError } = require("../src/errors");
-
-let users = fakerator.times(fakerator.entity.user, 10);
+const fakerator = fakeratorFactory();
+const users = fakerator.times(fakerator.entity.user, 10);
 
 _.each(users, (user, i) => (user.id = i + 1));
 let c = 0;

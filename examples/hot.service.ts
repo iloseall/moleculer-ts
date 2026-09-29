@@ -1,6 +1,6 @@
-"use strict";
+import type { ServiceSchema } from "../src/service";
 
-module.exports = {
+const HotSchema: ServiceSchema = {
 	name: "hot",
 	metadata: {
 		scalable: true,
@@ -29,3 +29,5 @@ module.exports = {
 		this.logger.info(">>> Service stopped!");
 	}
 };
+
+export default HotSchema;

@@ -140,7 +140,14 @@ declare namespace ServiceBroker {
 		namespace?: string | null;
 		nodeID?: string | null;
 
-		logger?: BaseLogger<LoggerOptions> | LoggerConfig | LoggerConfig[] | boolean | null;
+		logger?:
+			| BaseLogger<LoggerOptions>
+			| Console
+			| LoggerConfig
+			| (LoggerConfig | string)[]
+			| string
+			| boolean
+			| null;
 		logLevel?: LogLevels | LogLevelConfig | null;
 
 		transporter?: BaseTransporter | TransporterType | TransporterConfig | null;
@@ -508,7 +515,7 @@ const INTERNAL_MIDDLEWARES = [
  * @class ServiceBroker
  */
 class ServiceBroker {
-	loggerFactory: any;
+	loggerFactory: LoggerFactory;
 	_closeFn: any;
 	static MOLECULER_VERSION: string;
 	static PROTOCOL_VERSION: string;
@@ -905,7 +912,7 @@ class ServiceBroker {
 	 *
 	 * @memberof ServiceBroker
 	 */
-	stop(): Promise<void> {
+	stop(): Promise<any> {
 		this.started = false;
 		return this.Promise.resolve()
 			.then(() => {

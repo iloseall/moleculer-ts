@@ -5,7 +5,8 @@
  */
 
 import type ServiceBroker from "./service-broker";
-import type { LogLevels } from "./loggers/base";
+import type BaseLogger from "./loggers/base";
+import type { LogLevels, LoggerOptions } from "./loggers/base";
 import type { Logger } from "./logger-factory";
 
 declare namespace LoggerFactory {
@@ -57,7 +58,17 @@ class LoggerFactory {
 	/**
 	 * Initialize module.
 	 */
-	init(opts: null | boolean | LoggerFactory.LoggerConfig | LoggerFactory.LoggerConfig[]) {
+	init(
+		opts:
+			| null
+			| boolean
+			| string
+			| Console
+			| BaseLogger<LoggerOptions>
+			| LoggerFactory.Logger
+			| LoggerFactory.LoggerConfig
+			| (LoggerFactory.LoggerConfig | string)[]
+	) {
 		this.opts = opts;
 
 		const globalLogLevel = this.broker.options.logLevel || "info";
@@ -65,7 +76,8 @@ class LoggerFactory {
 		if (opts === false || opts == null) {
 			// No logger
 			this.appenders = [];
-		} else if (opts === true || (opts as any) === console) {
+		} else if (opts === true || opts === console) {
+			// The raw `console` is a supported shorthand for the default console logger.
 			// Default console logger
 			this.appenders = [
 				Loggers.resolve({
@@ -76,11 +88,9 @@ class LoggerFactory {
 				})
 			];
 		} else {
-			if (!Array.isArray(opts)) {
-				opts = [opts];
-			}
+			const list = Array.isArray(opts) ? opts : [opts];
 
-			this.appenders = _.compact(opts).map(o => {
+			this.appenders = _.compact(list).map(o => {
 				// Built-in shorthand
 				if (isString(o))
 					return Loggers.resolve({ type: o, options: { level: globalLogLevel } });

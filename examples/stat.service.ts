@@ -1,6 +1,11 @@
-"use strict";
+import defaultsDeep from "lodash/defaultsDeep";
+import type { ServiceSchema } from "../src/service";
 
-const defaultsDeep = require("lodash/defaultsDeep");
+interface TimeBucket {
+	time: number;
+	times: number[];
+	rps: number | null;
+}
 
 /**
  *
@@ -8,6 +13,17 @@ const defaultsDeep = require("lodash/defaultsDeep");
  * @class StatRequestStore
  */
 class StatRequestStore {
+	name: string;
+	dirty: boolean;
+	count: number;
+	errors: Record<string, number>;
+	maxBucketCount: number;
+	timeBuckets: TimeBucket[];
+	cycleCount: number;
+	stat: Record<string, any> | null;
+	lastTimeBucket: TimeBucket;
+	firstBucketTime: number;
+
 	/**
 	 * Creates an instance of StatRequestStore.
 	 *
@@ -78,7 +94,7 @@ class StatRequestStore {
 	calculateRps() {
 		const now = Date.now();
 		let totalCount = 0;
-		let values = [];
+		const values = [];
 		this.timeBuckets.forEach((bucket, i) => {
 			totalCount = totalCount + bucket.times.length;
 			if (bucket.rps == null && i < this.timeBuckets.length - 1) {
@@ -107,7 +123,7 @@ class StatRequestStore {
 	 */
 	calculate() {
 		if (this.dirty || !this.stat) {
-			let stat = {
+			const stat: Record<string, any> = {
 				count: this.count,
 				errors: Object.assign({}, this.errors),
 				rps: this.calculateRps()
@@ -158,6 +174,11 @@ class StatRequestStore {
  * @class RequestStatistics
  */
 class RequestStatistics {
+	options: Record<string, any>;
+	total: StatRequestStore;
+	actions: Map<string, StatRequestStore>;
+	cycleTimer: NodeJS.Timeout;
+
 	/**
 	 * Creates an instance of RequestStatistics.
 	 *
@@ -222,7 +243,7 @@ class RequestStatistics {
 	 * @memberof RequestStatistics
 	 */
 	snapshot() {
-		let snapshot = {
+		const snapshot = {
 			total: this.total.snapshot(),
 			actions: {}
 		};
@@ -233,7 +254,7 @@ class RequestStatistics {
 	}
 }
 
-module.exports = {
+const StatSchema: ServiceSchema = {
 	name: "stat",
 	actions: {
 		snapshot(ctx) {
@@ -241,7 +262,9 @@ module.exports = {
 		}
 	},
 	events: {
-		"metrics.trace.span.finish"(payload) {
+		"metrics.trace.span.finish"(ctx) {
+			const payload = ctx.params;
+
 			if (payload.error)
 				this.requests.append(
 					payload.action.name,
@@ -264,3 +287,5 @@ module.exports = {
 		this.requests = new RequestStatistics(defaultsDeep({}, this.broker.options));
 	}
 };
+
+export default StatSchema;

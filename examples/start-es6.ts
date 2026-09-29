@@ -1,4 +1,4 @@
-const { ServiceBroker } = require("../");
+import { ServiceBroker } from "../";
 
 const broker = new ServiceBroker({
 	namespace: "test",
@@ -6,5 +6,5 @@ const broker = new ServiceBroker({
 	hotReload: true
 });
 
-broker.loadService("./examples/es6.class.service.js");
+broker.loadService("./examples/es6.class.service.ts");
 broker.start();

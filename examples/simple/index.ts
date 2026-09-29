@@ -1,16 +1,14 @@
-"use strict";
-
-let ServiceBroker = require("../../src/service-broker");
+import ServiceBroker from "../../src/service-broker";
 
 // Create broker
-let broker = new ServiceBroker({
+const broker = new ServiceBroker({
 	logger: console,
 	transporter: null
 });
 
 // Load service
-broker.loadService(__dirname + "/../math.service.js");
-//broker.loadService(__dirname + "/../dummy.service.js");
+broker.loadService(__dirname + "/../math.service.ts");
+//broker.loadService(__dirname + "/../dummy.service.ts");
 
 // Call actions
 broker

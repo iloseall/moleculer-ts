@@ -1,13 +1,18 @@
-const Service = require("../src/service");
+import Service from "../src/service";
+import type { ServiceSettingSchema } from "../src/service";
 
-class GreeterService extends Service {
+interface GreeterSettings extends ServiceSettingSchema {
+	upperCase: boolean;
+}
+
+class GreeterService extends Service<GreeterSettings> {
 	constructor(broker) {
 		super(broker);
 
 		this.parseServiceSchema({
 			name: "greeter",
 			version: "v2",
-			meta: {
+			metadata: {
 				scalable: true
 			},
 			// dependencies: [
@@ -73,4 +78,4 @@ class GreeterService extends Service {
 	}
 }
 
-module.exports = GreeterService;
+export default GreeterService;

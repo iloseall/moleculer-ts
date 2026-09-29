@@ -503,7 +503,7 @@ const utils = {
 	 * @param {Array<String|Number>} arr
 	 * @returns {Array<String|Number>}
 	 */
-	uniq(arr) {
+	uniq(arr: any[]): any[] {
 		return [...new Set(arr)];
 	},
 

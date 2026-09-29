@@ -38,7 +38,7 @@ declare namespace Registry {
 				options?: RedisDiscovererOptions;
 		  };
 
-	type DiscovererType = DiscovererConfig["type"];
+	export type DiscovererType = DiscovererConfig["type"];
 
 	export interface RegistryOptions {
 		strategy?: typeof BaseStrategy | string;

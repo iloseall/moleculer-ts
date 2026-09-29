@@ -1,7 +1,13 @@
-const _ = require("lodash");
-const kleur = require("kleur");
-const cluster = require("cluster");
-const { humanize, uniq, randomInt } = require("../../src/utils");
+import _ from "lodash";
+import kleur from "kleur";
+import cluster from "cluster";
+import { humanize, uniq, randomInt } from "../../src/utils";
+import type { ServiceSchema, ServiceSettingSchema } from "../../src/service";
+
+interface NodeControllerSettings extends ServiceSettingSchema {
+	printIO: boolean;
+	printRegistry: boolean;
+}
 
 const padS = _.padStart;
 const padE = _.padEnd;
@@ -17,7 +23,7 @@ function val(value) {
 	return Number(value).toFixed(0);
 }
 
-module.exports = {
+const NodeControllerSchema: ServiceSchema<NodeControllerSettings> = {
 	name: "nodes",
 
 	settings: {
@@ -86,7 +92,7 @@ module.exports = {
 		startNewNode(nodeID) {
 			this.logger.info(`Starting ${nodeID} node...`);
 			const worker = cluster.fork();
-			worker.nodeID = nodeID;
+			(worker as any).nodeID = nodeID;
 			worker.on("message", msg => this.workerMessageHandler(worker, msg));
 			worker.on("disconnect", () => {
 				const idx = this.nodes.findIndex(node => node.worker == worker);
@@ -268,7 +274,7 @@ module.exports = {
 			);
 			console.log(kleur.yellow().bold("========"));
 
-			const nodeIDs = uniq([
+			const nodeIDs: string[] = uniq([
 				...Object.keys(this.workerRegistry),
 				...this.broker.registry.nodes.toArray().map(node => node.id)
 			])
@@ -382,3 +388,5 @@ module.exports = {
 		clearInterval(this.metricTimer);
 	}
 };
+
+export default NodeControllerSchema;

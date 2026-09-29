@@ -1,26 +1,31 @@
-let nc1 = require("nats").connect();
-let nc2 = require("nats").connect();
+import { connect } from "nats";
+
+// NOTE: this example was written for nats v1, where `connect()` returned the
+// connection synchronously. nats v2 returns a Promise, so the connections are
+// typed loosely and the original code is kept as-is.
+const nc1: any = connect();
+const nc2: any = connect();
 
 ///////////////////////////////////////
 // Publish/Subscribe Performance
 ///////////////////////////////////////
 
-let loop = 50000;
-let hash = 2500;
+const loop = 50000;
+const hash = 2500;
 
 console.log("Publish/Subscribe Performance Test");
 
 nc1.on("connect", function () {
-	let work1 = function () {
+	const work1 = function () {
 		let received = 0;
-		let start = new Date();
+		const start = new Date();
 
-		let sid = nc1.subscribe("test", function () {
+		const sid = nc1.subscribe("test", function () {
 			received += 1;
 
 			if (received === loop) {
-				let stop = new Date();
-				let mps = parseInt(loop / ((stop - start) / 1000));
+				const stop = new Date();
+				const mps = parseInt(String(loop / ((stop.getTime() - start.getTime()) / 1000)));
 				console.log("\nPublished/Subscribe at " + mps + " msgs/sec");
 				console.log("Received " + received + " messages");
 				nc1.unsubscribe(sid);
@@ -39,7 +44,7 @@ nc1.on("connect", function () {
 		});
 	};
 
-	let work2 = function () {
+	const work2 = function () {
 		let received = 0;
 		let start = new Date();
 
@@ -48,7 +53,7 @@ nc1.on("connect", function () {
 		});
 
 		nc1.flush(() => {
-			let doWork = function () {
+			const doWork = function () {
 				nc2.publish("ping", "ok");
 			};
 
@@ -56,8 +61,10 @@ nc1.on("connect", function () {
 				received += 1;
 
 				if (received >= loop) {
-					let stop = new Date();
-					let mps = parseInt(loop / ((stop - start) / 1000));
+					const stop = new Date();
+					const mps = parseInt(
+						String(loop / ((stop.getTime() - start.getTime()) / 1000))
+					);
 					console.log("\nPublished/Subscribe at " + mps + " msgs/sec");
 					console.log("Received " + received + " messages");
 					received = 0;
@@ -71,11 +78,11 @@ nc1.on("connect", function () {
 		});
 	};
 
-	let work3 = function () {
+	const work3 = function () {
 		let received = 0;
-		let start = new Date();
+		const start = new Date();
 
-		let sid = nc1.subscribe("test", function (data, reply) {
+		const sid = nc1.subscribe("test", function (data, reply) {
 			nc1.publish(reply, "ok");
 		});
 
@@ -90,8 +97,10 @@ nc1.on("connect", function () {
 					}
 
 					if (received === loop) {
-						let stop = new Date();
-						let mps = parseInt(loop / ((stop - start) / 1000));
+						const stop = new Date();
+						const mps = parseInt(
+							String(loop / ((stop.getTime() - start.getTime()) / 1000))
+						);
 						console.log("\nPublished/Subscribe at " + mps + " msgs/sec");
 						console.log("Received " + received + " messages");
 						nc1.unsubscribe(sid);

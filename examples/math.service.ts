@@ -1,6 +1,7 @@
-const { MoleculerError } = require("../src/errors");
+import { MoleculerError } from "../src/errors";
+import type { ServiceSchema } from "../src/service";
 
-module.exports = {
+const MathSchema: ServiceSchema = {
 	name: "math",
 	actions: {
 		add(ctx) {
@@ -27,11 +28,13 @@ module.exports = {
 				b: { type: "number", notEqual: 0, convert: true }
 			},
 			handler(ctx) {
-				let a = Number(ctx.params.a);
-				let b = Number(ctx.params.b);
+				const a = Number(ctx.params.a);
+				const b = Number(ctx.params.b);
 				if (b != 0 && !Number.isNaN(b)) return a / b;
 				else throw new MoleculerError("Divide by zero!", 422, null, ctx.params);
 			}
 		}
 	}
 };
+
+export default MathSchema;

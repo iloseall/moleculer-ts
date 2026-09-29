@@ -19,7 +19,7 @@
     "ci": "jest --watch",
     "ci:leak": "jest --testMatch \"**/leak-detection/index.spc.js\" --runInBand --watch",
     "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "demo": "tsx examples/index.js",
+    "demo": "tsx examples/index.ts",
     "demo:ts": "tsx --watch examples/typescript/index.ts",
     "demo:client-server:client": "tsx examples/client-server/client.ts",
     "demo:client-server:server": "tsx examples/client-server/server.ts",

@@ -17,8 +17,8 @@
  * `ctx.nodeID` is the sender node).
  */
 
-import _ = require("lodash");
-import ServiceBroker = require("../../src/service-broker");
+import _ from "lodash";
+import ServiceBroker from "../../src/service-broker";
 import type { LogLevels } from "../../src/loggers/base";
 import type { TransporterType } from "../../src/service-broker";
 

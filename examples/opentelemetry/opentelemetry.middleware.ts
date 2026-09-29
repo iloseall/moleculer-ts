@@ -1,11 +1,13 @@
-const _ = require("lodash");
-const { isFunction, isPlainObject, safetyObject } = require("moleculer").Utils;
-const { api } = require("@opentelemetry/sdk-node");
-const { SEMRESATTRS_SERVICE_NAME } = require("@opentelemetry/semantic-conventions");
+import _ from "lodash";
+import { isFunction, isPlainObject, safetyObject } from "../../src/utils";
+import { api } from "@opentelemetry/sdk-node";
+import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
+import type { Middleware } from "../../src/middleware";
+import type { TracingActionOptions } from "../../src/service";
 
 const tracer = api.trace.getTracer("moleculer-otel");
 
-function flattenTags(obj, convertToString = false, path = "") {
+function flattenTags(obj: any, convertToString = false, path = ""): any {
 	if (!obj) return null;
 
 	return Object.keys(obj).reduce((res, k) => {
@@ -21,13 +23,18 @@ function flattenTags(obj, convertToString = false, path = "") {
 	}, {});
 }
 
-module.exports = {
+const OpentelemetryMiddleware: Middleware = {
 	name: "OpenTelemetryMiddleware",
 
 	localAction(handler, action) {
-		let opts = action.tracing;
-		if (opts === true || opts === false) opts = { enabled: !!opts };
-		opts = _.defaultsDeep({}, opts, { enabled: true });
+		// `action.tracing` is `boolean | TracingActionOptions | undefined`; normalise it
+		// into a plain option object before the defaults are applied.
+		const tracingOpts = action.tracing;
+		const opts: Record<string, any> = _.defaultsDeep(
+			{},
+			tracingOpts === true || tracingOpts === false ? { enabled: tracingOpts } : tracingOpts,
+			{ enabled: true }
+		);
 
 		if (opts.enabled) {
 			return function tracingLocalActionMiddleware(ctx) {
@@ -46,7 +53,7 @@ module.exports = {
 							rawName: ctx.action.rawName
 						}
 					: null;
-				let tags = {
+				let tags: Record<string, any> = {
 					callingLevel: ctx.level,
 					action: actionObj,
 					remoteCall: ctx.nodeID !== ctx.broker.nodeID,
@@ -188,3 +195,5 @@ module.exports = {
 		};
 	}
 };
+
+export default OpentelemetryMiddleware;

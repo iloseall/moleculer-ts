@@ -1,9 +1,10 @@
-"use strict";
-
-const _ = require("lodash");
-const cluster = require("cluster");
-const ServiceBroker = require("../../src/service-broker");
-const EventReporter = require("../../src/metrics/reporters/event");
+import _ from "lodash";
+import cluster from "cluster";
+import ServiceBroker from "../../src/service-broker";
+import type { TransporterType } from "../../src/service-broker";
+import type { DiscovererType } from "../../src/registry/registry";
+import type { LogLevels } from "../../src/loggers/base";
+import EventReporter from "../../src/metrics/reporters/event";
 
 class ProcessEventMetricReporter extends EventReporter {
 	sendEvent() {
@@ -23,7 +24,7 @@ class ProcessEventMetricReporter extends EventReporter {
 }
 
 function start(opts) {
-	const transporter = process.env.TRANSPORTER || "NATS";
+	const transporter = (process.env.TRANSPORTER || "NATS") as TransporterType;
 
 	// Create broker
 	const broker = new ServiceBroker({
@@ -45,7 +46,7 @@ function start(opts) {
 		}
 	}*/
 		],
-		logLevel: process.env.LOGLEVEL || "warn",
+		logLevel: (process.env.LOGLEVEL || "warn") as LogLevels,
 		metrics: {
 			enabled: true,
 			reporter: new ProcessEventMetricReporter({
@@ -56,7 +57,7 @@ function start(opts) {
 		//heartbeatTimeout: 3 * 60,
 		registry: {
 			discoverer: {
-				type: process.env.DISCOVERER || "Local",
+				type: (process.env.DISCOVERER || "Local") as DiscovererType,
 				options: {
 					serializer: process.env.DISCOVERER_SERIALIZER
 				}
@@ -79,7 +80,7 @@ function start(opts) {
 	broker.localBus.on("$node.disconnected", () => sendUpdatedRegistry());
 
 	broker.start().then(() => {
-		process.on("message", async msg => {
+		process.on("message", async (msg: any) => {
 			if (msg.cmd == "stop") {
 				await broker.stop();
 				process.exit(0);
@@ -94,7 +95,7 @@ function start(opts) {
 	});
 }
 
-process.on("message", msg => {
+process.on("message", (msg: any) => {
 	if (msg.cmd == "start") {
 		start(msg);
 	}

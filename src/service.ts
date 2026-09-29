@@ -107,7 +107,17 @@ declare namespace Service {
 
 	export interface ActionSchema<TThis = Service> {
 		name?: string;
+		/**
+		 * Free-form metadata. Not used by the core, but exposed to tooling
+		 * (REPL `services` listing, API gateway & doc generators).
+		 */
+		description?: string;
 		visibility?: ActionVisibility;
+		/**
+		 * Legacy shorthand of `visibility: "protected"`. The registry still
+		 * honours it (`action.protected === true`), so it stays part of the schema.
+		 */
+		protected?: boolean;
 		params?: ActionParams;
 		service?: Service;
 		cache?: boolean | ActionCacheOptions;

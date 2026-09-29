@@ -1,8 +1,8 @@
-"use strict";
-
-const path = require("path");
-const cluster = require("cluster");
-const ServiceBroker = require("../../src/service-broker");
+import path from "path";
+import cluster from "cluster";
+import ServiceBroker from "../../src/service-broker";
+import type { TransporterType } from "../../src/service-broker";
+import type { DiscovererType } from "../../src/registry/registry";
 
 const stopSignals = [
 	"SIGHUP",
@@ -20,7 +20,7 @@ const stopSignals = [
 ];
 let stopping = false;
 
-const transporter = process.env.TRANSPORTER || "NATS";
+const transporter = (process.env.TRANSPORTER || "NATS") as TransporterType;
 
 // Create broker
 const broker = new ServiceBroker({
@@ -32,7 +32,7 @@ const broker = new ServiceBroker({
 	metrics: true,
 	registry: {
 		discoverer: {
-			type: process.env.DISCOVERER || "Local",
+			type: (process.env.DISCOVERER || "Local") as DiscovererType,
 			options: {
 				serializer: process.env.DISCOVERER_SERIALIZER,
 				monitor: false
@@ -50,10 +50,7 @@ const broker = new ServiceBroker({
 					{ option: "-k, --kill", description: "Kill nodes" }
 					//{ option: "--nodeID <nodeID>", description: "NodeID" }
 				],
-				types: {
-					//number: ["service"]
-				},
-				action(broker, args) {
+				action(broker, args: any) {
 					console.log(args);
 					return broker.call("nodes.scale", {
 						count: Number(args.count != null ? args.count : 0),
@@ -65,7 +62,7 @@ const broker = new ServiceBroker({
 	}
 });
 
-broker.loadService(path.join(__dirname, "node-controller.service.js"));
+broker.loadService(path.join(__dirname, "node-controller.service.ts"));
 
 broker
 	.start()
@@ -88,6 +85,6 @@ broker
 
 		await broker.Promise.delay(5000);
 
-		broker.loadService("./examples/math.service.js");
+		broker.loadService("./examples/math.service.ts");
 	})
 	.catch(err => broker.logger.error(err));

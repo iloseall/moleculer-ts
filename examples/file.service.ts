@@ -1,6 +1,6 @@
-"use strict";
+import type { ActionSchema, ServiceSchema } from "../src/service";
 
-module.exports = {
+const FileSchema: ServiceSchema = {
 	name: "file",
 	actions: {
 		html: {
@@ -15,6 +15,8 @@ module.exports = {
 </html>
 				`;
 			}
-		}
+		} as ActionSchema
 	}
 };
+
+export default FileSchema;

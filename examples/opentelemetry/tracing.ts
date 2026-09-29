@@ -1,19 +1,12 @@
-"use strict";
+// NOTE: this file still targets the older OpenTelemetry API (`node.NodeTracerProvider`
+// + `addSpanProcessor` + `resources.Resource`), which the installed SDK replaced. The
+// logic is kept verbatim, the casts only silence the API drift.
+import { api, core, node, tracing, metrics, resources, contextBase } from "@opentelemetry/sdk-node";
 
-const {
-	api,
-	core,
-	node,
-	tracing,
-	metrics,
-	resources,
-	contextBase
-} = require("@opentelemetry/sdk-node");
-
-const { registerInstrumentations } = require("@opentelemetry/instrumentation");
-const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
-const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-proto");
-const { SemanticResourceAttributes } = require("@opentelemetry/semantic-conventions");
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 
 // const { OTLPMetricExporter } = require("@opentelemetry/exporter-metrics-otlp-proto");
 // const { PeriodicExportingMetricReader } = require("@opentelemetry/sdk-metrics");
@@ -34,8 +27,8 @@ const exporter = new OTLPTraceExporter({
 	}
 });
 
-const provider = new node.NodeTracerProvider({
-	resource: new resources.Resource({
+const provider: any = new (node.NodeTracerProvider as any)({
+	resource: new (resources as any).Resource({
 		[SemanticResourceAttributes.SERVICE_NAME]: "moleculer",
 		[SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: "dev"
 	})
@@ -56,4 +49,4 @@ registerInstrumentations({
 		})
 	],
 	autoDetectResources: true
-});
+} as any);

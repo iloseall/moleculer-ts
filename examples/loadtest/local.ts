@@ -1,13 +1,11 @@
-"use strict";
+import random from "lodash/random";
+import os from "os";
+const hostname = os.hostname();
 
-let random = require("lodash/random");
-let os = require("os");
-let hostname = os.hostname();
-
-let ServiceBroker = require("../../src/service-broker");
+import ServiceBroker from "../../src/service-broker";
 
 // Create broker
-let broker = new ServiceBroker({
+const broker = new ServiceBroker({
 	nodeID: process.argv[2] || hostname + "-server",
 	logger: null,
 	transporter: null
@@ -25,7 +23,7 @@ broker.createService({
 	}
 });
 
-let payload = { a: random(0, 100), b: random(0, 100) };
+const payload = { a: random(0, 100), b: random(0, 100) };
 
 let count = 0;
 
@@ -56,7 +54,7 @@ broker.start().then(() => {
 
 		setInterval(() => {
 			if (count > 0) {
-				let rps = count / ((Date.now() - startTime) / 1000);
+				const rps = count / ((Date.now() - startTime) / 1000);
 				console.log(Number(rps.toFixed(0)).toLocaleString(), "req/s");
 				count = 0;
 				startTime = Date.now();
