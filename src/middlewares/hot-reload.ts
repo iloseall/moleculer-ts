@@ -222,7 +222,7 @@ function HotReloadMiddleware(broker) {
 	 * @param {*} service
 	 * @param {Number} level
 	 */
-	function processModule(mod, service = null, level = 0, parents = null) {
+	function processModule(mod, service = null, level = 0, parents = null, chain = new Set()) {
 		const fName = mod.filename;
 
 		// Skip node_modules files, if there is parent project file
@@ -232,6 +232,14 @@ function HotReloadMiddleware(broker) {
 
 		// Avoid circular dependency in project files
 		if (parents && parents.indexOf(fName) !== -1) return;
+
+		// Avoid infinite recursion on cyclic module graphs (A → B → A). The `parents`
+		// check above only covers cycles when `parents` is tracked, which is not the
+		// case for the top-level walk over non-service files; `chain` holds the files
+		// of the current DFS path (backtracked at the end) so a file can still be
+		// reached through several different branches, but never twice on the same one.
+		if (chain.has(fName)) return;
+		chain.add(fName);
 
 		// console.log(fName);
 
@@ -275,8 +283,12 @@ function HotReloadMiddleware(broker) {
 			} else if (parents) {
 				parents.push(fName);
 			}
-			mod.children.forEach(m => processModule(m, service, service ? level + 1 : 0, parents));
+			mod.children.forEach(m =>
+				processModule(m, service, service ? level + 1 : 0, parents, chain)
+			);
 		}
+
+		chain.delete(fName);
 	}
 
 	const folderWatchers = [];

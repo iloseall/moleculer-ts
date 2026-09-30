@@ -23,11 +23,11 @@ describe("Test Serializers resolver", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Serializers.resolve("xyz");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 
 		expect(() => {
 			Serializers.resolve({ type: "xyz" });
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 });
 
@@ -37,7 +37,7 @@ describe("Test Serializers register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Serializers.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

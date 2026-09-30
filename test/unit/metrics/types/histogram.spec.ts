@@ -45,7 +45,7 @@ describe("Test Base Metric class", () => {
 			expect(item.maxAgeSeconds).toBeUndefined();
 			expect(item.ageBuckets).toBeUndefined();
 
-			expect(registry.changed).toBeCalledTimes(0);
+			expect(registry.changed).toHaveBeenCalledTimes(0);
 		});
 
 		describe("Test with buckets", () => {
@@ -183,8 +183,8 @@ describe("Test Base Metric class", () => {
 					timestamp: now
 				});
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(100, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(100, null, now);
 			});
 
 			it("should sum values", () => {
@@ -199,8 +199,8 @@ describe("Test Base Metric class", () => {
 					timestamp: now
 				});
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(250, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(250, null, now);
 			});
 		});
 
@@ -231,8 +231,8 @@ describe("Test Base Metric class", () => {
 					}
 				});
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(2, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(2, null, now);
 			});
 
 			it("should sum values", () => {
@@ -255,8 +255,8 @@ describe("Test Base Metric class", () => {
 					}
 				});
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(13, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(13, null, now);
 			});
 		});
 
@@ -280,8 +280,8 @@ describe("Test Base Metric class", () => {
 					quantileValues: expect.any(HistogramMetric.TimeWindowQuantiles)
 				});
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(5, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(5, null, now);
 			});
 
 			it("should sum values", () => {
@@ -297,8 +297,8 @@ describe("Test Base Metric class", () => {
 					quantileValues: expect.any(HistogramMetric.TimeWindowQuantiles)
 				});
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(13, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(13, null, now);
 			});
 		});
 
@@ -322,14 +322,14 @@ describe("Test Base Metric class", () => {
 					timestamp: now
 				});
 
-				expect(MetricRate).toBeCalledTimes(1);
-				expect(MetricRate).toBeCalledWith(item, item.values.get(""), 1);
+				expect(MetricRate).toHaveBeenCalledTimes(1);
+				expect(MetricRate).toHaveBeenCalledWith(item, item.values.get(""), 1);
 
-				expect(rateUpdate).toBeCalledTimes(1);
-				expect(rateUpdate).toBeCalledWith(1);
+				expect(rateUpdate).toHaveBeenCalledTimes(1);
+				expect(rateUpdate).toHaveBeenCalledWith(1);
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(100, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(100, null, now);
 			});
 
 			it("should sum values", () => {
@@ -348,13 +348,13 @@ describe("Test Base Metric class", () => {
 					timestamp: now
 				});
 
-				expect(MetricRate).toBeCalledTimes(0);
+				expect(MetricRate).toHaveBeenCalledTimes(0);
 
-				expect(rateUpdate).toBeCalledTimes(1);
-				expect(rateUpdate).toBeCalledWith(2);
+				expect(rateUpdate).toHaveBeenCalledTimes(1);
+				expect(rateUpdate).toHaveBeenCalledWith(2);
 
-				expect(item.changed).toBeCalledTimes(1);
-				expect(item.changed).toBeCalledWith(250, null, now);
+				expect(item.changed).toHaveBeenCalledTimes(1);
+				expect(item.changed).toHaveBeenCalledWith(250, null, now);
 			});
 		});
 	});
@@ -487,8 +487,8 @@ describe("Test Base Metric class", () => {
 				},
 				quantileValues: expect.any(HistogramMetric.TimeWindowQuantiles)
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(null, { a: 5 }, 23456);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(null, { a: 5 }, 23456);
 			expect(item.values.size).toBe(2);
 		});
 
@@ -527,8 +527,8 @@ describe("Test Base Metric class", () => {
 				},
 				quantileValues: expect.any(HistogramMetric.TimeWindowQuantiles)
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith();
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith();
 			expect(item.values.size).toBe(2);
 		});
 	});
@@ -609,7 +609,7 @@ describe("Test TimeWindowQuantiles class", () => {
 		expect(item.dirty).toBe(false);
 		item.setDirty();
 		expect(item.dirty).toBe(true);
-		expect(fakeMetric.setDirty).toBeCalledTimes(1);
+		expect(fakeMetric.setDirty).toHaveBeenCalledTimes(1);
 	});
 
 	it("should add value to the current bucket", () => {
@@ -621,10 +621,10 @@ describe("Test TimeWindowQuantiles class", () => {
 
 	it("should call rotate after 10 secs", () => {
 		item.clearDirty();
-		expect(item.rotate).toBeCalledTimes(0);
+		expect(item.rotate).toHaveBeenCalledTimes(0);
 		clock.tick(11 * 1000);
 
-		expect(item.rotate).toBeCalledTimes(1);
+		expect(item.rotate).toHaveBeenCalledTimes(1);
 		expect(item.currentBucket).toBe(1);
 		expect(item.dirty).toBe(true);
 
@@ -665,6 +665,6 @@ describe("Test TimeWindowQuantiles class", () => {
 		mock.method(item, "clearDirty");
 		expect(item.snapshot()).toBe(snapshot);
 
-		expect(item.clearDirty).toBeCalledTimes(0);
+		expect(item.clearDirty).toHaveBeenCalledTimes(0);
 	});
 });

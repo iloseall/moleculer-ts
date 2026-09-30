@@ -74,11 +74,11 @@ describe("Test NewRelic tracing exporter class", () => {
 			exporter.init(fakeTracer);
 
 			expect(exporter.timer).toBeDefined();
-			expect(exporter.flush).toBeCalledTimes(0);
+			expect(exporter.flush).toHaveBeenCalledTimes(0);
 
 			clock.tick(5500);
 
-			expect(exporter.flush).toBeCalledTimes(1);
+			expect(exporter.flush).toHaveBeenCalledTimes(1);
 
 			exporter.stop();
 		});

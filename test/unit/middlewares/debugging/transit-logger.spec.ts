@@ -58,10 +58,10 @@ describe("Test ActionLogger", () => {
 			const packet = { type: "REQUEST", target: "server-2", params: { a: 5 } };
 			mw.transitPublish(next)(packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith(packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith(packet);
 
-			expect(logger.info).toBeCalledTimes(1);
+			expect(logger.info).toHaveBeenCalledTimes(1);
 			expect(logger.info).toHaveBeenNthCalledWith(1, "=> Send REQUEST packet to 'server-2'");
 		});
 
@@ -73,10 +73,10 @@ describe("Test ActionLogger", () => {
 			const packet = { type: "REQUEST", target: "server-2", payload: { a: 5 } };
 			mw.transitPublish(next)(packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith(packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith(packet);
 
-			expect(logger.info).toBeCalledTimes(2);
+			expect(logger.info).toHaveBeenCalledTimes(2);
 			expect(logger.info).toHaveBeenNthCalledWith(1, "=> Send REQUEST packet to 'server-2'");
 			expect(logger.info).toHaveBeenNthCalledWith(2, "=>", packet.payload);
 		});
@@ -89,10 +89,10 @@ describe("Test ActionLogger", () => {
 			const packet = { type: "HEARTBEAT", target: "server-2", payload: { a: 5 } };
 			mw.transitPublish(next)(packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith(packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith(packet);
 
-			expect(logger.info).toBeCalledTimes(0);
+			expect(logger.info).toHaveBeenCalledTimes(0);
 		});
 
 		it("should log published packet to file", async () => {
@@ -106,17 +106,17 @@ describe("Test ActionLogger", () => {
 				logParams: true
 			});
 
-			expect(utils.makeDirs).toBeCalledTimes(1);
-			expect(utils.makeDirs).toBeCalledWith(path.join("logs", "server-1"));
+			expect(utils.makeDirs).toHaveBeenCalledTimes(1);
+			expect(utils.makeDirs).toHaveBeenCalledWith(path.join("logs", "server-1"));
 
 			const next = mock.fn();
 			const packet = { type: "REQUEST", target: "server-2", payload: { a: 5 } };
 			mw.transitPublish(next)(packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith(packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith(packet);
 
-			expect(fs.writeFile).toBeCalledTimes(1);
+			expect(fs.writeFile).toHaveBeenCalledTimes(1);
 			expect(fs.writeFile).toHaveBeenNthCalledWith(
 				1,
 				path.join("logs", "server-1", "123456-send-REQUEST-to-server-2.log"),
@@ -145,10 +145,10 @@ describe("Test ActionLogger", () => {
 			const packet = { type: "REQUEST", target: "server-2", payload };
 			mw.transitPublish(next)(packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith(packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith(packet);
 
-			expect(fs.writeFile).toBeCalledTimes(1);
+			expect(fs.writeFile).toHaveBeenCalledTimes(1);
 			expect(fs.writeFile).toHaveBeenNthCalledWith(
 				1,
 				path.join("logs", "server-1", "123456-send-REQUEST-to-server-2.log"),
@@ -168,10 +168,10 @@ describe("Test ActionLogger", () => {
 			const next = mock.fn();
 			mw.transitMessageHandler(next)("RESPONSE", packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith("RESPONSE", packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith("RESPONSE", packet);
 
-			expect(logger.info).toBeCalledTimes(1);
+			expect(logger.info).toHaveBeenCalledTimes(1);
 			expect(logger.info).toHaveBeenNthCalledWith(
 				1,
 				"<= Receive RESPONSE packet from 'server-2'"
@@ -185,10 +185,10 @@ describe("Test ActionLogger", () => {
 			const next = mock.fn();
 			mw.transitMessageHandler(next)("RESPONSE", packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith("RESPONSE", packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith("RESPONSE", packet);
 
-			expect(logger.info).toBeCalledTimes(2);
+			expect(logger.info).toHaveBeenCalledTimes(2);
 			expect(logger.info).toHaveBeenNthCalledWith(
 				1,
 				"<= Receive RESPONSE packet from 'server-2'"
@@ -203,10 +203,10 @@ describe("Test ActionLogger", () => {
 			const next = mock.fn();
 			mw.transitMessageHandler(next)("HEARTBEAT", packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith("HEARTBEAT", packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith("HEARTBEAT", packet);
 
-			expect(logger.info).toBeCalledTimes(0);
+			expect(logger.info).toHaveBeenCalledTimes(0);
 		});
 
 		it("should log received packet to file", async () => {
@@ -223,10 +223,10 @@ describe("Test ActionLogger", () => {
 			const next = mock.fn();
 			mw.transitMessageHandler(next)("RESPONSE", packet);
 
-			expect(next).toBeCalledTimes(1);
-			expect(next).toBeCalledWith("RESPONSE", packet);
+			expect(next).toHaveBeenCalledTimes(1);
+			expect(next).toHaveBeenCalledWith("RESPONSE", packet);
 
-			expect(fs.writeFile).toBeCalledTimes(1);
+			expect(fs.writeFile).toHaveBeenCalledTimes(1);
 			expect(fs.writeFile).toHaveBeenNthCalledWith(
 				1,
 				path.join("logs", "server-1", "123456-receive-RESPONSE-from-server-2.log"),

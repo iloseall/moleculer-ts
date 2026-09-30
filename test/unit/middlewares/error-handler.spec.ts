@@ -81,8 +81,8 @@ describe("Test ErrorHandlerMiddleware", () => {
 					expect(err.message).toBe("Something wrong");
 					expect(err.ctx).toBe(ctx);
 
-					expect(broker.errorHandler).toBeCalledTimes(1);
-					expect(broker.errorHandler).toBeCalledWith(err, {
+					expect(broker.errorHandler).toHaveBeenCalledTimes(1);
+					expect(broker.errorHandler).toHaveBeenCalledWith(err, {
 						ctx,
 						service: action.service,
 						action
@@ -106,8 +106,8 @@ describe("Test ErrorHandlerMiddleware", () => {
 					expect(err.message).toBe("Something wrong");
 					expect(err.ctx).toBe(ctx);
 
-					expect(broker.errorHandler).toBeCalledTimes(1);
-					expect(broker.errorHandler).toBeCalledWith(err, {
+					expect(broker.errorHandler).toHaveBeenCalledTimes(1);
+					expect(broker.errorHandler).toHaveBeenCalledWith(err, {
 						ctx,
 						service: action.service,
 						action
@@ -152,8 +152,8 @@ describe("Test ErrorHandlerMiddleware", () => {
 				})
 				.then(() => {
 					expect(error.ctx).toBe(ctx);
-					expect(broker.errorHandler).toBeCalledTimes(1);
-					expect(broker.errorHandler).toBeCalledWith(error, {
+					expect(broker.errorHandler).toHaveBeenCalledTimes(1);
+					expect(broker.errorHandler).toHaveBeenCalledWith(error, {
 						ctx,
 						service: action.service,
 						event
@@ -181,8 +181,8 @@ describe("Test ErrorHandlerMiddleware", () => {
 					expect(err.message).toBe("Something wrong");
 					expect(err.ctx).toBe(ctx);
 
-					expect(broker.errorHandler).toBeCalledTimes(1);
-					expect(broker.errorHandler).toBeCalledWith(err, {
+					expect(broker.errorHandler).toHaveBeenCalledTimes(1);
+					expect(broker.errorHandler).toHaveBeenCalledWith(err, {
 						ctx,
 						service: action.service,
 						event

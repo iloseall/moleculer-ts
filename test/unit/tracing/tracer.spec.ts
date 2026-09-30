@@ -163,8 +163,8 @@ describe("Test Tracer", () => {
 			tracer.init();
 
 			expect(tracer.exporter).toBeUndefined();
-			expect(Exporters.resolve).toBeCalledTimes(0);
-			expect(fakeExporter.init).toBeCalledTimes(0);
+			expect(Exporters.resolve).toHaveBeenCalledTimes(0);
+			expect(fakeExporter.init).toHaveBeenCalledTimes(0);
 		});
 
 		it("should initialize one exporter", () => {
@@ -182,9 +182,9 @@ describe("Test Tracer", () => {
 			tracer.init();
 
 			expect(tracer.exporter.length).toBe(1);
-			expect(Exporters.resolve).toBeCalledTimes(1);
+			expect(Exporters.resolve).toHaveBeenCalledTimes(1);
 			expect(Exporters.resolve).toHaveBeenNthCalledWith(1, "Exporter1");
-			expect(fakeExporter.init).toBeCalledTimes(1);
+			expect(fakeExporter.init).toHaveBeenCalledTimes(1);
 			expect(fakeExporter.init).toHaveBeenNthCalledWith(1, tracer);
 
 			expect(tracer.defaultTags).toEqual({ a: 5 });
@@ -213,7 +213,7 @@ describe("Test Tracer", () => {
 			tracer.init();
 
 			expect(tracer.exporter.length).toBe(2);
-			expect(Exporters.resolve).toBeCalledTimes(2);
+			expect(Exporters.resolve).toHaveBeenCalledTimes(2);
 			expect(Exporters.resolve).toHaveBeenNthCalledWith(1, "Exporter1");
 			expect(Exporters.resolve).toHaveBeenNthCalledWith(2, {
 				type: "Datadog",
@@ -222,7 +222,7 @@ describe("Test Tracer", () => {
 				}
 			});
 
-			expect(fakeExporter.init).toBeCalledTimes(2);
+			expect(fakeExporter.init).toHaveBeenCalledTimes(2);
 			expect(fakeExporter.init).toHaveBeenNthCalledWith(1, tracer);
 			expect(fakeExporter.init).toHaveBeenNthCalledWith(2, tracer);
 
@@ -491,7 +491,7 @@ describe("Test Tracer", () => {
 
 			tracer.invokeExporter("someMethod", [5, "John"]);
 
-			expect(fakeExporter.someMethod).toBeCalledTimes(0);
+			expect(fakeExporter.someMethod).toHaveBeenCalledTimes(0);
 		});
 
 		it("should call a method in exporters", () => {
@@ -507,7 +507,7 @@ describe("Test Tracer", () => {
 
 			tracer.invokeExporter("someMethod", [5, "John"]);
 
-			expect(fakeExporter.someMethod).toBeCalledTimes(2);
+			expect(fakeExporter.someMethod).toHaveBeenCalledTimes(2);
 			expect(fakeExporter.someMethod).toHaveBeenNthCalledWith(1, 5, "John");
 			expect(fakeExporter.someMethod).toHaveBeenNthCalledWith(2, 5, "John");
 		});
@@ -528,10 +528,10 @@ describe("Test Tracer", () => {
 			const span = { id: "span-111", sampled: true };
 			tracer.spanStarted(span);
 
-			//expect(tracer.setCurrentSpan).toBeCalledTimes(1);
+			//expect(tracer.setCurrentSpan).toHaveBeenCalledTimes(1);
 			//expect(tracer.setCurrentSpan).toHaveBeenCalledWith(span);
 
-			expect(tracer.invokeExporter).toBeCalledTimes(1);
+			expect(tracer.invokeExporter).toHaveBeenCalledTimes(1);
 			expect(tracer.invokeExporter).toHaveBeenCalledWith("spanStarted", [span]);
 		});
 
@@ -542,10 +542,10 @@ describe("Test Tracer", () => {
 			const span = { id: "span-111", sampled: false };
 			tracer.spanStarted(span);
 
-			//expect(tracer.setCurrentSpan).toBeCalledTimes(1);
+			//expect(tracer.setCurrentSpan).toHaveBeenCalledTimes(1);
 			//expect(tracer.setCurrentSpan).toHaveBeenCalledWith(span);
 
-			expect(tracer.invokeExporter).toBeCalledTimes(0);
+			expect(tracer.invokeExporter).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -564,10 +564,10 @@ describe("Test Tracer", () => {
 			const span = { id: "span-111", sampled: true };
 			tracer.spanFinished(span);
 
-			// expect(tracer.removeCurrentSpan).toBeCalledTimes(1);
+			// expect(tracer.removeCurrentSpan).toHaveBeenCalledTimes(1);
 			// expect(tracer.removeCurrentSpan).toHaveBeenCalledWith(span);
 
-			expect(tracer.invokeExporter).toBeCalledTimes(1);
+			expect(tracer.invokeExporter).toHaveBeenCalledTimes(1);
 			expect(tracer.invokeExporter).toHaveBeenCalledWith("spanFinished", [span]);
 		});
 
@@ -578,10 +578,10 @@ describe("Test Tracer", () => {
 			const span = { id: "span-111", sampled: false };
 			tracer.spanFinished(span);
 
-			// expect(tracer.removeCurrentSpan).toBeCalledTimes(1);
+			// expect(tracer.removeCurrentSpan).toHaveBeenCalledTimes(1);
 			// expect(tracer.removeCurrentSpan).toHaveBeenCalledWith(span);
 
-			expect(tracer.invokeExporter).toBeCalledTimes(0);
+			expect(tracer.invokeExporter).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -602,7 +602,7 @@ describe("Test Tracer", () => {
 
 			expect(span1.meta.state).toEqual({ spans: [ span1 ] });
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(1);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(1);
 
 			expect(tracer.scope.setSessionData).toHaveBeenCalledTimes(1);
 			expect(tracer.scope.setSessionData).toHaveBeenCalledWith({ spans: [ span1 ] });
@@ -619,7 +619,7 @@ describe("Test Tracer", () => {
 			expect(span1.meta.state).toEqual({ spans: [ span1 ] });
 			expect(span2.meta.state).toEqual({ spans: [ span1, span2 ] });
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(1);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(1);
 
 			expect(tracer.scope.setSessionData).toHaveBeenCalledTimes(1);
 			expect(tracer.scope.setSessionData).toHaveBeenCalledWith({ spans: [ span1, span2 ] });
@@ -648,17 +648,17 @@ describe("Test Tracer", () => {
 			tracer.removeCurrentSpan(span2);
 			expect(span2.meta.state).toEqual({ spans: [ span1 ] });
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(0);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(0);
 
 			tracer.removeCurrentSpan(span1);
 			expect(span1.meta.state).toEqual({ spans: [ ] });
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(0);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(0);
 
 			tracer.removeCurrentSpan(span1);
 			expect(span1.meta.state).toEqual({ spans: [ ] });
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(0);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(0);
 
 		});
 
@@ -671,7 +671,7 @@ describe("Test Tracer", () => {
 
 			expect(state).toEqual({ spans: [ span1 ] });
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(1);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(1);
 		});
 
 		it("should return null if not state", () => {
@@ -680,7 +680,7 @@ describe("Test Tracer", () => {
 			const res = tracer.getCurrentSpan();
 			expect(res).toBe(null);
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(1);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(1);
 		});
 
 		it("should return the last span", () => {
@@ -690,7 +690,7 @@ describe("Test Tracer", () => {
 			const res = tracer.getCurrentSpan();
 			expect(res).toBe(span2);
 
-			expect(tracer.scope.getSessionData).toBeCalledTimes(1);
+			expect(tracer.scope.getSessionData).toHaveBeenCalledTimes(1);
 		});
 
 	});
@@ -703,10 +703,10 @@ describe("Test Tracer", () => {
 			mock.method(tracer, "getCurrentSpan");
 
 			expect(tracer.getCurrentTraceID()).toBeNull();
-			expect(tracer.getCurrentSpan).toBeCalledTimes(0);
+			expect(tracer.getCurrentSpan).toHaveBeenCalledTimes(0);
 
 			expect(tracer.getActiveSpanID()).toBeNull();
-			expect(tracer.getCurrentSpan).toBeCalledTimes(0);
+			expect(tracer.getCurrentSpan).toHaveBeenCalledTimes(0);
 		});
 
 	});
@@ -722,11 +722,11 @@ describe("Test Tracer", () => {
 			tracer.getCurrentSpan = mock.fn(() => ({ id: "span-123", traceID: "trace-123" }));
 
 			expect(tracer.getCurrentTraceID()).toBe("trace-123");
-			expect(tracer.getCurrentSpan).toBeCalledTimes(1);
+			expect(tracer.getCurrentSpan).toHaveBeenCalledTimes(1);
 
 			tracer.getCurrentSpan.mockClear();
 			expect(tracer.getActiveSpanID()).toBe("span-123");
-			expect(tracer.getCurrentSpan).toBeCalledTimes(1);
+			expect(tracer.getCurrentSpan).toHaveBeenCalledTimes(1);
 		});
 
 		it("should not return IDs", () => {
@@ -736,11 +736,11 @@ describe("Test Tracer", () => {
 			tracer.getCurrentSpan = mock.fn(() => null);
 
 			expect(tracer.getCurrentTraceID()).toBe(null);
-			expect(tracer.getCurrentSpan).toBeCalledTimes(1);
+			expect(tracer.getCurrentSpan).toHaveBeenCalledTimes(1);
 
 			tracer.getCurrentSpan.mockClear();
 			expect(tracer.getActiveSpanID()).toBe(null);
-			expect(tracer.getCurrentSpan).toBeCalledTimes(1);
+			expect(tracer.getCurrentSpan).toHaveBeenCalledTimes(1);
 		});
 
 	});

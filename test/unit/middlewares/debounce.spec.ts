@@ -58,26 +58,26 @@ describe("Test DebounceMiddleware", () => {
 			const ctx = Context.create(broker, endpoint);
 			const newHandler = mw.localEvent.call(broker, handler, event);
 
-			expect(event.handler).toBeCalledTimes(0);
+			expect(event.handler).toHaveBeenCalledTimes(0);
 
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(0);
+			expect(event.handler).toHaveBeenCalledTimes(0);
 
 			clock.tick(500);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(0);
+			expect(event.handler).toHaveBeenCalledTimes(0);
 
 			clock.tick(1500);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(0);
+			expect(event.handler).toHaveBeenCalledTimes(0);
 
 			clock.tick(2000);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(0);
+			expect(event.handler).toHaveBeenCalledTimes(0);
 
 			clock.tick(5000);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(1);
+			expect(event.handler).toHaveBeenCalledTimes(1);
 		});
 	});
 });

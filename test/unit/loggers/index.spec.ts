@@ -14,10 +14,10 @@ process.env.DATADOG_API_KEY = "datadog-api-key";
 
 describe("Test Loggers resolver", () => {
 	it("should throw error", () => {
-		expect(() => Loggers.resolve()).toThrowError(BrokerOptionsError);
-		expect(() => Loggers.resolve({})).toThrowError(BrokerOptionsError);
-		expect(() => Loggers.resolve("xyz")).toThrowError(BrokerOptionsError);
-		expect(() => Loggers.resolve({ type: "xyz" })).toThrowError(BrokerOptionsError);
+		expect(() => Loggers.resolve()).toThrow(BrokerOptionsError);
+		expect(() => Loggers.resolve({})).toThrow(BrokerOptionsError);
+		expect(() => Loggers.resolve("xyz")).toThrow(BrokerOptionsError);
+		expect(() => Loggers.resolve({ type: "xyz" })).toThrow(BrokerOptionsError);
 	});
 
 	it("should resolve Bunyan logger from string", () => {
@@ -131,7 +131,7 @@ describe("Test Logger register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Loggers.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

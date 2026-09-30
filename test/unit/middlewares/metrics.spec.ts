@@ -52,7 +52,7 @@ describe("Test MetricsMiddleware", () => {
 
 	it("should register metrics & CB event handlers", () => {
 		mw.created(broker);
-		expect(broker.metrics.register).toBeCalledTimes(20);
+		expect(broker.metrics.register).toHaveBeenCalledTimes(20);
 	});
 
 	it("should not wrap handler if metrics is disabled", () => {

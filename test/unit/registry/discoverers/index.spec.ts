@@ -83,8 +83,8 @@ describe("Test Discoverers resolver", () => {
 	});
 
 	it("should throw error if not found by name", () => {
-		expect(() => Discoverers.resolve("xyz")).toThrowError(BrokerOptionsError);
-		expect(() => Discoverers.resolve({ type: "xyz" })).toThrowError(BrokerOptionsError);
+		expect(() => Discoverers.resolve("xyz")).toThrow(BrokerOptionsError);
+		expect(() => Discoverers.resolve({ type: "xyz" })).toThrow(BrokerOptionsError);
 	});
 });
 
@@ -94,7 +94,7 @@ describe("Test Discoverer register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Discoverers.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

@@ -26,7 +26,7 @@ describe("Test Base Metric class", () => {
 			expect(item.type).toBe("info");
 			expect(item.name).toBe("test.info");
 
-			expect(registry.changed).toBeCalledTimes(0);
+			expect(registry.changed).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -47,8 +47,8 @@ describe("Test Base Metric class", () => {
 				timestamp: expect.any(Number),
 				value: "John"
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith("John", undefined, undefined);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith("John", undefined, undefined);
 		});
 
 		it("should store a labeled value", () => {
@@ -61,8 +61,8 @@ describe("Test Base Metric class", () => {
 				timestamp: expect.any(Number),
 				value: "Jane"
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith("Jane", { a: 5 }, undefined);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith("Jane", { a: 5 }, undefined);
 		});
 
 		it("should update the labeled value", () => {
@@ -75,8 +75,8 @@ describe("Test Base Metric class", () => {
 				timestamp: 12345,
 				value: "Adam"
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith("Adam", { a: 5 }, 12345);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith("Adam", { a: 5 }, 12345);
 		});
 
 		it("should reset the labeled value", () => {
@@ -87,8 +87,8 @@ describe("Test Base Metric class", () => {
 				timestamp: 23456,
 				value: null
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(null, { a: 5 }, 23456);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(null, { a: 5 }, 23456);
 			expect(item.values.size).toBe(2);
 		});
 
@@ -107,8 +107,8 @@ describe("Test Base Metric class", () => {
 				timestamp: 34567,
 				value: null
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith();
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith();
 			expect(item.values.size).toBe(2);
 		});
 	});

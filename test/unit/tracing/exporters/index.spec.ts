@@ -6,10 +6,10 @@ import TracingExporters from "../../../../src/tracing/exporters";
 
 describe("Test TracingExporters resolver", () => {
 	it("should throw error", () => {
-		expect(() => TracingExporters.resolve()).toThrowError(BrokerOptionsError);
-		expect(() => TracingExporters.resolve({})).toThrowError(BrokerOptionsError);
-		expect(() => TracingExporters.resolve("xyz")).toThrowError(BrokerOptionsError);
-		expect(() => TracingExporters.resolve({ type: "xyz" })).toThrowError(BrokerOptionsError);
+		expect(() => TracingExporters.resolve()).toThrow(BrokerOptionsError);
+		expect(() => TracingExporters.resolve({})).toThrow(BrokerOptionsError);
+		expect(() => TracingExporters.resolve("xyz")).toThrow(BrokerOptionsError);
+		expect(() => TracingExporters.resolve({ type: "xyz" })).toThrow(BrokerOptionsError);
 	});
 
 	it("should resolve console tracing exporter from string", () => {
@@ -79,7 +79,7 @@ describe("Test TracingExporters register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			TracingExporters.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

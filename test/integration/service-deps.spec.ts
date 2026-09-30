@@ -70,7 +70,7 @@ describe("Test Service dependencies", () => {
 
 		it.each([1, 2])("fulfils dependency with v%d", async version => {
 			await broker.Promise.delay(500);
-			expect(startedFn).not.toBeCalled();
+			expect(startedFn).not.toHaveBeenCalled();
 
 			broker.createService({
 				name: "thing",
@@ -78,12 +78,12 @@ describe("Test Service dependencies", () => {
 			});
 			await broker.start();
 
-			expect(startedFn).toBeCalled();
+			expect(startedFn).toHaveBeenCalled();
 		});
 
 		it("does not fulfil dependency with other version", async () => {
 			await broker.Promise.delay(500);
-			expect(startedFn).not.toBeCalled();
+			expect(startedFn).not.toHaveBeenCalled();
 
 			broker.createService({
 				name: "thing",
@@ -91,7 +91,7 @@ describe("Test Service dependencies", () => {
 			});
 
 			await broker.Promise.delay(500);
-			expect(startedFn).not.toBeCalled();
+			expect(startedFn).not.toHaveBeenCalled();
 		});
 	});
 });

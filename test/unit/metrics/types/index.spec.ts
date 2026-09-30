@@ -6,8 +6,8 @@ import MetricTypes from "../../../../src/metrics/types";
 
 describe("Test MetricTypes resolver", () => {
 	it("should throw error", () => {
-		expect(() => MetricTypes.resolve()).toThrowError(BrokerOptionsError);
-		expect(() => MetricTypes.resolve("xyz")).toThrowError(BrokerOptionsError);
+		expect(() => MetricTypes.resolve()).toThrow(BrokerOptionsError);
+		expect(() => MetricTypes.resolve("xyz")).toThrow(BrokerOptionsError);
 	});
 
 	it("should resolve metric types by string", () => {
@@ -24,7 +24,7 @@ describe("Test MetricTypes register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			MetricTypes.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

@@ -197,7 +197,7 @@ describe("Test RedisCacher cluster", () => {
 		expect(cacher.opts).toEqual(opts);
 		expect(() => {
 			cacher.init(broker);
-		}).toThrowError("There is no 'nodes' configuration for cluster.");
+		}).toThrow("There is no 'nodes' configuration for cluster.");
 	});
 
 	it("should construct serializer based on options", () => {
@@ -405,7 +405,7 @@ describe("Test RedisCacher set & get without prefix", () => {
 					count: 100
 				});
 
-				expect(cacher.client.del).not.toBeCalled();
+				expect(cacher.client.del).not.toHaveBeenCalled();
 			});
 	});
 });
@@ -696,7 +696,7 @@ describe("redlock enabled", () => {
 		it("should call redlock.unlock when calling unlock callback", () => {
 			return cacher.lock(key, 20).then(unlock => {
 				return unlock().then(() => {
-					expect(unlock1).toBeCalled();
+					expect(unlock1).toHaveBeenCalled();
 				});
 			});
 		});

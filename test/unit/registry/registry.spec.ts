@@ -112,7 +112,7 @@ describe("Test Registry.init", () => {
 
 		registry.init();
 
-		expect(registry.discoverer.init).toBeCalledTimes(1);
+		expect(registry.discoverer.init).toHaveBeenCalledTimes(1);
 		await registry.stop();
 	});
 });
@@ -127,7 +127,7 @@ describe("Test Registry.stop", () => {
 
 		registry.stop();
 
-		expect(registry.discoverer.stop).toBeCalledTimes(1);
+		expect(registry.discoverer.stop).toHaveBeenCalledTimes(1);
 	});
 });
 

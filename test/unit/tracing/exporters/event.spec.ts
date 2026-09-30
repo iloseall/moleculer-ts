@@ -82,11 +82,11 @@ describe("Test Event tracing exporter class", () => {
 			expect(exporter.broker).toBe(broker);
 
 			expect(exporter.timer).toBeDefined();
-			expect(exporter.flush).toBeCalledTimes(0);
+			expect(exporter.flush).toHaveBeenCalledTimes(0);
 
 			clock.tick(5500);
 
-			expect(exporter.flush).toBeCalledTimes(1);
+			expect(exporter.flush).toHaveBeenCalledTimes(1);
 		});
 
 		it("should not create timer", () => {
@@ -370,8 +370,8 @@ describe("Test Event tracing exporter class", () => {
 			expect(res).toEqual([{ a: 5 }, { b: 10, error: "MoleculerRetryableError" }]);
 
 			expect(res).not.toBe(exporter.queue);
-			expect(exporter.errorToObject).toBeCalledTimes(1);
-			expect(exporter.errorToObject).toBeCalledWith(error);
+			expect(exporter.errorToObject).toHaveBeenCalledTimes(1);
+			expect(exporter.errorToObject).toHaveBeenCalledWith(error);
 		});
 
 		it("should call spanConverter", () => {

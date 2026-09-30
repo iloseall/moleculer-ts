@@ -26,7 +26,7 @@ describe("Test Base Metric class", () => {
 			expect(item.type).toBe("counter");
 			expect(item.name).toBe("test.counter");
 
-			expect(registry.changed).toBeCalledTimes(0);
+			expect(registry.changed).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -37,19 +37,19 @@ describe("Test Base Metric class", () => {
 		it("should call set method", () => {
 			item.set.mockClear();
 			item.increment();
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(1, undefined, undefined);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(1, undefined, undefined);
 
 			item.set.mockClear();
 			const now = Date.now();
 			item.increment({ a: 5 }, 3, now);
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(4, { a: 5 }, now);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(4, { a: 5 }, now);
 
 			item.set.mockClear();
 			item.increment();
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(5, undefined, undefined);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(5, undefined, undefined);
 		});
 	});
 
@@ -78,8 +78,8 @@ describe("Test Base Metric class", () => {
 				timestamp: expect.any(Number),
 				value: 3
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(3, undefined, undefined);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(3, undefined, undefined);
 		});
 
 		it("should store a labeled value", () => {
@@ -92,8 +92,8 @@ describe("Test Base Metric class", () => {
 				timestamp: expect.any(Number),
 				value: 3
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(3, { a: 5 }, undefined);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(3, { a: 5 }, undefined);
 		});
 
 		it("should update the labeled value", () => {
@@ -106,8 +106,8 @@ describe("Test Base Metric class", () => {
 				timestamp: 12345,
 				value: 8
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(8, { a: 5 }, 12345);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(8, { a: 5 }, 12345);
 		});
 
 		it("should reset the labeled value", () => {
@@ -118,8 +118,8 @@ describe("Test Base Metric class", () => {
 				timestamp: 23456,
 				value: 0
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(0, { a: 5 }, 23456);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(0, { a: 5 }, 23456);
 			expect(item.values.size).toBe(2);
 		});
 
@@ -138,8 +138,8 @@ describe("Test Base Metric class", () => {
 				timestamp: 34567,
 				value: 0
 			});
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(null, null, 34567);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(null, null, 34567);
 			expect(item.values.size).toBe(2);
 		});
 	});

@@ -170,7 +170,7 @@ describe("Test Prometheus Reporter class", () => {
 			expect(res.statusCode).toBe(404);
 			expect(res.text).toBe("");
 
-			expect(reporter.generatePrometheusResponse).toBeCalledTimes(0);
+			expect(reporter.generatePrometheusResponse).toHaveBeenCalledTimes(0);
 		});
 
 		it("should call generatePrometheusResponse method and send response", async () => {
@@ -181,7 +181,7 @@ describe("Test Prometheus Reporter class", () => {
 			expect(res.headers["content-type"]).toBe("text/plain; version=0.0.4; charset=utf-8");
 			expect(res.text).toBe("Fake generatePrometheusResponse content.");
 
-			expect(reporter.generatePrometheusResponse).toBeCalledTimes(1);
+			expect(reporter.generatePrometheusResponse).toHaveBeenCalledTimes(1);
 		});
 
 		it("should call generatePrometheusResponse method and send response", async () => {
@@ -195,7 +195,7 @@ describe("Test Prometheus Reporter class", () => {
 			expect(res.headers["content-encoding"]).toBe("gzip");
 			expect(res.text).toBe("Fake generatePrometheusResponse content.");
 
-			expect(reporter.generatePrometheusResponse).toBeCalledTimes(1);
+			expect(reporter.generatePrometheusResponse).toHaveBeenCalledTimes(1);
 		});
 	});
 

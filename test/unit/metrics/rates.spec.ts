@@ -45,13 +45,13 @@ describe("Test MetricRate class", () => {
 		rate.tick = mock.fn();
 
 		clock.tick(3000);
-		expect(rate.tick).toBeCalledTimes(0);
+		expect(rate.tick).toHaveBeenCalledTimes(0);
 
 		clock.tick(2000);
-		expect(rate.tick).toBeCalledTimes(1);
+		expect(rate.tick).toHaveBeenCalledTimes(1);
 
 		clock.tick(5000);
-		expect(rate.tick).toBeCalledTimes(2);
+		expect(rate.tick).toHaveBeenCalledTimes(2);
 	});
 
 	it("should reset values", () => {
@@ -86,8 +86,8 @@ describe("Test rate calculation", () => {
 		expect(rate.value).toBe(100);
 		expect(rate.rate).toBe(600);
 
-		expect(fakeMetric.changed).toBeCalledTimes(1);
-		expect(fakeMetric.changed).toBeCalledWith("value", { a: 5 }, 1234567904990);
+		expect(fakeMetric.changed).toHaveBeenCalledTimes(1);
+		expect(fakeMetric.changed).toHaveBeenCalledWith("value", { a: 5 }, 1234567904990);
 	});
 
 	it("should calculate rate again #2", () => {
@@ -101,8 +101,8 @@ describe("Test rate calculation", () => {
 		expect(rate.value).toBe(120);
 		expect(rate.rate).toBe(420);
 
-		expect(fakeMetric.changed).toBeCalledTimes(1);
-		expect(fakeMetric.changed).toBeCalledWith("value", { a: 5 }, 1234567909990);
+		expect(fakeMetric.changed).toHaveBeenCalledTimes(1);
+		expect(fakeMetric.changed).toHaveBeenCalledWith("value", { a: 5 }, 1234567909990);
 	});
 
 	it("should calculate rate again without value update", () => {
@@ -115,8 +115,8 @@ describe("Test rate calculation", () => {
 		expect(rate.value).toBe(120);
 		expect(rate.rate).toBe(210);
 
-		expect(fakeMetric.changed).toBeCalledTimes(1);
-		expect(fakeMetric.changed).toBeCalledWith("value", { a: 5 }, 1234567914990);
+		expect(fakeMetric.changed).toHaveBeenCalledTimes(1);
+		expect(fakeMetric.changed).toHaveBeenCalledWith("value", { a: 5 }, 1234567914990);
 	});
 
 	it("should rate goes zero", () => {
@@ -129,6 +129,6 @@ describe("Test rate calculation", () => {
 		expect(rate.value).toBe(120);
 		expect(rate.rate).toBe(0);
 
-		expect(fakeMetric.changed).toBeCalledTimes(13);
+		expect(fakeMetric.changed).toHaveBeenCalledTimes(13);
 	});
 });

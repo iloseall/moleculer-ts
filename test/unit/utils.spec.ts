@@ -747,7 +747,7 @@ describe("Test utils.polyfillPromise", () => {
 				.catch(res => {
 					expect(res).toBeInstanceOf(Error);
 					expect(res.message).toBe("Wrong");
-					expect(fn).toBeCalledTimes(3);
+					expect(fn).toHaveBeenCalledTimes(3);
 				});
 		});
 	});

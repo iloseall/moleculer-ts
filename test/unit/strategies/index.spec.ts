@@ -34,11 +34,11 @@ describe("Test Strategies resolver", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Strategies.resolve("xyz");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 
 		expect(() => {
 			Strategies.resolve({ type: "xyz" });
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 });
 
@@ -48,7 +48,7 @@ describe("Test Strategies register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Strategies.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

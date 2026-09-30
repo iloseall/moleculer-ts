@@ -80,11 +80,11 @@ describe("Test EventReporter class", () => {
 			reporter.init(fakeRegistry);
 
 			expect(reporter.timer).toBeDefined();
-			expect(reporter.sendEvent).toBeCalledTimes(0);
+			expect(reporter.sendEvent).toHaveBeenCalledTimes(0);
 
 			clock.tick(2500);
 
-			expect(reporter.sendEvent).toBeCalledTimes(1);
+			expect(reporter.sendEvent).toHaveBeenCalledTimes(1);
 		});
 
 		it("should not start timer", () => {
@@ -98,11 +98,11 @@ describe("Test EventReporter class", () => {
 			reporter.init(fakeRegistry);
 
 			expect(reporter.timer).toBeUndefined();
-			expect(reporter.sendEvent).toBeCalledTimes(0);
+			expect(reporter.sendEvent).toHaveBeenCalledTimes(0);
 
 			clock.tick(2500);
 
-			expect(reporter.sendEvent).toBeCalledTimes(0);
+			expect(reporter.sendEvent).toHaveBeenCalledTimes(0);
 		});
 	});
 

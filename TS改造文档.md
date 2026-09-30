@@ -2,7 +2,7 @@
 
 > 目标：把「JS 实现 + 同目录手写 `.d.ts`」的双文件结构，改造成 **TypeScript 原生单文件源码**（`src/**/*.ts`），
 > 由 `tsc` 构建出 `dist/**/*.js` + `*.d.ts`，保持运行时行为等价、公共类型 API 不丢失，
-> 并让编译配置**对齐 TypeScript 6.0 的默认值与废弃清单**。
+> 并让编译配置**对齐 TypeScript 6.0 的默认值与废弃清单**（`typescript` 依赖现已实装 `^6.0.3`，见第三章）。
 
 ---
 
@@ -60,6 +60,9 @@ dist/         133 个 .js + 133 个 .d.ts + runner-esm.mjs（与 src 严格 1:1�
 
 TS 6.0（2026-03 GA）一次性改了 9 项默认值并废弃了一批选项，7.0（Go 重写版）会**移除**全部废弃项。
 因此本次直接按「升级到 6.0 后需要什么」来配置，避免二次返工。
+
+**当前状态**：`typescript` 依赖已由 `5.9.3` 升到 **`^6.0.3`**（6.0 线当前最新稳定版），配置与依赖现已一致；
+升级后复跑全量门禁，`tsc -p tsconfig.json` / `npm run build` / 137 suites 全部通过（见第五章），**没有出现额外的语法或类型迁移**。
 
 ### `tsconfig.json`
 
@@ -269,6 +272,24 @@ const opts: TracingActionOptions = _.defaultsDeep(
 
 > 相关但本次未改：① 中间件里的 `ctx` 仍是隐式 `any`；② `registry/action-catalog.ts`、`registry/service-catalog.ts` 用 `Omit<ActionSchema, "handler" | "remoteHandler" | "service">` 描述"可序列化的纯 schema"，是否把 `rawName` 也并入 `Omit` 属公开类型议题；③ 更彻底的"输入 schema / 运行时 `Action`"类型拆分见第十一章。
 
+### 16. jest 30 升级暴露的 `hot-reload` 无限递归（已修库）
+
+`src/middlewares/hot-reload.ts` 的 `processModule()` 遍历 `module.children` 时只有两条防护：`parents` 链
+（**顶层调用时 `parents === null`，此时完全失效**）与 `node_modules` 去重缓存。因此「非 node_modules 的模块成环」
+会让它无限递归。jest 29 的模块图恰好无环，升级到 jest 30 后 `test/unit/service-broker.spec.ts` 的 4 个用例报
+`RangeError: Maximum call stack size exceeded`（栈顶全是 `hot-reload.ts:239` ↔ `:278` 交替）。
+
+修法是给 DFS 路径加**回溯式环检测**（不使用全局 visited，保留"同一文件可经不同分支被访问多次"的原有语义）：
+
+| 位置 | 改动 |
+|---|---|
+| 函数签名 | 增加 `chain = new Set()`（每次顶层调用自动新建） |
+| 防护 | `if (chain.has(fName)) return;` + `chain.add(fName)`（紧跟原有 `parents` 检查之后） |
+| 递归调用 | 传入 `chain` |
+| 递归返回后 | `chain.delete(fName)` 回溯 |
+
+对无环模块图的行为**完全不变**（唯一区别是同一路径上重复出现时不再爆栈），`hot-reload` 与其余 136 个 suite 全绿。
+
 ---
 
 ## 五、门禁验证（改造后全量运行）
@@ -282,7 +303,7 @@ const opts: TracingActionOptions = _.defaultsDeep(
 | ESLint `test`（`--rule prettier endOfLine auto` 口径） | **0 problem** |
 | ESLint `examples src`（同上口径） | **0 error / 0 warning** |
 | `npm run build` | 通过，`dist/` 与 `src` **1:1**（133 js + 133 d.ts + runner-esm.mjs） |
-| `npm run test:ts`（build + tsd + hello-world 编译 + ts-node 运行） | 通过（tsd 0 error，示例服务正常启停） |
+| `npm run test:ts`（build + tsd + hello-world 编译 + `tsx` 运行） | 通过（tsd 0 error，示例服务正常启停） |
 | `npm run test:esm` | 通过（3 个服务启动成功） |
 | `npm run test:examples`（build + 示例类型检查） | 通过 |
 | ESLint `examples src` | **0 error / 15 warning**（均为未使用变量；忽略行尾差异口径） |
@@ -314,6 +335,11 @@ const opts: TracingActionOptions = _.defaultsDeep(
 | `dev` / `demo` / `bench` / `perf` / `memleak` | 改走 `tsx`，可直接解析 `.ts` |
 | `demo:client-server:server` / `demo:client-server:client` | 新增，运行示例 |
 | `lint` / `lint:fix` | 范围加入 `dev`（第九章；`dev` 现有 0 error / 3 个既有 warning） |
+| `typescript` | `^5.9.3` → **`^6.0.3`**（配置此前已按 6.0 对齐，见第三章；升级后无额外迁移） |
+| `jest` / `jest-diff` | `^29.7.0` → **`^30.5.2`**（见 7.7；旧匹配器别名 933 处改名、`hot-reload` 环检测修复见 4.16） |
+| `jest-cli` | **移除**：无任何脚本/代码引用（jest 30 已把它并入 `jest` 包） |
+| `jest-util` / `@jest/globals` | **新增**：jest 30 的依赖树嵌套在 `node_modules/jest/node_modules/` 下、顶层解析不到，需显式声明（前者是 ts-jest 的 optional peer，后者是 `test/helpers/*.ts` 的直接依赖） |
+| `test:ts` | 末段运行器由 `ts-node` 改走 `tsx --tsconfig …`，并**移除 `ts-node` 依赖**（它只服务这一个脚本；`jest-config` 仅把它列为 optional peer）。类型检查强度不变 —— 前一段 `tsc -p test/typescript/hello-world` 已覆盖该目录的类型把关，`tsx` 只负责运行 |
 | `test:ts` / `test:esm` / `test:examples` | 前置 `npm run build` |
 
 ### 示例与类型测试的类型检查门禁
@@ -339,10 +365,10 @@ const opts: TracingActionOptions = _.defaultsDeep(
 
 ---
 
-## 七、测试文件的 TypeScript 化（jest 保持不变）
+## 七、测试文件的 TypeScript 化（仍用 jest，后升至 jest 30）
 
-测试运行器仍是 **jest 29 + ts-jest 29**，不引入 node:test：只把测试文件本身从 `.js` 改为 `.ts`，
-并把原先分散的测试工具收敛成一套统一的 helper 层。
+测试运行器仍是 **jest + ts-jest**（本章迁移时为 jest 29 / ts-jest 29；随后 jest 升至 **30.5.2**，见 7.7），
+不引入 node:test：只把测试文件本身从 `.js` 改为 `.ts`，并把原先分散的测试工具收敛成一套统一的 helper 层。
 
 ### 7.1 范围与结果
 
@@ -401,7 +427,7 @@ spec 一律从 `../../helpers/test` 与 `../../helpers/expect` 导入，不直�
 
 | 文件 | 说明 |
 |---|---|
-| `tsconfig.jest.json`（新增） | ts-jest 专用：继承根配置，覆盖 `module: commonjs` / `moduleResolution: node` / `isolatedModules: true` / `esModuleInterop: true`；把已废弃的 `isolatedModules` 选项从 jest transform 里挪出，消除告警，同时不影响 `src` 构建配置 |
+| `tsconfig.jest.json`（新增） | ts-jest 专用：继承根配置，只保留 `isolatedModules: true` / `esModuleInterop: true`；把已废弃的 `isolatedModules` 选项从 jest transform 里挪出，消除告警，同时不影响 `src` 构建配置。**不再覆盖 `module` / `moduleResolution`**：TS 6.0 弃用了 `commonjs` + `moduleResolution: "node"`(node10) 这套配对（且 node10 在 TS 7 移除），改为继承根配置的 `nodenext`；包是 `"type": "commonjs"`，emit 仍是 CommonJS，jest 运行不受影响（`npm test` 137 suites / 2360 passed 实测） |
 | `tsconfig.test.json`（新增） | **只 gate `test/helpers/**`**（外加 `src/**/*.ts` 与 `types/extends.d.ts`），命令 `npm run test:tscheck`。136 个 spec **故意不进**这道门禁：它们原为 JS，且刻意包含类型违规用例（`new Context()` 无参、mock 赋给严格类成员、部分 endpoint 对象等），全面收紧是独立工作量 |
 | `package.json` → `jest.testMatch` | `["**/*.spec.ts", "**/*.spec.js"]`（保留 `.js` 以兼容 `test/leak-detection/*.spc.js` 之外的历史 spec） |
 | `package.json` → `jest.coveragePathIgnorePatterns` | 移除已删除的 `/test/unit/utils.js` |
@@ -417,6 +443,36 @@ spec 一律从 `../../helpers/test` 与 `../../helpers/expect` 导入，不直�
 剩余 4 处「`let x;` 在 `describe` 顶层声明、`before()` 里赋值」的写法手工改为声明即初始化
 （`service-broker.spec.ts` 3 处、`tracing/span.spec.ts` 1 处），未使用变量按 7.5 的放宽规则处理。
 收敛后 `eslint test` 回到 **0 problem**，且全量测试与覆盖率不变。
+
+### 7.7 升级到 jest 30（2026-09）
+
+`jest` / `jest-diff`：29.7.0 → **30.5.2**；`ts-jest` 保持 **29.4.14** —— 它已是 latest，且 peer 明确写了
+`jest: ^29.0.0 || ^30.0.0`，本身就是 jest 30 的配套版本。相关包均已在最新：`jest-util 30.5.1`、
+`@jest/globals 30.5.2`、`@sinonjs/fake-timers 15.4.0`、`clock-mock 2.0.4`。
+
+**主要工作量：jest 30 移除了旧匹配器别名**，仓库里共 **933 处 / 46 个文件**（全部是调用点，`src/` 0 处）：
+
+| 旧别名 | 数量 | 替换为 |
+|---|---|---|
+| `toBeCalledTimes` | 589 | `toHaveBeenCalledTimes` |
+| `toBeCalledWith` | 273 | `toHaveBeenCalledWith` |
+| `toThrowError` | 65 | `toThrow` |
+| `toBeCalled` | 6 | `toHaveBeenCalled` |
+
+改名是脚本化的纯机械替换（先 dry-run 把数量对齐再写入），随后 `eslint test --fix` 修正因名字变长而超出行宽的换行。
+
+**快照与假定时器零差异**：31 个快照全部原样通过（jest 30 未改变本仓库用到的序列化形态）；假定时器也没有行为差异
+（jest 30 内部已用 `@sinonjs/fake-timers` v15，与仓库直接依赖同版本）。
+
+**依赖布局的两个坑（升级时必踩）**：
+
+| 坑 | 现象 | 处理 |
+|---|---|---|
+| 移除 `jest-cli` 后 bin 链接丢失 | `npm test` 报 `'jest' is not recognized`（`node_modules/.bin/jest` 原先由 jest-cli 提供） | 重跑一次 `npm install` 即恢复 |
+| jest 30 把整棵依赖树装进 `node_modules/jest/node_modules/` | 顶层解析不到 `jest-util`（ts-jest 的 `require("jest-util")` 报错 → **0 suites**）与 `@jest/globals`（`test/helpers/*.ts` 的 `test:tscheck` 报 `TS2307`） | 二者**显式声明**为 devDependencies（`jest-util@^30.5.1`、`@jest/globals@^30.5.2`）—— 它们本就是 ts-jest 的 optional peer 与测试助手的直接依赖，此前只是靠依赖提升"碰巧"可用 |
+
+结果：**137 suites / 2360 passed / 4 skipped / 31 snapshots**，与 jest 29 基线逐项一致；`tsconfig.jest.json` 无需再动
+（7.5 已把它切到 `nodenext`，jest 30 下 ts-jest 仍按 CJS 转译）。
 
 ---
 
@@ -554,11 +610,17 @@ node dev/jsrepl.js
    `--rule '{"prettier/prettier":["error",{"endOfLine":"auto"}]}'` 复核时 `src` 为 0 error / 0 warning、`dev` 为 0 error / 3 warning（timing-attack 误报，非本次引入）。
 3. **产物不再是「逐字节相同」**：`esModuleInterop` 会引入 `__importDefault` / `__importStar` 辅助调用。
    对象引用、`instanceof`、单例语义均不变（jest 2360 项断言与覆盖率与改造前一致可佐证）。
-4. **测试工具链是升级 TS 6/7 的真正风险点**，而非语法：当前用 `ts-jest ^29`，
-   6.0/7.0 支持取决于 ts-jest 是否跟进；长期可考虑 Node 原生类型剥离或 swc。
-5. 调试时若用 `tsc xxx.ts` 单文件编译：TS 6.0 起目录内存在 tsconfig 时会报 `TS5112`，需加 `--ignoreConfig`。
-6. **测试的运行器始终是 jest**：曾尝试迁移到 Node 原生 `node:test`，因缺少链式 `expect` API、
+4. **TS 6.0 已实装**（`typescript@^6.0.3`）：升级后 `tsc -p tsconfig.json` 0 error、`npm run build` 通过、
+   137 suites / 2360 passed 与基线一致、`eslint src`（`endOfLine:auto` 口径）0 problem —— 说明"按 6.0 预配置"
+   的这套 tsconfig 确实够用，**没有额外的语法或类型迁移**。工具链 peer 覆盖情况：`ts-jest ^29`（`>=4.3 <7`）、
+   `typescript-eslint 8.71`（`>=4.8.4 <6.1.0`）都允许 6.0.x；`tsd` 自带 `@tsd/typescript`（5.9.x fork）、
+   `tsx`/esbuild 自带转译器，都不受工作区 TS 版本影响。
+5. **升到 7.0 暂时不可行**：`ts-jest` 与 `typescript-eslint` 的 peer 上界都卡在 7 以下（前者 `<7`、后者 `<6.1.0`），
+   需等它们发布支持 7.x 的新大版本；在那之前 `6.0.x` 就是依赖上限。长期仍可考虑 Node 原生类型剥离或 swc 来摆脱这层耦合。
+6. 调试时若用 `tsc xxx.ts` 单文件编译：TS 6.0 起目录内存在 tsconfig 时会报 `TS5112`，需加 `--ignoreConfig`。
+7. **测试的运行器始终是 jest**：曾尝试迁移到 Node 原生 `node:test`，因缺少链式 `expect` API、
    `mock.module` 需实验标志且无 hoisting、快照格式不兼容而放弃；唯一沉淀是规格化的 helper 层（见第七章）。
+   jest 自身已从 29.7.0 升到 **30.5.2**（见 7.7），runner 选型不变。
 
 ---
 
@@ -574,3 +636,4 @@ node dev/jsrepl.js
 - `dev/` 的历史坏引用（`./RedisHeartbeat`、`./examples/*.service.js`、`require("moleculer")`、`../src/validator`）按本次口径只记录未修，可作为独立小任务清理
 - 把 `ActionSchema` 拆成"输入 schema"与运行时 `Action`（`service: Service`、`rawName: string`、`handler` 必填）两个类型（见 4.15），可让 `Middleware.localAction` / `Context.action` 的语义更准；属公开类型调整，需同步 `index.d.ts`、tsd 用例与 catalog 的 `Omit<...>`
 - 中间件内部的 `ctx` 仍是隐式 `any`（`ctx._retryAttempts`、`ctx.startHrTime`、`ctx.service.actions[action.rawName]` 等，见 4.15.1），收口需先给 `Context` 补内部字段或引入内部类型
+- 升到 **TypeScript 7.0**（Go 重写版）需先等 `ts-jest`（peer `<7`）与 `typescript-eslint`（peer `<6.1.0`）发布支持 7.x 的大版本（见知悉项 5）；届时只需再复跑一遍全量门禁

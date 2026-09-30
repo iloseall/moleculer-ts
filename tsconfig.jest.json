@@ -1,10 +1,13 @@
 {
-	// ts-jest compiler options: transpile-only (fast) CommonJS output for the
-	// specs, without touching the options the `src` build uses.
+	// ts-jest compiler options: transpile-only (fast) output for the specs, without
+	// touching the options the `src` build uses.
+	//
+	// `module` / `moduleResolution` are deliberately NOT overridden here: TypeScript 6.0
+	// deprecates the old `commonjs` + `moduleResolution: "node"` (node10) pairing, so we
+	// inherit the root config's `nodenext` pair instead. The package is CommonJS
+	// (`"type": "commonjs"`), hence nodenext still emits CommonJS, which is what jest runs.
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
-		"module": "commonjs",
-		"moduleResolution": "node",
 		"isolatedModules": true,
 		"esModuleInterop": true
 	}

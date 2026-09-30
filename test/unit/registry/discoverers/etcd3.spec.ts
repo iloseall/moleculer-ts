@@ -160,8 +160,8 @@ describe("Test Etcd3Discoverer 'stop' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.stop();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.close).toBeCalledTimes(1);
-		expect(discoverer.client.close).toBeCalledWith();
+		expect(discoverer.client.close).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.close).toHaveBeenCalledWith();
 
 		expect(BaseDiscoverer.prototype.stop).toHaveBeenCalledTimes(1);
 	});
@@ -188,14 +188,14 @@ describe("Test Etcd3Discoverer 'registerMoleculerMetrics' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.registerMoleculerMetrics();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.metrics.register).toBeCalledTimes(2);
-		expect(broker.metrics.register).toBeCalledWith({
+		expect(broker.metrics.register).toHaveBeenCalledTimes(2);
+		expect(broker.metrics.register).toHaveBeenCalledWith({
 			name: "moleculer.discoverer.etcd.collect.total",
 			rate: true,
 			type: "counter",
 			description: "Number of Service Registry fetching from etcd"
 		});
-		expect(broker.metrics.register).toBeCalledWith({
+		expect(broker.metrics.register).toHaveBeenCalledWith({
 			name: "moleculer.discoverer.etcd.collect.time",
 			quantiles: true,
 			type: "histogram",
@@ -246,35 +246,37 @@ describe("Test Etcd3Discoverer 'sendHeartbeat' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendHeartbeat();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.metrics.timer).toBeCalledTimes(1);
-		expect(broker.metrics.timer).toBeCalledWith("moleculer.discoverer.etcd.collect.time");
+		expect(broker.metrics.timer).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.timer).toHaveBeenCalledWith("moleculer.discoverer.etcd.collect.time");
 
-		expect(discoverer.client.lease).toBeCalledTimes(1);
-		expect(discoverer.client.lease).toBeCalledWith(30);
-		expect(fakeLease.grant).toBeCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledWith(30);
+		expect(fakeLease.grant).toHaveBeenCalledTimes(1);
 		expect(discoverer.leaseBeat).toBe(fakeLease);
 
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledWith("moleculer/discovery/beats/node-99/12345678/1");
-		expect(fakeLease.value).toBeCalledTimes(1);
-		expect(fakeLease.value).toBeCalledWith({
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledWith("moleculer/discovery/beats/node-99/12345678/1");
+		expect(fakeLease.value).toHaveBeenCalledTimes(1);
+		expect(fakeLease.value).toHaveBeenCalledWith({
 			cpu: null,
 			sender: "node-99",
 			seq: 1,
 			ver: "5",
 			instanceID: "1234567890"
 		});
-		expect(fakeLease.on).toBeCalledTimes(1);
+		expect(fakeLease.on).toHaveBeenCalledTimes(1);
 
 		expect(discoverer.lastBeatSeq).toBe(1);
 
-		expect(discoverer.collectOnlineNodes).toBeCalledTimes(1);
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 
-		expect(broker.metrics.increment).toBeCalledTimes(1);
-		expect(broker.metrics.increment).toBeCalledWith("moleculer.discoverer.etcd.collect.total");
+		expect(broker.metrics.increment).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.increment).toHaveBeenCalledWith(
+			"moleculer.discoverer.etcd.collect.total"
+		);
 	});
 
 	it("should set HB key without del if seq is same", async () => {
@@ -293,33 +295,35 @@ describe("Test Etcd3Discoverer 'sendHeartbeat' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendHeartbeat();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.metrics.timer).toBeCalledTimes(1);
-		expect(broker.metrics.timer).toBeCalledWith("moleculer.discoverer.etcd.collect.time");
+		expect(broker.metrics.timer).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.timer).toHaveBeenCalledWith("moleculer.discoverer.etcd.collect.time");
 
-		expect(discoverer.client.lease).toBeCalledTimes(0);
-		expect(fakeLease.grant).toBeCalledTimes(0);
+		expect(discoverer.client.lease).toHaveBeenCalledTimes(0);
+		expect(fakeLease.grant).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledWith("moleculer/discovery/beats/node-99/12345678/1");
-		expect(fakeLease.value).toBeCalledTimes(1);
-		expect(fakeLease.value).toBeCalledWith({
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledWith("moleculer/discovery/beats/node-99/12345678/1");
+		expect(fakeLease.value).toHaveBeenCalledTimes(1);
+		expect(fakeLease.value).toHaveBeenCalledWith({
 			cpu: null,
 			sender: "node-99",
 			seq: 1,
 			ver: "5",
 			instanceID: "1234567890"
 		});
-		expect(fakeLease.on).toBeCalledTimes(0);
+		expect(fakeLease.on).toHaveBeenCalledTimes(0);
 
 		expect(discoverer.lastBeatSeq).toBe(1);
 
-		expect(discoverer.collectOnlineNodes).toBeCalledTimes(1);
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 
-		expect(broker.metrics.increment).toBeCalledTimes(1);
-		expect(broker.metrics.increment).toBeCalledWith("moleculer.discoverer.etcd.collect.total");
+		expect(broker.metrics.increment).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.increment).toHaveBeenCalledWith(
+			"moleculer.discoverer.etcd.collect.total"
+		);
 	});
 
 	it("should recreate lease if seq is same", async () => {
@@ -341,32 +345,32 @@ describe("Test Etcd3Discoverer 'sendHeartbeat' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendHeartbeat();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(fakeLease.revoke).toBeCalledTimes(1);
-		expect(fakeLease.on).toBeCalledTimes(0);
+		expect(fakeLease.revoke).toHaveBeenCalledTimes(1);
+		expect(fakeLease.on).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.client.lease).toBeCalledTimes(1);
-		expect(discoverer.client.lease).toBeCalledWith(30);
-		expect(fakeLease2.grant).toBeCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledWith(30);
+		expect(fakeLease2.grant).toHaveBeenCalledTimes(1);
 		expect(discoverer.leaseBeat).toBe(fakeLease2);
 
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakeLease2.put).toBeCalledTimes(1);
-		expect(fakeLease2.put).toBeCalledWith("moleculer/discovery/beats/node-99/12345678/2");
-		expect(fakeLease2.value).toBeCalledTimes(1);
-		expect(fakeLease2.value).toBeCalledWith({
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.put).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.put).toHaveBeenCalledWith("moleculer/discovery/beats/node-99/12345678/2");
+		expect(fakeLease2.value).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.value).toHaveBeenCalledWith({
 			cpu: null,
 			sender: "node-99",
 			seq: 2,
 			ver: "5",
 			instanceID: "1234567890"
 		});
-		expect(fakeLease2.on).toBeCalledTimes(1);
+		expect(fakeLease2.on).toHaveBeenCalledTimes(1);
 
 		expect(discoverer.lastBeatSeq).toBe(2);
 
-		expect(discoverer.collectOnlineNodes).toBeCalledTimes(1);
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should broadcast an error", async () => {
@@ -426,19 +430,19 @@ describe("Test Etcd3Discoverer 'collectOnlineNodes' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.collectOnlineNodes();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.registry.nodes.list).toBeCalledTimes(1);
-		expect(broker.registry.nodes.list).toBeCalledWith({
+		expect(broker.registry.nodes.list).toHaveBeenCalledTimes(1);
+		expect(broker.registry.nodes.list).toHaveBeenCalledWith({
 			onlyAvailable: true,
 			withServices: false
 		});
 
-		expect(discoverer.client.getAll).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledWith("moleculer/discovery/beats/");
-		expect(fakeClient.keys).toBeCalledTimes(1);
+		expect(discoverer.client.getAll).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledWith("moleculer/discovery/beats/");
+		expect(fakeClient.keys).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(0);
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(0);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(0);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(0);
 	});
 
 	it("should disconnect previous nodes", async () => {
@@ -451,21 +455,21 @@ describe("Test Etcd3Discoverer 'collectOnlineNodes' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.collectOnlineNodes();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.registry.nodes.list).toBeCalledTimes(1);
-		expect(broker.registry.nodes.list).toBeCalledWith({
+		expect(broker.registry.nodes.list).toHaveBeenCalledTimes(1);
+		expect(broker.registry.nodes.list).toHaveBeenCalledWith({
 			onlyAvailable: true,
 			withServices: false
 		});
 
-		expect(discoverer.client.getAll).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledWith("moleculer/discovery/beats/");
-		expect(fakeClient.keys).toBeCalledTimes(1);
+		expect(discoverer.client.getAll).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledWith("moleculer/discovery/beats/");
+		expect(fakeClient.keys).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(0);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(2);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-1", true);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-2", true);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(0);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(2);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-1", true);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-2", true);
 	});
 
 	it("should add new nodes (full check)", async () => {
@@ -486,26 +490,26 @@ describe("Test Etcd3Discoverer 'collectOnlineNodes' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.collectOnlineNodes();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.getAll).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledWith("moleculer/discovery/beats/");
-		expect(fakeClient.buffers).toBeCalledTimes(1);
-		expect(fakeClient.keys).toBeCalledTimes(0);
+		expect(discoverer.client.getAll).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledWith("moleculer/discovery/beats/");
+		expect(fakeClient.buffers).toHaveBeenCalledTimes(1);
+		expect(fakeClient.keys).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(2);
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-1", {
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(2);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-1", {
 			instanceID: "111",
 			sender: "node-1",
 			seq: 1
 		});
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-2", {
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-2", {
 			instanceID: "222",
 			sender: "node-2",
 			seq: 2
 		});
 
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(1);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-3", true);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(1);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-3", true);
 	});
 
 	it("should add new nodes (fast check)", async () => {
@@ -526,28 +530,28 @@ describe("Test Etcd3Discoverer 'collectOnlineNodes' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.collectOnlineNodes();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.getAll).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledTimes(1);
-		expect(fakeClient.prefix).toBeCalledWith("moleculer/discovery/beats/");
-		expect(fakeClient.buffers).toBeCalledTimes(0);
-		expect(fakeClient.keys).toBeCalledTimes(1);
+		expect(discoverer.client.getAll).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledTimes(1);
+		expect(fakeClient.prefix).toHaveBeenCalledWith("moleculer/discovery/beats/");
+		expect(fakeClient.buffers).toHaveBeenCalledTimes(0);
+		expect(fakeClient.keys).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(2);
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-1", {
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(2);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-1", {
 			instanceID: "111",
 			sender: "node-1",
 			seq: 1,
 			key: "moleculer/discovery/beats/node-1/111/1"
 		});
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-2", {
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-2", {
 			instanceID: "222",
 			sender: "node-2",
 			seq: 2,
 			key: "moleculer/discovery/beats/node-2/222/2"
 		});
 
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(1);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-3", true);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(1);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-3", true);
 	});
 });
 
@@ -580,17 +584,17 @@ describe("Test Etcd3Discoverer 'discoverNode' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.discoverNode("node-1");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.get).toBeCalledTimes(1);
-		expect(discoverer.client.get).toBeCalledWith("moleculer/discovery/info/node-1");
-		expect(buffer).toBeCalledTimes(1);
+		expect(discoverer.client.get).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.get).toHaveBeenCalledWith("moleculer/discovery/info/node-1");
+		expect(buffer).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.serializer.deserialize).toBeCalledTimes(1);
-		expect(discoverer.serializer.deserialize).toBeCalledWith("fake-data", P.PACKET_INFO);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledTimes(1);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledWith("fake-data", P.PACKET_INFO);
 
-		expect(discoverer.processRemoteNodeInfo).toBeCalledTimes(1);
-		expect(discoverer.processRemoteNodeInfo).toBeCalledWith("node-1", "fake-data");
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledTimes(1);
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledWith("node-1", "fake-data");
 	});
 
 	it("should handle if data is invalid", async () => {
@@ -600,16 +604,16 @@ describe("Test Etcd3Discoverer 'discoverNode' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.discoverNode("node-1");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.get).toBeCalledTimes(1);
-		expect(discoverer.client.get).toBeCalledWith("moleculer/discovery/info/node-1");
-		expect(buffer).toBeCalledTimes(1);
+		expect(discoverer.client.get).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.get).toHaveBeenCalledWith("moleculer/discovery/info/node-1");
+		expect(buffer).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.warn).toBeCalledTimes(1);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.serializer.deserialize).toBeCalledTimes(1);
-		expect(discoverer.serializer.deserialize).toBeCalledWith("fake-data", P.PACKET_INFO);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledTimes(1);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledWith("fake-data", P.PACKET_INFO);
 
-		expect(discoverer.processRemoteNodeInfo).toBeCalledTimes(0);
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledTimes(0);
 	});
 
 	it("should handle if no data", async () => {
@@ -618,15 +622,17 @@ describe("Test Etcd3Discoverer 'discoverNode' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.discoverNode("node-1");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.get).toBeCalledTimes(1);
-		expect(discoverer.client.get).toBeCalledWith("moleculer/discovery/info/node-1");
-		expect(buffer).toBeCalledTimes(1);
+		expect(discoverer.client.get).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.get).toHaveBeenCalledWith("moleculer/discovery/info/node-1");
+		expect(buffer).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.warn).toBeCalledTimes(1);
-		expect(discoverer.logger.warn).toBeCalledWith("No INFO for 'node-1' node in registry.");
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(1);
+		expect(discoverer.logger.warn).toHaveBeenCalledWith(
+			"No INFO for 'node-1' node in registry."
+		);
 
-		expect(discoverer.serializer.deserialize).toBeCalledTimes(0);
-		expect(discoverer.processRemoteNodeInfo).toBeCalledTimes(0);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledTimes(0);
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledTimes(0);
 	});
 });
 
@@ -639,8 +645,8 @@ describe("Test Etcd3Discoverer 'discoverAllNodes' method", () => {
 
 		await discoverer.discoverAllNodes();
 
-		expect(discoverer.collectOnlineNodes).toBeCalledTimes(1);
-		expect(discoverer.collectOnlineNodes).toBeCalledWith();
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledTimes(1);
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledWith();
 
 		await discoverer.stop();
 	});
@@ -698,43 +704,43 @@ describe("Test Etcd3Discoverer 'sendLocalNodeInfo' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.getLocalNodeInfo).toBeCalledTimes(1);
+		expect(broker.getLocalNodeInfo).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.client.lease).toBeCalledTimes(1);
-		expect(discoverer.client.lease).toBeCalledWith(60);
-		expect(fakeLease.grant).toBeCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledWith(60);
+		expect(fakeLease.grant).toHaveBeenCalledTimes(1);
 		expect(discoverer.leaseInfo).toBe(fakeLease);
 
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledWith("moleculer/discovery/info/node-99");
-		expect(fakeLease.value).toBeCalledTimes(1);
-		expect(fakeLease.value).toBeCalledWith({ sender: "node-99", ver: "5", a: 5 });
-		expect(fakeLease.on).toBeCalledTimes(1);
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledWith("moleculer/discovery/info/node-99");
+		expect(fakeLease.value).toHaveBeenCalledTimes(1);
+		expect(fakeLease.value).toHaveBeenCalledWith({ sender: "node-99", ver: "5", a: 5 });
+		expect(fakeLease.on).toHaveBeenCalledTimes(1);
 
 		expect(discoverer.lastInfoSeq).toBe(1);
-		expect(discoverer.beat).toBeCalledTimes(1);
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(1);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should send INFO & call recreateInfoUpdateTimer & NOT beat", async () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo("node-10");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.getLocalNodeInfo).toBeCalledTimes(1);
+		expect(broker.getLocalNodeInfo).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.client.lease).toBeCalledTimes(0);
+		expect(discoverer.client.lease).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledTimes(1);
-		expect(fakeLease.put).toBeCalledWith("moleculer/discovery/info/node-99");
-		expect(fakeLease.value).toBeCalledTimes(1);
-		expect(fakeLease.value).toBeCalledWith({ sender: "node-99", ver: "5", a: 5 });
-		expect(fakeLease.on).toBeCalledTimes(0);
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledTimes(1);
+		expect(fakeLease.put).toHaveBeenCalledWith("moleculer/discovery/info/node-99");
+		expect(fakeLease.value).toHaveBeenCalledTimes(1);
+		expect(fakeLease.value).toHaveBeenCalledWith({ sender: "node-99", ver: "5", a: 5 });
+		expect(fakeLease.on).toHaveBeenCalledTimes(0);
 
 		expect(discoverer.lastInfoSeq).toBe(1);
-		expect(discoverer.beat).toBeCalledTimes(0);
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should recreate lease if seq is same", async () => {
@@ -745,24 +751,24 @@ describe("Test Etcd3Discoverer 'sendLocalNodeInfo' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(fakeLease.revoke).toBeCalledTimes(1);
-		expect(fakeLease.on).toBeCalledTimes(0);
+		expect(fakeLease.revoke).toHaveBeenCalledTimes(1);
+		expect(fakeLease.on).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.client.lease).toBeCalledTimes(1);
-		expect(discoverer.client.lease).toBeCalledWith(60);
-		expect(fakeLease2.on).toBeCalledTimes(1);
-		expect(fakeLease2.grant).toBeCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledWith(60);
+		expect(fakeLease2.on).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.grant).toHaveBeenCalledTimes(1);
 		expect(discoverer.leaseInfo).toBe(fakeLease2);
 
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakeLease2.put).toBeCalledTimes(1);
-		expect(fakeLease2.put).toBeCalledWith("moleculer/discovery/info/node-99");
-		expect(fakeLease2.value).toBeCalledTimes(1);
-		expect(fakeLease2.value).toBeCalledWith({ sender: "node-99", ver: "5", a: 5 });
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.put).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.put).toHaveBeenCalledWith("moleculer/discovery/info/node-99");
+		expect(fakeLease2.value).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.value).toHaveBeenCalledWith({ sender: "node-99", ver: "5", a: 5 });
 
 		expect(discoverer.lastInfoSeq).toBe(2);
-		expect(discoverer.beat).toBeCalledTimes(1);
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(1);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should recreate lease if seq is same & call makeBalancedSubscriptions", async () => {
@@ -776,26 +782,26 @@ describe("Test Etcd3Discoverer 'sendLocalNodeInfo' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(fakeLease.revoke).toBeCalledTimes(1);
-		expect(fakeLease.on).toBeCalledTimes(0);
+		expect(fakeLease.revoke).toHaveBeenCalledTimes(1);
+		expect(fakeLease.on).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.client.lease).toBeCalledTimes(1);
-		expect(discoverer.client.lease).toBeCalledWith(60);
-		expect(fakeLease2.on).toBeCalledTimes(1);
-		expect(fakeLease2.grant).toBeCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.lease).toHaveBeenCalledWith(60);
+		expect(fakeLease2.on).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.grant).toHaveBeenCalledTimes(1);
 		expect(discoverer.leaseInfo).toBe(fakeLease2);
 
-		expect(broker.transit.tx.makeBalancedSubscriptions).toBeCalledTimes(1);
+		expect(broker.transit.tx.makeBalancedSubscriptions).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakeLease2.put).toBeCalledTimes(1);
-		expect(fakeLease2.put).toBeCalledWith("moleculer/discovery/info/node-99");
-		expect(fakeLease2.value).toBeCalledTimes(1);
-		expect(fakeLease2.value).toBeCalledWith({ sender: "node-99", ver: "5", a: 5 });
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.put).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.put).toHaveBeenCalledWith("moleculer/discovery/info/node-99");
+		expect(fakeLease2.value).toHaveBeenCalledTimes(1);
+		expect(fakeLease2.value).toHaveBeenCalledWith({ sender: "node-99", ver: "5", a: 5 });
 
 		expect(discoverer.lastInfoSeq).toBe(3);
-		expect(discoverer.beat).toBeCalledTimes(1);
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(1);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should handle error", async () => {
@@ -804,12 +810,15 @@ describe("Test Etcd3Discoverer 'sendLocalNodeInfo' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(fakeLease2.put).toBeCalledTimes(1);
+		expect(fakeLease2.put).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.beat).toBeCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.logger.error).toBeCalledTimes(1);
-		expect(discoverer.logger.error).toBeCalledWith("Unable to send INFO to etcd server", err);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(1);
+		expect(discoverer.logger.error).toHaveBeenCalledWith(
+			"Unable to send INFO to etcd server",
+			err
+		);
 	});
 
 	it("should broadcast an error", async () => {
@@ -848,15 +857,15 @@ describe("Test Etcd3Discoverer 'localNodeDisconnected' method", () => {
 
 		await discoverer.localNodeDisconnected();
 
-		expect(BaseDiscoverer.prototype.localNodeDisconnected).toBeCalledTimes(1);
+		expect(BaseDiscoverer.prototype.localNodeDisconnected).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.client.delete).toBeCalledTimes(2);
-		expect(fakeDelete.key).toBeCalledTimes(2);
-		expect(fakeDelete.key).toBeCalledWith("moleculer/discovery/info/node-99");
-		expect(fakeDelete.key).toBeCalledWith("moleculer/discovery/beats/node-99/12345678");
+		expect(discoverer.client.delete).toHaveBeenCalledTimes(2);
+		expect(fakeDelete.key).toHaveBeenCalledTimes(2);
+		expect(fakeDelete.key).toHaveBeenCalledWith("moleculer/discovery/info/node-99");
+		expect(fakeDelete.key).toHaveBeenCalledWith("moleculer/discovery/beats/node-99/12345678");
 
-		expect(discoverer.leaseBeat.revoke).toBeCalledTimes(1);
-		expect(discoverer.leaseInfo.revoke).toBeCalledTimes(1);
+		expect(discoverer.leaseBeat.revoke).toHaveBeenCalledTimes(1);
+		expect(discoverer.leaseInfo.revoke).toHaveBeenCalledTimes(1);
 
 		await discoverer.stop();
 	});

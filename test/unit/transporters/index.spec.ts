@@ -203,11 +203,11 @@ describe("Test Transporter resolver", () => {
 		it("should throw error if type if not correct", () => {
 			expect(() => {
 				Transporters.resolve("xyz");
-			}).toThrowError(BrokerOptionsError);
+			}).toThrow(BrokerOptionsError);
 
 			expect(() => {
 				Transporters.resolve({ type: "xyz" });
-			}).toThrowError(BrokerOptionsError);
+			}).toThrow(BrokerOptionsError);
 		});
 	});
 });
@@ -218,7 +218,7 @@ describe("Test Transporters register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Transporters.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

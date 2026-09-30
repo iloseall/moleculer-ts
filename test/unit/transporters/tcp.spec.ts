@@ -533,11 +533,11 @@ describe("Test TcpTransporter startUdpServer", () => {
 
 		await promUpdateLocalInfo;
 
-		expect(transporter.getLocalNodeInfo).toBeCalledTimes(1);
-		expect(fakeNode.updateLocalInfo).toBeCalledTimes(1);
-		expect(fakeNode.updateLocalInfo).toBeCalledWith(broker.getCpuUsage);
+		expect(transporter.getLocalNodeInfo).toHaveBeenCalledTimes(1);
+		expect(fakeNode.updateLocalInfo).toHaveBeenCalledTimes(1);
+		expect(fakeNode.updateLocalInfo).toHaveBeenCalledWith(broker.getCpuUsage);
 
-		expect(transporter.sendGossipRequest).toBeCalledTimes(1);
+		expect(transporter.sendGossipRequest).toHaveBeenCalledTimes(1);
 
 		transporter.stopTimers(); // clean up handle
 	});

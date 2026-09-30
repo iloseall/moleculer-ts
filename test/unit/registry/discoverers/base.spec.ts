@@ -69,8 +69,8 @@ describe("Test BaseDiscoverer 'init' method", () => {
 		discoverer.init(registry);
 
 		expect(discoverer.logger).toBeDefined();
-		expect(broker.getLogger).toBeCalledTimes(1);
-		expect(broker.getLogger).toBeCalledWith("Discovery");
+		expect(broker.getLogger).toHaveBeenCalledTimes(1);
+		expect(broker.getLogger).toHaveBeenCalledWith("Discovery");
 		expect(discoverer.transit).toBeUndefined();
 
 		expect(discoverer.opts).toEqual({
@@ -84,8 +84,8 @@ describe("Test BaseDiscoverer 'init' method", () => {
 
 		expect(discoverer.localNode).toBe(registry.nodes.localNode);
 
-		expect(discoverer.registerMoleculerMetrics).toBeCalledTimes(1);
-		expect(discoverer.registerMoleculerMetrics).toBeCalledWith();
+		expect(discoverer.registerMoleculerMetrics).toHaveBeenCalledTimes(1);
+		expect(discoverer.registerMoleculerMetrics).toHaveBeenCalledWith();
 	});
 
 	it("init with opts & transit", () => {
@@ -120,21 +120,24 @@ describe("Test BaseDiscoverer 'init' method", () => {
 			cleanOfflineNodesTimeout: 600
 		});
 
-		expect(broker.localBus.on).toBeCalledTimes(2);
-		expect(broker.localBus.on).toBeCalledWith("$transporter.connected", expect.any(Function));
-		expect(broker.localBus.on).toBeCalledWith(
+		expect(broker.localBus.on).toHaveBeenCalledTimes(2);
+		expect(broker.localBus.on).toHaveBeenCalledWith(
+			"$transporter.connected",
+			expect.any(Function)
+		);
+		expect(broker.localBus.on).toHaveBeenCalledWith(
 			"$transporter.disconnected",
 			expect.any(Function)
 		);
 
 		// Test event handlers
-		expect(discoverer.startHeartbeatTimers).toBeCalledTimes(0);
+		expect(discoverer.startHeartbeatTimers).toHaveBeenCalledTimes(0);
 		eventsCB["$transporter.connected"]();
-		expect(discoverer.startHeartbeatTimers).toBeCalledTimes(1);
+		expect(discoverer.startHeartbeatTimers).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.stopHeartbeatTimers).toBeCalledTimes(0);
+		expect(discoverer.stopHeartbeatTimers).toHaveBeenCalledTimes(0);
 		eventsCB["$transporter.disconnected"]();
-		expect(discoverer.stopHeartbeatTimers).toBeCalledTimes(1);
+		expect(discoverer.stopHeartbeatTimers).toHaveBeenCalledTimes(1);
 	});
 });
 
@@ -150,8 +153,8 @@ describe("Test BaseDiscoverer 'stop' method", () => {
 		discoverer.init(registry);
 		await discoverer.stop();
 
-		expect(discoverer.stopHeartbeatTimers).toBeCalledTimes(1);
-		expect(discoverer.stopHeartbeatTimers).toBeCalledWith();
+		expect(discoverer.stopHeartbeatTimers).toHaveBeenCalledTimes(1);
+		expect(discoverer.stopHeartbeatTimers).toHaveBeenCalledWith();
 	});
 
 	it("should do nothing if no init", async () => {
@@ -185,17 +188,17 @@ describe("Test BaseDiscoverer 'startHeartbeatTimers' method", () => {
 		expect(discoverer.checkNodesTimer).toBeDefined();
 		expect(discoverer.offlineTimer).toBeDefined();
 
-		expect(discoverer.beat).toBeCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(0);
 		mock.advanceTimersByTime(12000);
-		expect(discoverer.beat).toBeCalledTimes(1);
+		expect(discoverer.beat).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.checkRemoteNodes).toBeCalledTimes(0);
+		expect(discoverer.checkRemoteNodes).toHaveBeenCalledTimes(0);
 		mock.advanceTimersByTime(20000);
-		expect(discoverer.checkRemoteNodes).toBeCalledTimes(1);
+		expect(discoverer.checkRemoteNodes).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.checkOfflineNodes).toBeCalledTimes(0);
+		expect(discoverer.checkOfflineNodes).toHaveBeenCalledTimes(0);
 		mock.advanceTimersByTime(30000);
-		expect(discoverer.checkOfflineNodes).toBeCalledTimes(1);
+		expect(discoverer.checkOfflineNodes).toHaveBeenCalledTimes(1);
 	});
 });
 
@@ -228,9 +231,9 @@ describe("Test BaseDiscoverer 'stopHeartbeatTimers' method", () => {
 
 		mock.advanceTimersByTime(35000);
 
-		expect(discoverer.beat).toBeCalledTimes(0);
-		expect(discoverer.checkRemoteNodes).toBeCalledTimes(0);
-		expect(discoverer.checkOfflineNodes).toBeCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(0);
+		expect(discoverer.checkRemoteNodes).toHaveBeenCalledTimes(0);
+		expect(discoverer.checkOfflineNodes).toHaveBeenCalledTimes(0);
 	});
 });
 
@@ -249,7 +252,7 @@ describe("Test BaseDiscoverer 'disableHeartbeat' method", () => {
 		discoverer.disableHeartbeat();
 
 		expect(discoverer.opts.heartbeatInterval).toBe(0);
-		expect(discoverer.stopHeartbeatTimers).toBeCalledTimes(1);
+		expect(discoverer.stopHeartbeatTimers).toHaveBeenCalledTimes(1);
 	});
 });
 
@@ -268,11 +271,11 @@ describe("Test BaseDiscoverer 'beat' method", () => {
 
 		await discoverer.beat();
 
-		expect(discoverer.localNode.updateLocalInfo).toBeCalledTimes(1);
-		expect(discoverer.localNode.updateLocalInfo).toBeCalledWith(broker.getCpuUsage);
+		expect(discoverer.localNode.updateLocalInfo).toHaveBeenCalledTimes(1);
+		expect(discoverer.localNode.updateLocalInfo).toHaveBeenCalledWith(broker.getCpuUsage);
 
-		expect(discoverer.sendHeartbeat).toBeCalledTimes(1);
-		expect(discoverer.sendHeartbeat).toBeCalledWith();
+		expect(discoverer.sendHeartbeat).toHaveBeenCalledTimes(1);
+		expect(discoverer.sendHeartbeat).toHaveBeenCalledWith();
 	});
 });
 
@@ -298,8 +301,8 @@ describe("Test BaseDiscoverer 'checkRemoteNodes' method", () => {
 
 		discoverer.checkRemoteNodes();
 
-		expect(registry.nodes.disconnected).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.disconnected).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 
 		expect(node.lastHeartbeatTime).toBeDefined();
 	});
@@ -312,9 +315,9 @@ describe("Test BaseDiscoverer 'checkRemoteNodes' method", () => {
 
 		discoverer.checkRemoteNodes();
 
-		expect(registry.nodes.disconnected).toBeCalledTimes(1);
-		expect(registry.nodes.disconnected).toBeCalledWith("node-10", true);
-		expect(discoverer.logger.warn).toBeCalledTimes(1);
+		expect(registry.nodes.disconnected).toHaveBeenCalledTimes(1);
+		expect(registry.nodes.disconnected).toHaveBeenCalledWith("node-10", true);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(1);
 	});
 
 	it("should not call disconnected if time between", async () => {
@@ -325,8 +328,8 @@ describe("Test BaseDiscoverer 'checkRemoteNodes' method", () => {
 
 		discoverer.checkRemoteNodes();
 
-		expect(registry.nodes.disconnected).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.disconnected).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 
 	it("should not call disconnected if not available", async () => {
@@ -338,8 +341,8 @@ describe("Test BaseDiscoverer 'checkRemoteNodes' method", () => {
 
 		discoverer.checkRemoteNodes();
 
-		expect(registry.nodes.disconnected).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.disconnected).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 
 	it("should not call disconnected if local", async () => {
@@ -351,8 +354,8 @@ describe("Test BaseDiscoverer 'checkRemoteNodes' method", () => {
 
 		discoverer.checkRemoteNodes();
 
-		expect(registry.nodes.disconnected).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.disconnected).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 
 	it("should not call disconnected if disabled", async () => {
@@ -364,8 +367,8 @@ describe("Test BaseDiscoverer 'checkRemoteNodes' method", () => {
 
 		discoverer.checkRemoteNodes();
 
-		expect(registry.nodes.disconnected).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.disconnected).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 });
 
@@ -391,8 +394,8 @@ describe("Test BaseDiscoverer 'checkOfflineNodes' method", () => {
 
 		discoverer.checkOfflineNodes();
 
-		expect(registry.nodes.delete).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.delete).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 
 		expect(node.lastHeartbeatTime).toBeDefined();
 	});
@@ -405,9 +408,9 @@ describe("Test BaseDiscoverer 'checkOfflineNodes' method", () => {
 
 		discoverer.checkOfflineNodes();
 
-		expect(registry.nodes.delete).toBeCalledTimes(1);
-		expect(registry.nodes.delete).toBeCalledWith("node-10");
-		expect(discoverer.logger.warn).toBeCalledTimes(1);
+		expect(registry.nodes.delete).toHaveBeenCalledTimes(1);
+		expect(registry.nodes.delete).toHaveBeenCalledWith("node-10");
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(1);
 	});
 
 	it("should not call delete if time between", async () => {
@@ -418,8 +421,8 @@ describe("Test BaseDiscoverer 'checkOfflineNodes' method", () => {
 
 		discoverer.checkOfflineNodes();
 
-		expect(registry.nodes.delete).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.delete).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 
 	it("should not call delete if available", async () => {
@@ -431,8 +434,8 @@ describe("Test BaseDiscoverer 'checkOfflineNodes' method", () => {
 
 		discoverer.checkOfflineNodes();
 
-		expect(registry.nodes.delete).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.delete).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 
 	it("should not call delete if local", async () => {
@@ -444,8 +447,8 @@ describe("Test BaseDiscoverer 'checkOfflineNodes' method", () => {
 
 		discoverer.checkOfflineNodes();
 
-		expect(registry.nodes.delete).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.delete).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 
 	it("should not call delete if disabled", async () => {
@@ -457,8 +460,8 @@ describe("Test BaseDiscoverer 'checkOfflineNodes' method", () => {
 
 		discoverer.checkOfflineNodes();
 
-		expect(registry.nodes.delete).toBeCalledTimes(0);
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(registry.nodes.delete).toHaveBeenCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 	});
 });
 
@@ -490,13 +493,13 @@ describe("Test BaseDiscoverer 'heartbeatReceived' method", () => {
 
 		discoverer.heartbeatReceived("node-9", {});
 
-		expect(registry.nodes.get).toBeCalledTimes(1);
-		expect(registry.nodes.get).toBeCalledWith("node-9");
+		expect(registry.nodes.get).toHaveBeenCalledTimes(1);
+		expect(registry.nodes.get).toHaveBeenCalledWith("node-9");
 
-		expect(discoverer.discoverNode).toBeCalledTimes(1);
-		expect(discoverer.discoverNode).toBeCalledWith("node-9");
+		expect(discoverer.discoverNode).toHaveBeenCalledTimes(1);
+		expect(discoverer.discoverNode).toHaveBeenCalledWith("node-9");
 
-		expect(node.heartbeat).toBeCalledTimes(0);
+		expect(node.heartbeat).toHaveBeenCalledTimes(0);
 	});
 
 	it("should call discoverNode if node is not available", async () => {
@@ -507,10 +510,10 @@ describe("Test BaseDiscoverer 'heartbeatReceived' method", () => {
 
 		discoverer.heartbeatReceived("node-10", {});
 
-		expect(discoverer.discoverNode).toBeCalledTimes(1);
-		expect(discoverer.discoverNode).toBeCalledWith("node-10");
+		expect(discoverer.discoverNode).toHaveBeenCalledTimes(1);
+		expect(discoverer.discoverNode).toHaveBeenCalledWith("node-10");
 
-		expect(node.heartbeat).toBeCalledTimes(0);
+		expect(node.heartbeat).toHaveBeenCalledTimes(0);
 	});
 
 	it("should call discoverNode if seq is different", async () => {
@@ -522,10 +525,10 @@ describe("Test BaseDiscoverer 'heartbeatReceived' method", () => {
 
 		discoverer.heartbeatReceived("node-10", { seq: 3 });
 
-		expect(discoverer.discoverNode).toBeCalledTimes(1);
-		expect(discoverer.discoverNode).toBeCalledWith("node-10");
+		expect(discoverer.discoverNode).toHaveBeenCalledTimes(1);
+		expect(discoverer.discoverNode).toHaveBeenCalledWith("node-10");
 
-		expect(node.heartbeat).toBeCalledTimes(0);
+		expect(node.heartbeat).toHaveBeenCalledTimes(0);
 	});
 
 	it("should call discoverNode if instanceID different", async () => {
@@ -535,10 +538,10 @@ describe("Test BaseDiscoverer 'heartbeatReceived' method", () => {
 
 		discoverer.heartbeatReceived("node-10", { instanceID: "iid-2" });
 
-		expect(discoverer.discoverNode).toBeCalledTimes(1);
-		expect(discoverer.discoverNode).toBeCalledWith("node-10");
+		expect(discoverer.discoverNode).toHaveBeenCalledTimes(1);
+		expect(discoverer.discoverNode).toHaveBeenCalledWith("node-10");
 
-		expect(node.heartbeat).toBeCalledTimes(0);
+		expect(node.heartbeat).toHaveBeenCalledTimes(0);
 	});
 
 	it("should call heartbeat if instanceID & seq same", async () => {
@@ -548,9 +551,9 @@ describe("Test BaseDiscoverer 'heartbeatReceived' method", () => {
 
 		discoverer.heartbeatReceived("node-10", { seq: 2, instanceID: "iid-1" });
 
-		expect(discoverer.discoverNode).toBeCalledTimes(0);
-		expect(node.heartbeat).toBeCalledTimes(1);
-		expect(node.heartbeat).toBeCalledWith({ seq: 2, instanceID: "iid-1" });
+		expect(discoverer.discoverNode).toHaveBeenCalledTimes(0);
+		expect(node.heartbeat).toHaveBeenCalledTimes(1);
+		expect(node.heartbeat).toHaveBeenCalledWith({ seq: 2, instanceID: "iid-1" });
 	});
 
 	it("should call heartbeat if no instanceID in payload", async () => {
@@ -560,9 +563,9 @@ describe("Test BaseDiscoverer 'heartbeatReceived' method", () => {
 
 		discoverer.heartbeatReceived("node-10", { seq: 2 });
 
-		expect(discoverer.discoverNode).toBeCalledTimes(0);
-		expect(node.heartbeat).toBeCalledTimes(1);
-		expect(node.heartbeat).toBeCalledWith({ seq: 2 });
+		expect(discoverer.discoverNode).toHaveBeenCalledTimes(0);
+		expect(node.heartbeat).toHaveBeenCalledTimes(1);
+		expect(node.heartbeat).toHaveBeenCalledWith({ seq: 2 });
 	});
 
 	it("should call heartbeat if not seq in payload", async () => {
@@ -572,9 +575,9 @@ describe("Test BaseDiscoverer 'heartbeatReceived' method", () => {
 
 		discoverer.heartbeatReceived("node-10", {});
 
-		expect(discoverer.discoverNode).toBeCalledTimes(0);
-		expect(node.heartbeat).toBeCalledTimes(1);
-		expect(node.heartbeat).toBeCalledWith({});
+		expect(discoverer.discoverNode).toHaveBeenCalledTimes(0);
+		expect(node.heartbeat).toHaveBeenCalledTimes(1);
+		expect(node.heartbeat).toHaveBeenCalledWith({});
 	});
 });
 
@@ -593,8 +596,8 @@ describe("Test BaseDiscoverer 'processRemoteNodeInfo' method", () => {
 		const payload = { a: 5 };
 		discoverer.processRemoteNodeInfo("node-9", payload);
 
-		expect(registry.processNodeInfo).toBeCalledTimes(1);
-		expect(registry.processNodeInfo).toBeCalledWith(payload);
+		expect(registry.processNodeInfo).toHaveBeenCalledTimes(1);
+		expect(registry.processNodeInfo).toHaveBeenCalledWith(payload);
 	});
 });
 
@@ -617,8 +620,8 @@ describe("Test BaseDiscoverer 'sendHeartbeat' method", () => {
 
 		discoverer.sendHeartbeat();
 
-		expect(broker.transit.sendHeartbeat).toBeCalledTimes(1);
-		expect(broker.transit.sendHeartbeat).toBeCalledWith(discoverer.localNode);
+		expect(broker.transit.sendHeartbeat).toHaveBeenCalledTimes(1);
+		expect(broker.transit.sendHeartbeat).toHaveBeenCalledWith(discoverer.localNode);
 
 		await discoverer.stop();
 	});
@@ -643,8 +646,8 @@ describe("Test BaseDiscoverer 'localNodeDisconnected' method", () => {
 
 		discoverer.localNodeDisconnected();
 
-		expect(broker.transit.sendDisconnectPacket).toBeCalledTimes(1);
-		expect(broker.transit.sendDisconnectPacket).toBeCalledWith();
+		expect(broker.transit.sendDisconnectPacket).toHaveBeenCalledTimes(1);
+		expect(broker.transit.sendDisconnectPacket).toHaveBeenCalledWith();
 
 		await discoverer.stop();
 	});
@@ -661,8 +664,8 @@ describe("Test BaseDiscoverer 'remoteNodeDisconnected' method", () => {
 
 		discoverer.remoteNodeDisconnected("node-2", true);
 
-		expect(registry.nodes.disconnected).toBeCalledTimes(1);
-		expect(registry.nodes.disconnected).toBeCalledWith("node-2", true);
+		expect(registry.nodes.disconnected).toHaveBeenCalledTimes(1);
+		expect(registry.nodes.disconnected).toHaveBeenCalledWith("node-2", true);
 
 		await discoverer.stop();
 	});

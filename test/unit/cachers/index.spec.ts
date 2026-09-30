@@ -106,11 +106,11 @@ describe("Test Cacher resolver with invalid instances", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Cachers.resolve({ type: "xyz" });
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 
 		expect(() => {
 			Cachers.resolve("xyz");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 });
 
@@ -120,7 +120,7 @@ describe("Test Cacher register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Cachers.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

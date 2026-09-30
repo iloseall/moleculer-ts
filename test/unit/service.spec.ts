@@ -14,7 +14,7 @@ describe("Test Service class", () => {
 		it("should throw error if missing serviceBroker instance", () => {
 			expect(() => {
 				new Service();
-			}).toThrowError("Must set a ServiceBroker instance!");
+			}).toThrow("Must set a ServiceBroker instance!");
 		});
 
 		it("should set broker to local variable", () => {
@@ -22,7 +22,7 @@ describe("Test Service class", () => {
 			const svc = new Service(broker);
 			expect(svc.broker).toBe(broker);
 			expect(svc.Promise).toBe(broker.Promise);
-			expect(Service.prototype.parseServiceSchema).toBeCalledTimes(0);
+			expect(Service.prototype.parseServiceSchema).toHaveBeenCalledTimes(0);
 		});
 
 		it("should call the parseServiceSchema", () => {
@@ -34,8 +34,8 @@ describe("Test Service class", () => {
 			const svc = new Service(broker, schema);
 			expect(svc.broker).toBe(broker);
 			expect(svc.Promise).toBe(broker.Promise);
-			expect(Service.prototype.parseServiceSchema).toBeCalledTimes(1);
-			expect(Service.prototype.parseServiceSchema).toBeCalledWith(schema);
+			expect(Service.prototype.parseServiceSchema).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.parseServiceSchema).toHaveBeenCalledWith(schema);
 		});
 	});
 
@@ -53,7 +53,7 @@ describe("Test Service class", () => {
 		it("should throw error if missing schema", () => {
 			expect(() => {
 				svc.parseServiceSchema();
-			}).toThrowError("The service schema can't be null. Maybe is it not a service schema?");
+			}).toThrow("The service schema can't be null. Maybe is it not a service schema?");
 		});
 
 		it("should throw error if name is empty", () => {
@@ -61,10 +61,10 @@ describe("Test Service class", () => {
 			expect(() => {
 				console.error = mock.fn();
 				svc.parseServiceSchema({});
-			}).toThrowError(
+			}).toThrow(
 				"Service name can't be empty! Maybe it is not a valid Service schema. Maybe is it not a service schema?"
 			);
-			expect(Service.prototype.applyMixins).toBeCalledTimes(0);
+			expect(Service.prototype.applyMixins).toHaveBeenCalledTimes(0);
 		});
 
 		it("should set common local variables", () => {
@@ -76,7 +76,7 @@ describe("Test Service class", () => {
 			expect(svc.originalSchema).toEqual({ name: "posts" });
 			expect(svc.originalSchema).not.toBe(schema);
 
-			expect(Service.prototype.applyMixins).toBeCalledTimes(0);
+			expect(Service.prototype.applyMixins).toHaveBeenCalledTimes(0);
 
 			expect(svc.name).toBe("posts");
 			expect(svc.version).toBeUndefined();
@@ -86,13 +86,16 @@ describe("Test Service class", () => {
 			expect(svc.fullName).toBe("posts");
 			expect(svc.logger).toBeDefined();
 
-			expect(broker.getLogger).toBeCalledTimes(1);
-			expect(broker.getLogger).toBeCalledWith("posts", { svc: "posts", ver: undefined });
+			expect(broker.getLogger).toHaveBeenCalledTimes(1);
+			expect(broker.getLogger).toHaveBeenCalledWith("posts", {
+				svc: "posts",
+				ver: undefined
+			});
 
 			expect(svc.actions).toEqual({});
 			expect(svc.events).toEqual({});
 
-			expect(svc._init).toBeCalledTimes(1);
+			expect(svc._init).toHaveBeenCalledTimes(1);
 		});
 
 		it("should set common local variables with version", () => {
@@ -106,8 +109,8 @@ describe("Test Service class", () => {
 			expect(svc.originalSchema).toEqual({ name: "posts", version: 3, mixins: [] });
 			expect(svc.originalSchema).not.toBe(schema);
 
-			expect(Service.prototype.applyMixins).toBeCalledTimes(1);
-			expect(Service.prototype.applyMixins).toBeCalledWith(schema);
+			expect(Service.prototype.applyMixins).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.applyMixins).toHaveBeenCalledWith(schema);
 
 			expect(svc.name).toBe("posts");
 			expect(svc.version).toBe(3);
@@ -117,13 +120,13 @@ describe("Test Service class", () => {
 			expect(svc.fullName).toBe("v3.posts");
 			expect(svc.logger).toBeDefined();
 
-			expect(broker.getLogger).toBeCalledTimes(1);
-			expect(broker.getLogger).toBeCalledWith("v3.posts", { svc: "posts", ver: 3 });
+			expect(broker.getLogger).toHaveBeenCalledTimes(1);
+			expect(broker.getLogger).toHaveBeenCalledWith("v3.posts", { svc: "posts", ver: 3 });
 
 			expect(svc.actions).toEqual({});
 			expect(svc.events).toEqual({});
 
-			expect(svc._init).toBeCalledTimes(1);
+			expect(svc._init).toHaveBeenCalledTimes(1);
 		});
 
 		it("should set common local variables with version & noVersionPrefix", () => {
@@ -147,7 +150,7 @@ describe("Test Service class", () => {
 						actions() {}
 					}
 				});
-			}).toThrowError("Invalid method name 'actions' in 'posts' service!");
+			}).toThrow("Invalid method name 'actions' in 'posts' service!");
 
 			expect(() => {
 				svc.parseServiceSchema({
@@ -156,7 +159,7 @@ describe("Test Service class", () => {
 						applyMixins() {}
 					}
 				});
-			}).toThrowError("Invalid method name 'applyMixins' in 'posts' service!");
+			}).toThrow("Invalid method name 'applyMixins' in 'posts' service!");
 
 			expect(() => {
 				svc.parseServiceSchema({
@@ -165,7 +168,7 @@ describe("Test Service class", () => {
 						mergeSchemaSettings() {}
 					}
 				});
-			}).toThrowError("Invalid method name 'mergeSchemaSettings' in 'posts' service!");
+			}).toThrow("Invalid method name 'mergeSchemaSettings' in 'posts' service!");
 
 			expect(() => {
 				svc.parseServiceSchema({
@@ -174,7 +177,7 @@ describe("Test Service class", () => {
 						mergeSchemaUnknown() {}
 					}
 				});
-			}).toThrowError("Invalid method name 'mergeSchemaUnknown' in 'posts' service!");
+			}).toThrow("Invalid method name 'mergeSchemaUnknown' in 'posts' service!");
 		});
 
 		it("should set methods and bind the service instance", () => {
@@ -240,11 +243,11 @@ describe("Test Service class", () => {
 			};
 			svc.parseServiceSchema(schema);
 
-			expect(svc._createAction).toBeCalledTimes(2);
+			expect(svc._createAction).toHaveBeenCalledTimes(2);
 			expect(svc._createAction).toHaveBeenNthCalledWith(1, schema.actions.alpha, "alpha");
 			expect(svc._createAction).toHaveBeenNthCalledWith(2, schema.actions.gamma, "gamma");
 
-			expect(broker.middlewares.wrapHandler).toBeCalledTimes(2);
+			expect(broker.middlewares.wrapHandler).toHaveBeenCalledTimes(2);
 			expect(broker.middlewares.wrapHandler).toHaveBeenNthCalledWith(
 				1,
 				"localAction",
@@ -258,7 +261,7 @@ describe("Test Service class", () => {
 				{ name: "gamma", handler: expect.any(Function) }
 			);
 
-			expect(broker.registry.createPrivateActionEndpoint).toBeCalledTimes(2);
+			expect(broker.registry.createPrivateActionEndpoint).toHaveBeenCalledTimes(2);
 			expect(broker.registry.createPrivateActionEndpoint).toHaveBeenNthCalledWith(1, {
 				name: "alpha",
 				handler: expect.any(Function)
@@ -304,8 +307,8 @@ describe("Test Service class", () => {
 			const res = svc.actions.alpha({ a: 5 });
 
 			expect(res).toBe("Alpha");
-			expect(schema.actions.alpha).toBeCalledTimes(1);
-			expect(schema.actions.alpha).toBeCalledWith(expect.any(Context));
+			expect(schema.actions.alpha).toHaveBeenCalledTimes(1);
+			expect(schema.actions.alpha).toHaveBeenCalledWith(expect.any(Context));
 			expect(schema.actions.alpha.mock.calls[0][0].params).toEqual({ a: 5 });
 			expect(schema.actions.alpha.mock.calls[0][0].endpoint).toEqual({ id: "nodeID" });
 
@@ -314,8 +317,8 @@ describe("Test Service class", () => {
 			const res2 = svc.actions.alpha({ a: 5 }, { ctx: fakeCtx });
 
 			expect(res2).toBe("Alpha");
-			expect(schema.actions.alpha).toBeCalledTimes(1);
-			expect(schema.actions.alpha).toBeCalledWith(fakeCtx);
+			expect(schema.actions.alpha).toHaveBeenCalledTimes(1);
+			expect(schema.actions.alpha).toHaveBeenCalledWith(fakeCtx);
 		});
 
 		it("should register events", () => {
@@ -335,7 +338,7 @@ describe("Test Service class", () => {
 			};
 			svc.parseServiceSchema(schema);
 
-			expect(svc._createEvent).toBeCalledTimes(2);
+			expect(svc._createEvent).toHaveBeenCalledTimes(2);
 			expect(svc._createEvent).toHaveBeenNthCalledWith(
 				1,
 				schema.events["user.created"],
@@ -382,8 +385,8 @@ describe("Test Service class", () => {
 			const res = svc.events["user.created"]({ id: 5 });
 
 			expect(res).toBe("User created");
-			expect(schema.events["user.created"]).toBeCalledTimes(1);
-			expect(schema.events["user.created"]).toBeCalledWith(expect.any(Context));
+			expect(schema.events["user.created"]).toHaveBeenCalledTimes(1);
+			expect(schema.events["user.created"]).toHaveBeenCalledWith(expect.any(Context));
 			expect(schema.events["user.created"].mock.calls[0][0].params).toEqual({ id: 5 });
 			expect(schema.events["user.created"].mock.calls[0][0].eventName).toBe("user.created");
 			expect(schema.events["user.created"].mock.calls[0][0].eventType).toBe("emit");
@@ -394,8 +397,8 @@ describe("Test Service class", () => {
 			const res2 = svc.events["user.created"]({ a: 5 }, { ctx: fakeCtx });
 
 			expect(res2).toBe("User created");
-			expect(schema.events["user.created"]).toBeCalledTimes(1);
-			expect(schema.events["user.created"]).toBeCalledWith(fakeCtx);
+			expect(schema.events["user.created"]).toHaveBeenCalledTimes(1);
+			expect(schema.events["user.created"]).toHaveBeenCalledWith(fakeCtx);
 		});
 
 		it("should call service single 'merged' hook", () => {
@@ -406,8 +409,8 @@ describe("Test Service class", () => {
 			};
 			svc.parseServiceSchema(schema);
 
-			expect(merged).toBeCalledTimes(1);
-			expect(merged).toBeCalledWith(schema);
+			expect(merged).toHaveBeenCalledTimes(1);
+			expect(merged).toHaveBeenCalledWith(schema);
 		});
 
 		it("should call service multi 'merged' hook", () => {
@@ -420,11 +423,11 @@ describe("Test Service class", () => {
 			};
 			svc.parseServiceSchema(schema);
 
-			expect(merged1).toBeCalledTimes(1);
-			expect(merged1).toBeCalledWith(schema);
+			expect(merged1).toHaveBeenCalledTimes(1);
+			expect(merged1).toHaveBeenCalledWith(schema);
 
-			expect(merged2).toBeCalledTimes(1);
-			expect(merged2).toBeCalledWith(schema);
+			expect(merged2).toHaveBeenCalledTimes(1);
+			expect(merged2).toHaveBeenCalledWith(schema);
 
 			expect(FLOW.join("-")).toBe("C1-C2");
 		});
@@ -507,11 +510,11 @@ describe("Test Service class", () => {
 
 			svc._init();
 
-			expect(broker.addLocalService).toBeCalledTimes(1);
-			expect(broker.addLocalService).toBeCalledWith(svc);
+			expect(broker.addLocalService).toHaveBeenCalledTimes(1);
+			expect(broker.addLocalService).toHaveBeenCalledWith(svc);
 
-			expect(broker.callMiddlewareHookSync).toBeCalledTimes(1);
-			expect(broker.callMiddlewareHookSync).toBeCalledWith("serviceCreated", [svc]);
+			expect(broker.callMiddlewareHookSync).toHaveBeenCalledTimes(1);
+			expect(broker.callMiddlewareHookSync).toHaveBeenCalledWith("serviceCreated", [svc]);
 		});
 
 		it("should call service single 'created' hook", () => {
@@ -525,8 +528,8 @@ describe("Test Service class", () => {
 
 			svc._init();
 
-			expect(created).toBeCalledTimes(1);
-			expect(created).toBeCalledWith();
+			expect(created).toHaveBeenCalledTimes(1);
+			expect(created).toHaveBeenCalledWith();
 		});
 
 		it("should call service multi 'created' hook", () => {
@@ -544,10 +547,10 @@ describe("Test Service class", () => {
 
 			svc._init();
 
-			expect(created1).toBeCalledTimes(1);
-			expect(created1).toBeCalledWith();
-			expect(created2).toBeCalledTimes(1);
-			expect(created2).toBeCalledWith();
+			expect(created1).toHaveBeenCalledTimes(1);
+			expect(created1).toHaveBeenCalledWith();
+			expect(created2).toHaveBeenCalledTimes(1);
+			expect(created2).toHaveBeenCalledWith();
 
 			expect(FLOW.join("-")).toBe("C1-C2");
 		});
@@ -573,14 +576,14 @@ describe("Test Service class", () => {
 
 			await svc._start();
 
-			expect(broker.callMiddlewareHook).toBeCalledTimes(2);
+			expect(broker.callMiddlewareHook).toHaveBeenCalledTimes(2);
 			expect(broker.callMiddlewareHook).toHaveBeenNthCalledWith(1, "serviceStarting", [svc]);
 			expect(broker.callMiddlewareHook).toHaveBeenNthCalledWith(2, "serviceStarted", [svc]);
 
-			expect(broker.registerLocalService).toBeCalledTimes(1);
-			expect(broker.registerLocalService).toBeCalledWith(svc._serviceSpecification);
+			expect(broker.registerLocalService).toHaveBeenCalledTimes(1);
+			expect(broker.registerLocalService).toHaveBeenCalledWith(svc._serviceSpecification);
 
-			expect(svc.waitForServices).toBeCalledTimes(0);
+			expect(svc.waitForServices).toHaveBeenCalledTimes(0);
 		});
 
 		it("should call waitForServices if dependencies are defined", async () => {
@@ -595,15 +598,15 @@ describe("Test Service class", () => {
 
 			await svc._start();
 
-			expect(broker.callMiddlewareHook).toBeCalledTimes(2);
+			expect(broker.callMiddlewareHook).toHaveBeenCalledTimes(2);
 			expect(broker.callMiddlewareHook).toHaveBeenNthCalledWith(1, "serviceStarting", [svc]);
 			expect(broker.callMiddlewareHook).toHaveBeenNthCalledWith(2, "serviceStarted", [svc]);
 
-			expect(broker.registerLocalService).toBeCalledTimes(1);
-			expect(broker.registerLocalService).toBeCalledWith(svc._serviceSpecification);
+			expect(broker.registerLocalService).toHaveBeenCalledTimes(1);
+			expect(broker.registerLocalService).toHaveBeenCalledWith(svc._serviceSpecification);
 
-			expect(svc.waitForServices).toBeCalledTimes(1);
-			expect(svc.waitForServices).toBeCalledWith(["users", "auth"], 0, 1000);
+			expect(svc.waitForServices).toHaveBeenCalledTimes(1);
+			expect(svc.waitForServices).toHaveBeenCalledWith(["users", "auth"], 0, 1000);
 		});
 
 		it("should call waitForServices if dependencies are defined & $dependencyTimeout", async () => {
@@ -619,8 +622,8 @@ describe("Test Service class", () => {
 
 			await svc._start();
 
-			expect(svc.waitForServices).toBeCalledTimes(1);
-			expect(svc.waitForServices).toBeCalledWith(["users", "auth"], 3000, 1000);
+			expect(svc.waitForServices).toHaveBeenCalledTimes(1);
+			expect(svc.waitForServices).toHaveBeenCalledWith(["users", "auth"], 3000, 1000);
 		});
 
 		it("should call waitForServices if dependencies are defined & $dependencyInterval", async () => {
@@ -636,8 +639,8 @@ describe("Test Service class", () => {
 
 			await svc._start();
 
-			expect(svc.waitForServices).toBeCalledTimes(1);
-			expect(svc.waitForServices).toBeCalledWith(["users", "auth"], 0, 100);
+			expect(svc.waitForServices).toHaveBeenCalledTimes(1);
+			expect(svc.waitForServices).toHaveBeenCalledWith(["users", "auth"], 0, 100);
 		});
 
 		it("should call single started lifecycle event handler", async () => {
@@ -649,8 +652,8 @@ describe("Test Service class", () => {
 
 			await svc._start();
 
-			expect(started).toBeCalledTimes(1);
-			expect(started).toBeCalledWith();
+			expect(started).toHaveBeenCalledTimes(1);
+			expect(started).toHaveBeenCalledWith();
 		});
 
 		it("should call multiple started lifecycle event handler", async () => {
@@ -665,11 +668,11 @@ describe("Test Service class", () => {
 
 			await svc._start();
 
-			expect(started1).toBeCalledTimes(1);
-			expect(started1).toBeCalledWith();
+			expect(started1).toHaveBeenCalledTimes(1);
+			expect(started1).toHaveBeenCalledWith();
 
-			expect(started2).toBeCalledTimes(1);
-			expect(started2).toBeCalledWith();
+			expect(started2).toHaveBeenCalledTimes(1);
+			expect(started2).toHaveBeenCalledWith();
 
 			expect(FLOW.join("-")).toBe("S1-S2");
 		});
@@ -691,7 +694,7 @@ describe("Test Service class", () => {
 
 			await svc._stop();
 
-			expect(broker.callMiddlewareHook).toBeCalledTimes(2);
+			expect(broker.callMiddlewareHook).toHaveBeenCalledTimes(2);
 			expect(broker.callMiddlewareHook).toHaveBeenNthCalledWith(1, "serviceStopping", [svc], {
 				reverse: true
 			});
@@ -709,8 +712,8 @@ describe("Test Service class", () => {
 
 			await svc._stop();
 
-			expect(stopped).toBeCalledTimes(1);
-			expect(stopped).toBeCalledWith();
+			expect(stopped).toHaveBeenCalledTimes(1);
+			expect(stopped).toHaveBeenCalledWith();
 		});
 
 		it("should call multiple stopped lifecycle event handler", async () => {
@@ -724,11 +727,11 @@ describe("Test Service class", () => {
 
 			await svc._stop();
 
-			expect(stopped1).toBeCalledTimes(1);
-			expect(stopped1).toBeCalledWith();
+			expect(stopped1).toHaveBeenCalledTimes(1);
+			expect(stopped1).toHaveBeenCalledWith();
 
-			expect(stopped2).toBeCalledTimes(1);
-			expect(stopped2).toBeCalledWith();
+			expect(stopped2).toHaveBeenCalledTimes(1);
+			expect(stopped2).toHaveBeenCalledWith();
 
 			expect(FLOW.join("-")).toBe("S2-S1");
 		});
@@ -743,22 +746,22 @@ describe("Test Service class", () => {
 		it("should throw error if method schema is invalid", () => {
 			expect(() => {
 				svc._createMethod(null, "list");
-			}).toThrowError("Invalid method definition in 'list' method in 'v2.posts' service!");
+			}).toThrow("Invalid method definition in 'list' method in 'v2.posts' service!");
 			expect(() => {
 				svc._createMethod("schema", "list");
-			}).toThrowError("Invalid method definition in 'list' method in 'v2.posts' service!");
+			}).toThrow("Invalid method definition in 'list' method in 'v2.posts' service!");
 		});
 
 		it("should throw error if action handler is not defined", () => {
 			expect(() => {
 				svc._createMethod({}, "list");
-			}).toThrowError("Missing method handler on 'list' method in 'v2.posts' service!");
+			}).toThrow("Missing method handler on 'list' method in 'v2.posts' service!");
 			expect(() => {
 				svc._createMethod({ handler: null }, "list");
-			}).toThrowError("Missing method handler on 'list' method in 'v2.posts' service!");
+			}).toThrow("Missing method handler on 'list' method in 'v2.posts' service!");
 			expect(() => {
 				svc._createMethod({ handler: "wrong" }, "list");
-			}).toThrowError("Missing method handler on 'list' method in 'v2.posts' service!");
+			}).toThrow("Missing method handler on 'list' method in 'v2.posts' service!");
 		});
 
 		it("should create action definition from a shorthand handler", () => {
@@ -813,22 +816,22 @@ describe("Test Service class", () => {
 		it("should throw error if action schema is invalid", () => {
 			expect(() => {
 				svc._createAction(null, "list");
-			}).toThrowError("Invalid action definition in 'list' action in 'v2.posts' service!");
+			}).toThrow("Invalid action definition in 'list' action in 'v2.posts' service!");
 			expect(() => {
 				svc._createAction("schema", "list");
-			}).toThrowError("Invalid action definition in 'list' action in 'v2.posts' service!");
+			}).toThrow("Invalid action definition in 'list' action in 'v2.posts' service!");
 		});
 
 		it("should throw error if action handler is not defined", () => {
 			expect(() => {
 				svc._createAction({}, "list");
-			}).toThrowError("Missing action handler on 'list' action in 'v2.posts' service!");
+			}).toThrow("Missing action handler on 'list' action in 'v2.posts' service!");
 			expect(() => {
 				svc._createAction({ handler: null }, "list");
-			}).toThrowError("Missing action handler on 'list' action in 'v2.posts' service!");
+			}).toThrow("Missing action handler on 'list' action in 'v2.posts' service!");
 			expect(() => {
 				svc._createAction({ handler: "wrong" }, "list");
-			}).toThrowError("Missing action handler on 'list' action in 'v2.posts' service!");
+			}).toThrow("Missing action handler on 'list' action in 'v2.posts' service!");
 		});
 
 		it("should create action definition from a shorthand handler", () => {
@@ -849,7 +852,7 @@ describe("Test Service class", () => {
 
 			expect.assertions(4);
 
-			expect(svc.Promise.method).toBeCalledTimes(1);
+			expect(svc.Promise.method).toHaveBeenCalledTimes(1);
 
 			return res.handler().then(res => expect(res).toBe("Hello"));
 		});
@@ -1004,26 +1007,22 @@ describe("Test Service class", () => {
 		it("should throw error if event schema is invalid", () => {
 			expect(() => {
 				svc._createEvent(null, "user.created");
-			}).toThrowError(
-				"Invalid event definition in 'user.created' event in 'v2.posts' service!"
-			);
+			}).toThrow("Invalid event definition in 'user.created' event in 'v2.posts' service!");
 			expect(() => {
 				svc._createEvent("schema", "user.created");
-			}).toThrowError(
-				"Invalid event definition in 'user.created' event in 'v2.posts' service!"
-			);
+			}).toThrow("Invalid event definition in 'user.created' event in 'v2.posts' service!");
 		});
 
 		it("should throw error if event handler is not defined", () => {
 			expect(() => {
 				svc._createEvent({}, "user.created");
-			}).toThrowError("Missing event handler on 'user.created' event in 'v2.posts' service!");
+			}).toThrow("Missing event handler on 'user.created' event in 'v2.posts' service!");
 			expect(() => {
 				svc._createEvent({ handler: null }, "user.created");
-			}).toThrowError("Missing event handler on 'user.created' event in 'v2.posts' service!");
+			}).toThrow("Missing event handler on 'user.created' event in 'v2.posts' service!");
 			expect(() => {
 				svc._createEvent({ handler: "wrong" }, "user.created");
-			}).toThrowError("Missing event handler on 'user.created' event in 'v2.posts' service!");
+			}).toThrow("Missing event handler on 'user.created' event in 'v2.posts' service!");
 		});
 
 		it("should create event definition from a shorthand handler", () => {
@@ -1068,7 +1067,7 @@ describe("Test Service class", () => {
 
 			expect.assertions(4);
 
-			expect(svc.Promise.method).toBeCalledTimes(1);
+			expect(svc.Promise.method).toHaveBeenCalledTimes(1);
 
 			return res.handler({}).then(res => expect(res).toBe("Hello"));
 		});
@@ -1257,7 +1256,7 @@ describe("Test Service class", () => {
 			const res = Service.prototype.applyMixins(schema);
 
 			expect(res).toBe(schema);
-			expect(Service.prototype.mergeSchemas).toBeCalledTimes(0);
+			expect(Service.prototype.mergeSchemas).toHaveBeenCalledTimes(0);
 		});
 
 		it("should call mergeSchema once", () => {
@@ -1276,8 +1275,8 @@ describe("Test Service class", () => {
 			expect(res).toEqual({
 				name: "users"
 			});
-			expect(Service.prototype.mergeSchemas).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemas).toBeCalledWith(mixin1, schema);
+			expect(Service.prototype.mergeSchemas).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemas).toHaveBeenCalledWith(mixin1, schema);
 		});
 
 		it("should call mergeSchema twice", () => {
@@ -1301,7 +1300,7 @@ describe("Test Service class", () => {
 				version: 2
 			});
 
-			expect(Service.prototype.mergeSchemas).toBeCalledTimes(2);
+			expect(Service.prototype.mergeSchemas).toHaveBeenCalledTimes(2);
 			expect(Service.prototype.mergeSchemas).toHaveBeenNthCalledWith(1, mixin2, mixin1);
 			expect(Service.prototype.mergeSchemas).toHaveBeenNthCalledWith(2, mixin2, schema);
 		});
@@ -1328,7 +1327,7 @@ describe("Test Service class", () => {
 				version: 2
 			});
 
-			expect(Service.prototype.mergeSchemas).toBeCalledTimes(2);
+			expect(Service.prototype.mergeSchemas).toHaveBeenCalledTimes(2);
 			expect(Service.prototype.mergeSchemas).toHaveBeenNthCalledWith(1, mixin2, mixin1);
 			expect(Service.prototype.mergeSchemas).toHaveBeenNthCalledWith(2, mixin2, schema);
 		});
@@ -1437,39 +1436,48 @@ describe("Test Service class", () => {
 
 			Service.prototype.mergeSchemas({}, mixin);
 
-			expect(Service.prototype.mergeSchemaSettings).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaSettings).toBeCalledWith(mixin.settings, undefined);
+			expect(Service.prototype.mergeSchemaSettings).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaSettings).toHaveBeenCalledWith(
+				mixin.settings,
+				undefined
+			);
 
-			expect(Service.prototype.mergeSchemaMetadata).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaMetadata).toBeCalledWith(mixin.metadata, undefined);
+			expect(Service.prototype.mergeSchemaMetadata).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaMetadata).toHaveBeenCalledWith(
+				mixin.metadata,
+				undefined
+			);
 
-			expect(Service.prototype.mergeSchemaHooks).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaHooks).toBeCalledWith(mixin.hooks, {});
+			expect(Service.prototype.mergeSchemaHooks).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaHooks).toHaveBeenCalledWith(mixin.hooks, {});
 
-			expect(Service.prototype.mergeSchemaActions).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaActions).toBeCalledWith(mixin.actions, {});
+			expect(Service.prototype.mergeSchemaActions).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaActions).toHaveBeenCalledWith(mixin.actions, {});
 
-			expect(Service.prototype.mergeSchemaMethods).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaMethods).toBeCalledWith(mixin.methods, undefined);
+			expect(Service.prototype.mergeSchemaMethods).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaMethods).toHaveBeenCalledWith(
+				mixin.methods,
+				undefined
+			);
 
-			expect(Service.prototype.mergeSchemaEvents).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaEvents).toBeCalledWith(mixin.events, {});
+			expect(Service.prototype.mergeSchemaEvents).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaEvents).toHaveBeenCalledWith(mixin.events, {});
 
-			expect(Service.prototype.mergeSchemaLifecycleHandlers).toBeCalledTimes(3);
-			expect(Service.prototype.mergeSchemaLifecycleHandlers).toBeCalledWith(
+			expect(Service.prototype.mergeSchemaLifecycleHandlers).toHaveBeenCalledTimes(3);
+			expect(Service.prototype.mergeSchemaLifecycleHandlers).toHaveBeenCalledWith(
 				mixin.created,
 				undefined
 			);
-			expect(Service.prototype.mergeSchemaLifecycleHandlers).toBeCalledWith(
+			expect(Service.prototype.mergeSchemaLifecycleHandlers).toHaveBeenCalledWith(
 				mixin.started,
 				undefined
 			);
-			expect(Service.prototype.mergeSchemaLifecycleHandlers).toBeCalledWith(
+			expect(Service.prototype.mergeSchemaLifecycleHandlers).toHaveBeenCalledWith(
 				mixin.stopped,
 				undefined
 			);
 
-			expect(Service.prototype.mergeSchemaUniqArray).toBeCalledTimes(2);
+			expect(Service.prototype.mergeSchemaUniqArray).toHaveBeenCalledTimes(2);
 			expect(Service.prototype.mergeSchemaUniqArray).toHaveBeenNthCalledWith(
 				1,
 				mixin.mixins,
@@ -1481,7 +1489,7 @@ describe("Test Service class", () => {
 				undefined
 			);
 
-			expect(Service.prototype.mergeSchemaUnknown).toBeCalledTimes(1);
+			expect(Service.prototype.mergeSchemaUnknown).toHaveBeenCalledTimes(1);
 			expect(Service.prototype.mergeSchemaUnknown).toHaveBeenNthCalledWith(
 				1,
 				mixin.custom,
@@ -1499,9 +1507,9 @@ describe("Test Service class", () => {
 
 			Service.prototype.mergeSchemas({}, mixin);
 
-			expect(Service.prototype.mergeSchemaMyProp).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaMyProp).toBeCalledWith("123", undefined);
-			expect(Service.prototype.mergeSchemaUnknown).toBeCalledTimes(0);
+			expect(Service.prototype.mergeSchemaMyProp).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaMyProp).toHaveBeenCalledWith("123", undefined);
+			expect(Service.prototype.mergeSchemaUnknown).toHaveBeenCalledTimes(0);
 		});
 
 		it("should not overwrite the name & version", () => {
@@ -1722,8 +1730,8 @@ describe("Test Service class", () => {
 			const res = Service.prototype.mergeSchemaDependencies(src, prev);
 			expect(res).toEqual([1, 2, 3, 4, 5, 6, 8, 10]);
 
-			expect(Service.prototype.mergeSchemaUniqArray).toBeCalledTimes(1);
-			expect(Service.prototype.mergeSchemaUniqArray).toBeCalledWith(src, prev);
+			expect(Service.prototype.mergeSchemaUniqArray).toHaveBeenCalledTimes(1);
+			expect(Service.prototype.mergeSchemaUniqArray).toHaveBeenCalledWith(src, prev);
 		});
 	});
 

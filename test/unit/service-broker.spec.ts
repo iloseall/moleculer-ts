@@ -142,8 +142,8 @@ describe("Test ServiceBroker constructor", () => {
 		expect(broker.services).toBeInstanceOf(Array);
 
 		expect(broker.registry).toBeInstanceOf(Registry);
-		expect(broker.registry.init).toBeCalledTimes(1);
-		expect(broker.registry.init).toBeCalledWith();
+		expect(broker.registry.init).toHaveBeenCalledTimes(1);
+		expect(broker.registry.init).toHaveBeenCalledWith();
 
 		expect(broker.middlewares).toBeInstanceOf(MiddlewareHandler);
 
@@ -791,8 +791,8 @@ describe("Test broker.stop", () => {
 			broker.registry.discoverer.sendLocalNodeInfo = mock.fn();
 
 			return broker.stop().then(() => {
-				expect(broker.registry.regenerateLocalRawInfo).toBeCalledTimes(0);
-				expect(broker.registry.discoverer.sendLocalNodeInfo).toBeCalledTimes(0);
+				expect(broker.registry.regenerateLocalRawInfo).toHaveBeenCalledTimes(0);
+				expect(broker.registry.discoverer.sendLocalNodeInfo).toHaveBeenCalledTimes(0);
 
 				expect(optStopped).toHaveBeenCalledTimes(1);
 				expect(svc._stop).toHaveBeenCalledTimes(1);
@@ -863,9 +863,9 @@ describe("Test broker.stop", () => {
 			broker.registry.discoverer.sendLocalNodeInfo = mock.fn();
 
 			return broker.stop().then(() => {
-				expect(broker.registry.regenerateLocalRawInfo).toBeCalledTimes(1);
-				expect(broker.registry.regenerateLocalRawInfo).toBeCalledWith(true, true);
-				expect(broker.registry.discoverer.sendLocalNodeInfo).toBeCalledTimes(1);
+				expect(broker.registry.regenerateLocalRawInfo).toHaveBeenCalledTimes(1);
+				expect(broker.registry.regenerateLocalRawInfo).toHaveBeenCalledWith(true, true);
+				expect(broker.registry.discoverer.sendLocalNodeInfo).toHaveBeenCalledTimes(1);
 
 				expect(optStopped).toHaveBeenCalledTimes(1);
 				expect(svc._stop).toHaveBeenCalledTimes(1);
@@ -1044,7 +1044,7 @@ describe("Test broker.errorHandler", () => {
 		const error = new MoleculerError("Some error");
 		const info = {};
 
-		expect(() => broker.errorHandler(error, info)).toThrowError(error);
+		expect(() => broker.errorHandler(error, info)).toThrow(error);
 	});
 
 	it("should call errorHandler and not throw further", () => {
@@ -1073,7 +1073,7 @@ describe("Test broker.errorHandler", () => {
 		const error = new MoleculerError("Some error");
 		const info = {};
 
-		expect(() => broker.errorHandler(error, info)).toThrowError(error);
+		expect(() => broker.errorHandler(error, info)).toThrow(error);
 
 		expect(errorHandler).toHaveBeenCalledTimes(1);
 		expect(errorHandler).toHaveBeenCalledWith(error, info);
@@ -2741,17 +2741,13 @@ describe("Test broker._getLocalActionEndpoint", () => {
 	it("should throw ServiceNotFoundError if there is no endpoint list", () => {
 		broker.registry.getActionEndpoints = mock.fn();
 
-		expect(() => broker._getLocalActionEndpoint("posts.find")).toThrowError(
-			ServiceNotFoundError
-		);
+		expect(() => broker._getLocalActionEndpoint("posts.find")).toThrow(ServiceNotFoundError);
 	});
 
 	it("should throw ServiceNotFoundError if there is no local endpoint", () => {
 		broker.registry.getActionEndpoints = mock.fn(() => ({ hasLocal: () => false }));
 
-		expect(() => broker._getLocalActionEndpoint("posts.find")).toThrowError(
-			ServiceNotFoundError
-		);
+		expect(() => broker._getLocalActionEndpoint("posts.find")).toThrow(ServiceNotFoundError);
 	});
 
 	it("should throw ServiceNotAvailableError if there is no next endpoint", () => {
@@ -2759,7 +2755,7 @@ describe("Test broker._getLocalActionEndpoint", () => {
 		const epList = { hasLocal: () => true, nextLocal: mock.fn(() => null) };
 		broker.registry.getActionEndpoints = mock.fn(() => epList);
 
-		expect(() => broker._getLocalActionEndpoint("posts.find", ctx)).toThrowError(
+		expect(() => broker._getLocalActionEndpoint("posts.find", ctx)).toThrow(
 			ServiceNotAvailableError
 		);
 		expect(epList.nextLocal).toHaveBeenCalledTimes(1);

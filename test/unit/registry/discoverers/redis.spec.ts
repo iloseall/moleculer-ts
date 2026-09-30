@@ -290,8 +290,8 @@ describe("Test RedisDiscoverer 'stop' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.stop();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.quit).toBeCalledTimes(1);
-		expect(discoverer.client.quit).toBeCalledWith();
+		expect(discoverer.client.quit).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.quit).toHaveBeenCalledWith();
 
 		expect(BaseDiscoverer.prototype.stop).toHaveBeenCalledTimes(1);
 	});
@@ -318,14 +318,14 @@ describe("Test RedisDiscoverer 'registerMoleculerMetrics' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.registerMoleculerMetrics();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.metrics.register).toBeCalledTimes(2);
-		expect(broker.metrics.register).toBeCalledWith({
+		expect(broker.metrics.register).toHaveBeenCalledTimes(2);
+		expect(broker.metrics.register).toHaveBeenCalledWith({
 			name: "moleculer.discoverer.redis.collect.total",
 			rate: true,
 			type: "counter",
 			description: "Number of Service Registry fetching from Redis"
 		});
-		expect(broker.metrics.register).toBeCalledWith({
+		expect(broker.metrics.register).toHaveBeenCalledWith({
 			name: "moleculer.discoverer.redis.collect.time",
 			quantiles: true,
 			type: "histogram",
@@ -355,9 +355,9 @@ describe("Test RedisDiscoverer 'recreateInfoUpdateTimer' method", () => {
 
 		mock.advanceTimersByTime(21 * 60 * 1000);
 
-		expect(discoverer.recreateInfoUpdateTimer).toBeCalledTimes(2);
-		expect(discoverer.client.expire).toBeCalledTimes(1);
-		expect(discoverer.client.expire).toBeCalledWith("MOL-DSCVR-INFO:node-99", 3600);
+		expect(discoverer.recreateInfoUpdateTimer).toHaveBeenCalledTimes(2);
+		expect(discoverer.client.expire).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.expire).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-99", 3600);
 	});
 });
 
@@ -393,31 +393,35 @@ describe("Test RedisDiscoverer 'sendHeartbeat' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendHeartbeat();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.metrics.timer).toBeCalledTimes(1);
-		expect(broker.metrics.timer).toBeCalledWith("moleculer.discoverer.redis.collect.time");
+		expect(broker.metrics.timer).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.timer).toHaveBeenCalledWith(
+			"moleculer.discoverer.redis.collect.time"
+		);
 
-		expect(discoverer.client.multi).toBeCalledTimes(1);
-		expect(fakePipeline.del).toBeCalledTimes(1);
-		expect(fakePipeline.del).toBeCalledWith("MOL-DSCVR-BEAT:node-99|12345678|0");
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakePipeline.setex).toBeCalledTimes(1);
-		expect(fakePipeline.setex).toBeCalledWith("MOL-DSCVR-BEAT:node-99|12345678|1", 30, {
+		expect(discoverer.client.multi).toHaveBeenCalledTimes(1);
+		expect(fakePipeline.del).toHaveBeenCalledTimes(1);
+		expect(fakePipeline.del).toHaveBeenCalledWith("MOL-DSCVR-BEAT:node-99|12345678|0");
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakePipeline.setex).toHaveBeenCalledTimes(1);
+		expect(fakePipeline.setex).toHaveBeenCalledWith("MOL-DSCVR-BEAT:node-99|12345678|1", 30, {
 			cpu: null,
 			instanceID: "1234567890",
 			sender: "node-99",
 			seq: 1,
 			ver: "5"
 		});
-		expect(fakePipeline.exec).toBeCalledTimes(1);
+		expect(fakePipeline.exec).toHaveBeenCalledTimes(1);
 
 		expect(discoverer.lastBeatSeq).toBe(1);
 
-		expect(discoverer.collectOnlineNodes).toBeCalledTimes(1);
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 
-		expect(broker.metrics.increment).toBeCalledTimes(1);
-		expect(broker.metrics.increment).toBeCalledWith("moleculer.discoverer.redis.collect.total");
+		expect(broker.metrics.increment).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.increment).toHaveBeenCalledWith(
+			"moleculer.discoverer.redis.collect.total"
+		);
 	});
 
 	it("should set HB key without del if seq is same", async () => {
@@ -434,30 +438,34 @@ describe("Test RedisDiscoverer 'sendHeartbeat' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendHeartbeat();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.metrics.timer).toBeCalledTimes(1);
-		expect(broker.metrics.timer).toBeCalledWith("moleculer.discoverer.redis.collect.time");
+		expect(broker.metrics.timer).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.timer).toHaveBeenCalledWith(
+			"moleculer.discoverer.redis.collect.time"
+		);
 
-		expect(discoverer.client.multi).toBeCalledTimes(1);
-		expect(fakePipeline.del).toBeCalledTimes(0);
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(fakePipeline.setex).toBeCalledTimes(1);
-		expect(fakePipeline.setex).toBeCalledWith("MOL-DSCVR-BEAT:node-99|12345678|1", 30, {
+		expect(discoverer.client.multi).toHaveBeenCalledTimes(1);
+		expect(fakePipeline.del).toHaveBeenCalledTimes(0);
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(fakePipeline.setex).toHaveBeenCalledTimes(1);
+		expect(fakePipeline.setex).toHaveBeenCalledWith("MOL-DSCVR-BEAT:node-99|12345678|1", 30, {
 			cpu: null,
 			instanceID: "1234567890",
 			sender: "node-99",
 			seq: 1,
 			ver: "5"
 		});
-		expect(fakePipeline.exec).toBeCalledTimes(1);
+		expect(fakePipeline.exec).toHaveBeenCalledTimes(1);
 
 		expect(discoverer.lastBeatSeq).toBe(1);
 
-		expect(discoverer.collectOnlineNodes).toBeCalledTimes(1);
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 
-		expect(broker.metrics.increment).toBeCalledTimes(1);
-		expect(broker.metrics.increment).toBeCalledWith("moleculer.discoverer.redis.collect.total");
+		expect(broker.metrics.increment).toHaveBeenCalledTimes(1);
+		expect(broker.metrics.increment).toHaveBeenCalledWith(
+			"moleculer.discoverer.redis.collect.total"
+		);
 	});
 
 	it("should broadcast an error", async () => {
@@ -520,26 +528,26 @@ describe("Test RedisDiscoverer 'collectOnlineNodes' method", () => {
 
 		await p;
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.registry.nodes.list).toBeCalledTimes(1);
-		expect(broker.registry.nodes.list).toBeCalledWith({
+		expect(broker.registry.nodes.list).toHaveBeenCalledTimes(1);
+		expect(broker.registry.nodes.list).toHaveBeenCalledWith({
 			onlyAvailable: true,
 			withServices: false
 		});
 
-		expect(discoverer.client.scanStream).toBeCalledTimes(1);
-		expect(discoverer.client.scanStream).toBeCalledWith({
+		expect(discoverer.client.scanStream).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.scanStream).toHaveBeenCalledWith({
 			match: "MOL-DSCVR-BEAT:*",
 			count: 100
 		});
 
-		expect(fakeStream.on).toBeCalledTimes(3);
-		expect(fakeStream.on).toBeCalledWith("data", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("error", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("end", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledTimes(3);
+		expect(fakeStream.on).toHaveBeenCalledWith("data", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("error", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("end", expect.any(Function));
 
-		expect(discoverer.client.mgetBuffer).toBeCalledTimes(0);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(0);
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(0);
+		expect(discoverer.client.mgetBuffer).toHaveBeenCalledTimes(0);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(0);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(0);
 	});
 
 	it("should disconnect previous nodes", async () => {
@@ -555,28 +563,28 @@ describe("Test RedisDiscoverer 'collectOnlineNodes' method", () => {
 
 		await p;
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.registry.nodes.list).toBeCalledTimes(1);
-		expect(broker.registry.nodes.list).toBeCalledWith({
+		expect(broker.registry.nodes.list).toHaveBeenCalledTimes(1);
+		expect(broker.registry.nodes.list).toHaveBeenCalledWith({
 			onlyAvailable: true,
 			withServices: false
 		});
 
-		expect(discoverer.client.scanStream).toBeCalledTimes(1);
-		expect(discoverer.client.scanStream).toBeCalledWith({
+		expect(discoverer.client.scanStream).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.scanStream).toHaveBeenCalledWith({
 			match: "MOL-DSCVR-BEAT:*",
 			count: 50
 		});
 
-		expect(fakeStream.on).toBeCalledTimes(3);
-		expect(fakeStream.on).toBeCalledWith("data", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("error", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("end", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledTimes(3);
+		expect(fakeStream.on).toHaveBeenCalledWith("data", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("error", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("end", expect.any(Function));
 
-		expect(discoverer.client.mgetBuffer).toBeCalledTimes(0);
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(0);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(2);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-1", true);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-2", true);
+		expect(discoverer.client.mgetBuffer).toHaveBeenCalledTimes(0);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(0);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(2);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-1", true);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-2", true);
 	});
 
 	it("should add new nodes (full check)", async () => {
@@ -603,27 +611,27 @@ describe("Test RedisDiscoverer 'collectOnlineNodes' method", () => {
 
 		await p;
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.mgetBuffer).toBeCalledTimes(1);
-		expect(discoverer.client.mgetBuffer).toBeCalledWith(
+		expect(discoverer.client.mgetBuffer).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.mgetBuffer).toHaveBeenCalledWith(
 			"MOL-DSCVR-BEAT:node-1|111|1",
 			"MOL-DSCVR-BEAT:node-2|222|2",
 			"MOL-DSCVR-BEAT:node-99|999|9"
 		);
 
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(2);
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-1", {
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(2);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-1", {
 			instanceID: "111",
 			sender: "node-1",
 			seq: 1
 		});
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-2", {
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-2", {
 			instanceID: "222",
 			sender: "node-2",
 			seq: 2
 		});
 
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(1);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-3", true);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(1);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-3", true);
 	});
 
 	it("should add new nodes (fast check)", async () => {
@@ -643,21 +651,21 @@ describe("Test RedisDiscoverer 'collectOnlineNodes' method", () => {
 
 		await p;
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.mgetBuffer).toBeCalledTimes(0);
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(2);
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-1", {
+		expect(discoverer.client.mgetBuffer).toHaveBeenCalledTimes(0);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(2);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-1", {
 			instanceID: "111",
 			sender: "node-1",
 			seq: 1
 		});
-		expect(discoverer.heartbeatReceived).toBeCalledWith("node-2", {
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledWith("node-2", {
 			instanceID: "222",
 			sender: "node-2",
 			seq: 2
 		});
 
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(1);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledWith("node-3", true);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(1);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledWith("node-3", true);
 	});
 
 	it("should stop on error", async () => {
@@ -679,9 +687,9 @@ describe("Test RedisDiscoverer 'collectOnlineNodes' method", () => {
 		} catch (e) {
 			expect(e).toBe(err);
 		}
-		expect(discoverer.client.mgetBuffer).toBeCalledTimes(0);
-		expect(discoverer.heartbeatReceived).toBeCalledTimes(0);
-		expect(discoverer.remoteNodeDisconnected).toBeCalledTimes(0);
+		expect(discoverer.client.mgetBuffer).toHaveBeenCalledTimes(0);
+		expect(discoverer.heartbeatReceived).toHaveBeenCalledTimes(0);
+		expect(discoverer.remoteNodeDisconnected).toHaveBeenCalledTimes(0);
 
 		expect.assertions(4);
 	});
@@ -710,16 +718,16 @@ describe("Test RedisDiscoverer 'discoverNode' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.discoverNode("node-1");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.getBuffer).toBeCalledTimes(1);
-		expect(discoverer.client.getBuffer).toBeCalledWith("MOL-DSCVR-INFO:node-1");
+		expect(discoverer.client.getBuffer).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.getBuffer).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-1");
 
-		expect(discoverer.logger.warn).toBeCalledTimes(0);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.serializer.deserialize).toBeCalledTimes(1);
-		expect(discoverer.serializer.deserialize).toBeCalledWith("fake-data", P.PACKET_INFO);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledTimes(1);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledWith("fake-data", P.PACKET_INFO);
 
-		expect(discoverer.processRemoteNodeInfo).toBeCalledTimes(1);
-		expect(discoverer.processRemoteNodeInfo).toBeCalledWith("node-1", "fake-data");
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledTimes(1);
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledWith("node-1", "fake-data");
 	});
 
 	it("should handle if data is invalid", async () => {
@@ -732,15 +740,15 @@ describe("Test RedisDiscoverer 'discoverNode' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.discoverNode("node-1");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.getBuffer).toBeCalledTimes(1);
-		expect(discoverer.client.getBuffer).toBeCalledWith("MOL-DSCVR-INFO:node-1");
+		expect(discoverer.client.getBuffer).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.getBuffer).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-1");
 
-		expect(discoverer.logger.warn).toBeCalledTimes(1);
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.serializer.deserialize).toBeCalledTimes(1);
-		expect(discoverer.serializer.deserialize).toBeCalledWith("fake-data", P.PACKET_INFO);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledTimes(1);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledWith("fake-data", P.PACKET_INFO);
 
-		expect(discoverer.processRemoteNodeInfo).toBeCalledTimes(0);
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledTimes(0);
 	});
 
 	it("should handle if no data", async () => {
@@ -751,14 +759,16 @@ describe("Test RedisDiscoverer 'discoverNode' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.discoverNode("node-1");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.getBuffer).toBeCalledTimes(1);
-		expect(discoverer.client.getBuffer).toBeCalledWith("MOL-DSCVR-INFO:node-1");
+		expect(discoverer.client.getBuffer).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.getBuffer).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-1");
 
-		expect(discoverer.logger.warn).toBeCalledTimes(1);
-		expect(discoverer.logger.warn).toBeCalledWith("No INFO for 'node-1' node in registry.");
+		expect(discoverer.logger.warn).toHaveBeenCalledTimes(1);
+		expect(discoverer.logger.warn).toHaveBeenCalledWith(
+			"No INFO for 'node-1' node in registry."
+		);
 
-		expect(discoverer.serializer.deserialize).toBeCalledTimes(0);
-		expect(discoverer.processRemoteNodeInfo).toBeCalledTimes(0);
+		expect(discoverer.serializer.deserialize).toHaveBeenCalledTimes(0);
+		expect(discoverer.processRemoteNodeInfo).toHaveBeenCalledTimes(0);
 	});
 });
 
@@ -771,8 +781,8 @@ describe("Test RedisDiscoverer 'discoverAllNodes' method", () => {
 
 		await discoverer.discoverAllNodes();
 
-		expect(discoverer.collectOnlineNodes).toBeCalledTimes(1);
-		expect(discoverer.collectOnlineNodes).toBeCalledWith();
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledTimes(1);
+		expect(discoverer.collectOnlineNodes).toHaveBeenCalledWith();
 
 		await discoverer.stop();
 	});
@@ -808,10 +818,10 @@ describe("Test RedisDiscoverer 'sendLocalNodeInfo' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.getLocalNodeInfo).toBeCalledTimes(1);
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(discoverer.client.setex).toBeCalledTimes(1);
-		expect(discoverer.client.setex).toBeCalledWith("MOL-DSCVR-INFO:node-99", 1800, {
+		expect(broker.getLocalNodeInfo).toHaveBeenCalledTimes(1);
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.setex).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.setex).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-99", 1800, {
 			a: 5,
 			sender: "node-99",
 			ver: "5"
@@ -819,20 +829,20 @@ describe("Test RedisDiscoverer 'sendLocalNodeInfo' method", () => {
 
 		expect(discoverer.lastInfoSeq).toBe(1);
 
-		expect(discoverer.recreateInfoUpdateTimer).toBeCalledTimes(1);
-		expect(discoverer.beat).toBeCalledTimes(1);
+		expect(discoverer.recreateInfoUpdateTimer).toHaveBeenCalledTimes(1);
+		expect(discoverer.beat).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should send INFO & call recreateInfoUpdateTimer & NOT beat", async () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo("node-10");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.getLocalNodeInfo).toBeCalledTimes(1);
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(discoverer.client.setex).toBeCalledTimes(1);
-		expect(discoverer.client.setex).toBeCalledWith("MOL-DSCVR-INFO:node-99", 1800, {
+		expect(broker.getLocalNodeInfo).toHaveBeenCalledTimes(1);
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.setex).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.setex).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-99", 1800, {
 			a: 5,
 			sender: "node-99",
 			ver: "5"
@@ -840,10 +850,10 @@ describe("Test RedisDiscoverer 'sendLocalNodeInfo' method", () => {
 
 		expect(discoverer.lastInfoSeq).toBe(1);
 
-		expect(discoverer.recreateInfoUpdateTimer).toBeCalledTimes(1);
-		expect(discoverer.beat).toBeCalledTimes(0);
+		expect(discoverer.recreateInfoUpdateTimer).toHaveBeenCalledTimes(1);
+		expect(discoverer.beat).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should send INFO & call recreateInfoUpdateTimer & beat & call makeBalancedSubscriptions", async () => {
@@ -852,23 +862,23 @@ describe("Test RedisDiscoverer 'sendLocalNodeInfo' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(broker.getLocalNodeInfo).toBeCalledTimes(1);
-		expect(discoverer.serializer.serialize).toBeCalledTimes(1);
-		expect(discoverer.client.setex).toBeCalledTimes(1);
-		expect(discoverer.client.setex).toBeCalledWith("MOL-DSCVR-INFO:node-99", 1800, {
+		expect(broker.getLocalNodeInfo).toHaveBeenCalledTimes(1);
+		expect(discoverer.serializer.serialize).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.setex).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.setex).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-99", 1800, {
 			a: 5,
 			sender: "node-99",
 			ver: "5"
 		});
 
-		expect(broker.transit.tx.makeBalancedSubscriptions).toBeCalledTimes(1);
+		expect(broker.transit.tx.makeBalancedSubscriptions).toHaveBeenCalledTimes(1);
 
 		expect(discoverer.lastInfoSeq).toBe(1);
 
-		expect(discoverer.recreateInfoUpdateTimer).toBeCalledTimes(1);
-		expect(discoverer.beat).toBeCalledTimes(1);
+		expect(discoverer.recreateInfoUpdateTimer).toHaveBeenCalledTimes(1);
+		expect(discoverer.beat).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 	});
 
 	it("should handle error", async () => {
@@ -877,13 +887,16 @@ describe("Test RedisDiscoverer 'sendLocalNodeInfo' method", () => {
 		// ---- ^ SETUP ^ ---
 		await discoverer.sendLocalNodeInfo();
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.setex).toBeCalledTimes(1);
+		expect(discoverer.client.setex).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.recreateInfoUpdateTimer).toBeCalledTimes(0);
-		expect(discoverer.beat).toBeCalledTimes(0);
+		expect(discoverer.recreateInfoUpdateTimer).toHaveBeenCalledTimes(0);
+		expect(discoverer.beat).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.logger.error).toBeCalledTimes(1);
-		expect(discoverer.logger.error).toBeCalledWith("Unable to send INFO to Redis server", err);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(1);
+		expect(discoverer.logger.error).toHaveBeenCalledWith(
+			"Unable to send INFO to Redis server",
+			err
+		);
 	});
 
 	it("should broadcast an error", async () => {
@@ -918,13 +931,13 @@ describe("Test RedisDiscoverer 'localNodeDisconnected' method", () => {
 
 		await discoverer.localNodeDisconnected();
 
-		expect(BaseDiscoverer.prototype.localNodeDisconnected).toBeCalledTimes(1);
+		expect(BaseDiscoverer.prototype.localNodeDisconnected).toHaveBeenCalledTimes(1);
 
-		expect(discoverer.client.del).toBeCalledTimes(1);
-		expect(discoverer.client.del).toBeCalledWith("MOL-DSCVR-INFO:node-99");
+		expect(discoverer.client.del).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.del).toHaveBeenCalledWith("MOL-DSCVR-INFO:node-99");
 
-		expect(discoverer.scanClean).toBeCalledTimes(1);
-		expect(discoverer.scanClean).toBeCalledWith("MOL-DSCVR-BEAT:node-99|12345678*");
+		expect(discoverer.scanClean).toHaveBeenCalledTimes(1);
+		expect(discoverer.scanClean).toHaveBeenCalledWith("MOL-DSCVR-BEAT:node-99|12345678*");
 
 		await discoverer.stop();
 	});
@@ -961,27 +974,27 @@ describe("Test RedisDiscoverer 'scanClean' method", () => {
 		// ---- ^ SETUP ^ ---
 		const p = discoverer.scanClean("SOME.**");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.scanStream).toBeCalledTimes(1);
-		expect(discoverer.client.scanStream).toBeCalledWith({ match: "SOME.**", count: 50 });
+		expect(discoverer.client.scanStream).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.scanStream).toHaveBeenCalledWith({ match: "SOME.**", count: 50 });
 
-		expect(fakeStream.on).toBeCalledTimes(3);
-		expect(fakeStream.on).toBeCalledWith("data", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("error", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("end", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledTimes(3);
+		expect(fakeStream.on).toHaveBeenCalledWith("data", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("error", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("end", expect.any(Function));
 
-		expect(discoverer.client.del).toBeCalledTimes(0);
+		expect(discoverer.client.del).toHaveBeenCalledTimes(0);
 
 		await fakeStreamCB.data(["key1", "key2"]);
 
-		expect(discoverer.client.del).toBeCalledTimes(1);
-		expect(discoverer.client.del).toBeCalledWith(["key1", "key2"]);
+		expect(discoverer.client.del).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.del).toHaveBeenCalledWith(["key1", "key2"]);
 
-		expect(fakeStream.pause).toBeCalledTimes(1);
-		expect(fakeStream.resume).toBeCalledTimes(1);
+		expect(fakeStream.pause).toHaveBeenCalledTimes(1);
+		expect(fakeStream.resume).toHaveBeenCalledTimes(1);
 
 		fakeStreamCB.end();
 
-		expect(discoverer.logger.error).toBeCalledTimes(0);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(0);
 
 		await p;
 	});
@@ -990,24 +1003,24 @@ describe("Test RedisDiscoverer 'scanClean' method", () => {
 		// ---- ^ SETUP ^ ---
 		const p = discoverer.scanClean("SOME.**");
 		// ---- ˇ ASSERTS ˇ ---
-		expect(discoverer.client.scanStream).toBeCalledTimes(1);
-		expect(discoverer.client.scanStream).toBeCalledWith({ match: "SOME.**", count: 50 });
+		expect(discoverer.client.scanStream).toHaveBeenCalledTimes(1);
+		expect(discoverer.client.scanStream).toHaveBeenCalledWith({ match: "SOME.**", count: 50 });
 
-		expect(fakeStream.on).toBeCalledTimes(3);
-		expect(fakeStream.on).toBeCalledWith("data", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("error", expect.any(Function));
-		expect(fakeStream.on).toBeCalledWith("end", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledTimes(3);
+		expect(fakeStream.on).toHaveBeenCalledWith("data", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("error", expect.any(Function));
+		expect(fakeStream.on).toHaveBeenCalledWith("end", expect.any(Function));
 
-		expect(discoverer.client.del).toBeCalledTimes(0);
+		expect(discoverer.client.del).toHaveBeenCalledTimes(0);
 
 		const err = new Error("Something happened");
 		await fakeStreamCB.error(err);
 
-		expect(discoverer.client.del).toBeCalledTimes(0);
-		expect(fakeStream.pause).toBeCalledTimes(0);
-		expect(fakeStream.resume).toBeCalledTimes(0);
+		expect(discoverer.client.del).toHaveBeenCalledTimes(0);
+		expect(fakeStream.pause).toHaveBeenCalledTimes(0);
+		expect(fakeStream.resume).toHaveBeenCalledTimes(0);
 
-		expect(discoverer.logger.error).toBeCalledTimes(1);
+		expect(discoverer.logger.error).toHaveBeenCalledTimes(1);
 
 		fakeStreamCB.end();
 

@@ -156,8 +156,8 @@ describe("Test Base Metric class", () => {
 			item.clear();
 
 			expect(item.values.size).toBe(0);
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith();
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith();
 		});
 	});
 
@@ -176,8 +176,8 @@ describe("Test Base Metric class", () => {
 			expect(item.lastSnapshot).toBeNull();
 
 			expect(item.snapshot()).toBe("snapshot");
-			expect(item.generateSnapshot).toBeCalledTimes(1);
-			expect(item.clearDirty).toBeCalledTimes(1);
+			expect(item.generateSnapshot).toHaveBeenCalledTimes(1);
+			expect(item.clearDirty).toHaveBeenCalledTimes(1);
 			expect(item.lastSnapshot).toBe("snapshot");
 		});
 
@@ -186,8 +186,8 @@ describe("Test Base Metric class", () => {
 			item.clearDirty.mockClear();
 
 			expect(item.snapshot()).toBe("snapshot");
-			expect(item.generateSnapshot).toBeCalledTimes(0);
-			expect(item.clearDirty).toBeCalledTimes(0);
+			expect(item.generateSnapshot).toHaveBeenCalledTimes(0);
+			expect(item.clearDirty).toHaveBeenCalledTimes(0);
 			expect(item.lastSnapshot).toBe("snapshot");
 		});
 	});
@@ -207,9 +207,9 @@ describe("Test Base Metric class", () => {
 			const labels = { a: 6, b: "Jane" };
 			item.changed(5.6, labels, 123456);
 
-			expect(item.setDirty).toBeCalledTimes(1);
-			expect(registry.changed).toBeCalledTimes(1);
-			expect(registry.changed).toBeCalledWith(item, 5.6, labels, 123456);
+			expect(item.setDirty).toHaveBeenCalledTimes(1);
+			expect(registry.changed).toHaveBeenCalledTimes(1);
+			expect(registry.changed).toHaveBeenCalledWith(item, 5.6, labels, 123456);
 		});
 	});
 

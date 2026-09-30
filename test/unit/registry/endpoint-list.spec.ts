@@ -188,7 +188,7 @@ describe("Test EndpointList.select", () => {
 		list.strategy.select = mock.fn();
 		expect(() => {
 			list.select(arr);
-		}).toThrowError(MoleculerError);
+		}).toThrow(MoleculerError);
 	});
 });
 

@@ -11,10 +11,10 @@ process.env.DATADOG_API_KEY = "datadog-api-key";
 
 describe("Test MetricReporters resolver", () => {
 	it("should throw error", () => {
-		expect(() => MetricReporters.resolve()).toThrowError(BrokerOptionsError);
-		expect(() => MetricReporters.resolve({})).toThrowError(BrokerOptionsError);
-		expect(() => MetricReporters.resolve("xyz")).toThrowError(BrokerOptionsError);
-		expect(() => MetricReporters.resolve({ type: "xyz" })).toThrowError(BrokerOptionsError);
+		expect(() => MetricReporters.resolve()).toThrow(BrokerOptionsError);
+		expect(() => MetricReporters.resolve({})).toThrow(BrokerOptionsError);
+		expect(() => MetricReporters.resolve("xyz")).toThrow(BrokerOptionsError);
+		expect(() => MetricReporters.resolve({ type: "xyz" })).toThrow(BrokerOptionsError);
 	});
 
 	it("should resolve console metric reporter from string", () => {
@@ -96,7 +96,7 @@ describe("Test Reporter register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			MetricReporters.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

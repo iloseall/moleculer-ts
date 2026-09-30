@@ -47,8 +47,8 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ˇ ASSERTS ˇ ---
 
 			expect(storage.broker).toBe(broker);
-			expect(asyncHooks.createHook).toBeCalledTimes(1);
-			expect(asyncHooks.createHook).toBeCalledWith({
+			expect(asyncHooks.createHook).toHaveBeenCalledTimes(1);
+			expect(asyncHooks.createHook).toHaveBeenCalledWith({
 				init: "_initBindMock",
 				//before: "_beforeBindMock",
 				//after: "_afterBindMock",
@@ -63,13 +63,13 @@ describe("Test 'AsyncStorage' class", () => {
 				hook: "createHookMock",
 				store: new Map()
 			};
-			expect(_initBindMock).toBeCalledTimes(1);
-			expect(_initBindMock).toBeCalledWith(thisOnMock);
-			//expect(_beforeBindMock).toBeCalledTimes(1);
-			//expect(_beforeBindMock).toBeCalledWith(thisOnMock);
-			//expect(_afterBindMock).toBeCalledTimes(1);
-			//expect(_afterBindMock).toBeCalledWith(thisOnMock);
-			expect(_destroyBindMock).toBeCalledTimes(2);
+			expect(_initBindMock).toHaveBeenCalledTimes(1);
+			expect(_initBindMock).toHaveBeenCalledWith(thisOnMock);
+			//expect(_beforeBindMock).toHaveBeenCalledTimes(1);
+			//expect(_beforeBindMock).toHaveBeenCalledWith(thisOnMock);
+			//expect(_afterBindMock).toHaveBeenCalledTimes(1);
+			//expect(_afterBindMock).toHaveBeenCalledWith(thisOnMock);
+			expect(_destroyBindMock).toHaveBeenCalledTimes(2);
 			expect(_destroyBindMock).toHaveBeenNthCalledWith(1, thisOnMock);
 			expect(_destroyBindMock).toHaveBeenNthCalledWith(2, thisOnMock);
 			expect(storage.executionAsyncId).toBe(executionAsyncIdMock);
@@ -89,8 +89,8 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage.enable();
 			// ---- ˇ ASSERTS ˇ ---
-			expect(enableHookMock).toBeCalledTimes(1);
-			expect(enableHookMock).toBeCalledWith();
+			expect(enableHookMock).toHaveBeenCalledTimes(1);
+			expect(enableHookMock).toHaveBeenCalledWith();
 
 			enableHookMock.mockClear();
 		});
@@ -102,8 +102,8 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage.disable();
 			// ---- ˇ ASSERTS ˇ ---
-			expect(disableHookMock).toBeCalledTimes(1);
-			expect(disableHookMock).toBeCalledWith();
+			expect(disableHookMock).toHaveBeenCalledTimes(1);
+			expect(disableHookMock).toHaveBeenCalledWith();
 
 			disableHookMock.mockClear();
 		});
@@ -116,10 +116,10 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage.stop();
 			// ---- ˇ ASSERTS ˇ ---
-			expect(disableHookMock).toBeCalledTimes(1);
-			expect(disableHookMock).toBeCalledWith();
-			expect(storage.store.clear).toBeCalledTimes(1);
-			expect(storage.store.clear).toBeCalledWith();
+			expect(disableHookMock).toHaveBeenCalledTimes(1);
+			expect(disableHookMock).toHaveBeenCalledWith();
+			expect(storage.store.clear).toHaveBeenCalledTimes(1);
+			expect(storage.store.clear).toHaveBeenCalledWith();
 
 			disableHookMock.mockClear();
 		});
@@ -131,8 +131,8 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			const res = storage.getAsyncId();
 			// ---- ˇ ASSERTS ˇ ---
-			expect(executionAsyncIdMock).toBeCalledTimes(1);
-			expect(executionAsyncIdMock).toBeCalledWith();
+			expect(executionAsyncIdMock).toHaveBeenCalledTimes(1);
+			expect(executionAsyncIdMock).toHaveBeenCalledWith();
 			expect(res).toEqual("currentUidMock");
 
 			executionAsyncIdMock.mockClear();
@@ -146,10 +146,10 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage.setSessionData("dataMock");
 			// ---- ˇ ASSERTS ˇ ---
-			expect(executionAsyncIdMock).toBeCalledTimes(1);
-			expect(executionAsyncIdMock).toBeCalledWith();
-			expect(storage.store.set).toBeCalledTimes(1);
-			expect(storage.store.set).toBeCalledWith("currentUidMock", {
+			expect(executionAsyncIdMock).toHaveBeenCalledTimes(1);
+			expect(executionAsyncIdMock).toHaveBeenCalledWith();
+			expect(storage.store.set).toHaveBeenCalledTimes(1);
+			expect(storage.store.set).toHaveBeenCalledWith("currentUidMock", {
 				data: "dataMock",
 				owner: "currentUidMock"
 			});
@@ -171,10 +171,10 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			const res = storage.getSessionData();
 			// ---- ˇ ASSERTS ˇ ---
-			expect(executionAsyncIdMock).toBeCalledTimes(1);
-			expect(executionAsyncIdMock).toBeCalledWith();
-			expect(storage.store.get).toBeCalledTimes(1);
-			expect(storage.store.get).toBeCalledWith("currentUidMock");
+			expect(executionAsyncIdMock).toHaveBeenCalledTimes(1);
+			expect(executionAsyncIdMock).toHaveBeenCalledWith();
+			expect(storage.store.get).toHaveBeenCalledTimes(1);
+			expect(storage.store.get).toHaveBeenCalledWith("currentUidMock");
 			expect(res).toEqual("itemDataMock");
 
 			executionAsyncIdMock.mockClear();
@@ -188,10 +188,10 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			const res = storage.getSessionData();
 			// ---- ˇ ASSERTS ˇ ---
-			expect(executionAsyncIdMock).toBeCalledTimes(1);
-			expect(executionAsyncIdMock).toBeCalledWith();
-			expect(storage.store.get).toBeCalledTimes(1);
-			expect(storage.store.get).toBeCalledWith("currentUidMock");
+			expect(executionAsyncIdMock).toHaveBeenCalledTimes(1);
+			expect(executionAsyncIdMock).toHaveBeenCalledWith();
+			expect(storage.store.get).toHaveBeenCalledTimes(1);
+			expect(storage.store.get).toHaveBeenCalledWith("currentUidMock");
 			expect(res).toBeNull();
 
 			executionAsyncIdMock.mockClear();
@@ -215,8 +215,8 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			const res = storage._init(null, "TIMERWRAP", null);
 			// ---- ˇ ASSERTS ˇ ---
-			expect(storage.store.get).toBeCalledTimes(0);
-			expect(storage.store.set).toBeCalledTimes(0);
+			expect(storage.store.get).toHaveBeenCalledTimes(0);
+			expect(storage.store.set).toHaveBeenCalledTimes(0);
 			expect(res).toBeUndefined();
 		});
 
@@ -226,9 +226,9 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage._init("asyncId", "NOT_TIMERWRAP", "triggerAsyncId");
 			// ---- ˇ ASSERTS ˇ ---
-			expect(storage.store.get).toBeCalledTimes(1);
-			expect(storage.store.get).toBeCalledWith("triggerAsyncId");
-			expect(storage.store.set).toBeCalledTimes(0);
+			expect(storage.store.get).toHaveBeenCalledTimes(1);
+			expect(storage.store.get).toHaveBeenCalledWith("triggerAsyncId");
+			expect(storage.store.set).toHaveBeenCalledTimes(0);
 		});
 
 		it("should set item in store (triggerAsyncId -> asyncId)", () => {
@@ -237,10 +237,10 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage._init("asyncId", "NOT_TIMERWRAP", "triggerAsyncId");
 			// ---- ˇ ASSERTS ˇ ---
-			expect(storage.store.get).toBeCalledTimes(1);
-			expect(storage.store.get).toBeCalledWith("triggerAsyncId");
-			expect(storage.store.set).toBeCalledTimes(1);
-			expect(storage.store.set).toBeCalledWith("asyncId", "itemMock");
+			expect(storage.store.get).toHaveBeenCalledTimes(1);
+			expect(storage.store.get).toHaveBeenCalledWith("triggerAsyncId");
+			expect(storage.store.set).toHaveBeenCalledTimes(1);
+			expect(storage.store.set).toHaveBeenCalledWith("asyncId", "itemMock");
 		});
 	});
 
@@ -251,9 +251,9 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage._destroy("asyncId");
 			// ---- ˇ ASSERTS ˇ ---
-			expect(storage.store.get).toBeCalledTimes(1);
-			expect(storage.store.get).toBeCalledWith("asyncId");
-			expect(storage.store.delete).toBeCalledTimes(0);
+			expect(storage.store.get).toHaveBeenCalledTimes(1);
+			expect(storage.store.get).toHaveBeenCalledWith("asyncId");
+			expect(storage.store.delete).toHaveBeenCalledTimes(0);
 		});
 
 		it("should delete item from store by asyncId", () => {
@@ -265,10 +265,10 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage._destroy("asyncId");
 			// ---- ˇ ASSERTS ˇ ---
-			expect(storage.store.get).toBeCalledTimes(1);
-			expect(storage.store.get).toBeCalledWith("asyncId");
-			expect(storage.store.delete).toBeCalledTimes(1);
-			expect(storage.store.delete).toBeCalledWith("asyncId");
+			expect(storage.store.get).toHaveBeenCalledTimes(1);
+			expect(storage.store.get).toHaveBeenCalledWith("asyncId");
+			expect(storage.store.delete).toHaveBeenCalledTimes(1);
+			expect(storage.store.delete).toHaveBeenCalledWith("asyncId");
 		});
 
 		// Commented case
@@ -284,10 +284,10 @@ describe("Test 'AsyncStorage' class", () => {
 			// ---- ^ SETUP ^ ---
 			storage._destroy("asyncId");
 			// ---- ˇ ASSERTS ˇ ---
-			expect(storage.store.get).toBeCalledTimes(1);
-			expect(storage.store.get).toBeCalledWith("asyncId");
-			expect(storage.store.delete).toBeCalledTimes(1);
-			expect(storage.store.delete).toBeCalledWith("asyncId");
+			expect(storage.store.get).toHaveBeenCalledTimes(1);
+			expect(storage.store.get).toHaveBeenCalledWith("asyncId");
+			expect(storage.store.delete).toHaveBeenCalledTimes(1);
+			expect(storage.store.delete).toHaveBeenCalledWith("asyncId");
 			expect(data.data).tobeNull();
 		});*/
 	});

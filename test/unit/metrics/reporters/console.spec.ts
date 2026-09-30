@@ -76,11 +76,11 @@ describe("Test ConsoleReporter class", () => {
 			reporter.init(fakeRegistry);
 
 			expect(reporter.timer).toBeDefined();
-			expect(reporter.print).toBeCalledTimes(0);
+			expect(reporter.print).toHaveBeenCalledTimes(0);
 
 			clock.tick(2500);
 
-			expect(reporter.print).toBeCalledTimes(1);
+			expect(reporter.print).toHaveBeenCalledTimes(1);
 		});
 
 		it("should not start timer", () => {
@@ -94,11 +94,11 @@ describe("Test ConsoleReporter class", () => {
 			reporter.init(fakeRegistry);
 
 			expect(reporter.timer).toBeUndefined();
-			expect(reporter.print).toBeCalledTimes(0);
+			expect(reporter.print).toHaveBeenCalledTimes(0);
 
 			clock.tick(2500);
 
-			expect(reporter.print).toBeCalledTimes(0);
+			expect(reporter.print).toHaveBeenCalledTimes(0);
 		});
 	});
 

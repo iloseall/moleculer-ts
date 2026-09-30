@@ -91,7 +91,7 @@ describe("Test StatsDReporter class", () => {
 			reporter.flush = mock.fn();
 			reporter.init(fakeRegistry);
 
-			expect(reporter.flush).toBeCalledTimes(1);
+			expect(reporter.flush).toHaveBeenCalledTimes(1);
 		});
 	});
 
@@ -133,8 +133,8 @@ describe("Test StatsDReporter class", () => {
 
 			reporter.flush();
 
-			expect(reporter.generateStatsDSeries).toBeCalledTimes(1);
-			expect(reporter.sendChunks).toBeCalledTimes(0);
+			expect(reporter.generateStatsDSeries).toHaveBeenCalledTimes(1);
+			expect(reporter.sendChunks).toHaveBeenCalledTimes(0);
 		});
 
 		it("should call generateStatsDSeries & sendChunks", () => {
@@ -143,9 +143,9 @@ describe("Test StatsDReporter class", () => {
 
 			reporter.flush();
 
-			expect(reporter.generateStatsDSeries).toBeCalledTimes(1);
-			expect(reporter.sendChunks).toBeCalledTimes(1);
-			expect(reporter.sendChunks).toBeCalledWith([1, 2]);
+			expect(reporter.generateStatsDSeries).toHaveBeenCalledTimes(1);
+			expect(reporter.sendChunks).toHaveBeenCalledTimes(1);
+			expect(reporter.sendChunks).toHaveBeenCalledWith([1, 2]);
 		});
 	});
 
@@ -176,8 +176,8 @@ describe("Test StatsDReporter class", () => {
 
 			reporter.sendChunks(Array.from(series));
 
-			expect(reporter.send).toBeCalledTimes(1);
-			expect(reporter.send).toBeCalledWith(Buffer.from(series.slice(0, 4).join("\n")));
+			expect(reporter.send).toHaveBeenCalledTimes(1);
+			expect(reporter.send).toHaveBeenCalledWith(Buffer.from(series.slice(0, 4).join("\n")));
 		});
 
 		it("should call send with the rest", () => {
@@ -185,8 +185,8 @@ describe("Test StatsDReporter class", () => {
 
 			clock.tick(150);
 
-			expect(reporter.send).toBeCalledTimes(1);
-			expect(reporter.send).toBeCalledWith(Buffer.from(series.slice(4, 6).join("\n")));
+			expect(reporter.send).toHaveBeenCalledTimes(1);
+			expect(reporter.send).toHaveBeenCalledWith(Buffer.from(series.slice(4, 6).join("\n")));
 		});
 
 		it("should not call send", () => {
@@ -194,7 +194,7 @@ describe("Test StatsDReporter class", () => {
 
 			clock.tick(150);
 
-			expect(reporter.send).toBeCalledTimes(0);
+			expect(reporter.send).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -225,8 +225,8 @@ describe("Test StatsDReporter class", () => {
 
 			reporter.sendChunks(Array.from(series));
 
-			expect(reporter.send).toBeCalledTimes(1);
-			expect(reporter.send).toBeCalledWith(Buffer.from(series.slice(0, 6).join("\n")));
+			expect(reporter.send).toHaveBeenCalledTimes(1);
+			expect(reporter.send).toHaveBeenCalledWith(Buffer.from(series.slice(0, 6).join("\n")));
 		});
 
 		it("should not call send", () => {
@@ -234,7 +234,7 @@ describe("Test StatsDReporter class", () => {
 
 			clock.tick(150);
 
-			expect(reporter.send).toBeCalledTimes(0);
+			expect(reporter.send).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -252,13 +252,20 @@ describe("Test StatsDReporter class", () => {
 			const buf = Buffer.from("Moleculer Metrics Data");
 			reporter.send(buf);
 
-			expect(dgram.createSocket).toBeCalledTimes(1);
-			expect(dgram.createSocket).toBeCalledWith("udp4");
+			expect(dgram.createSocket).toHaveBeenCalledTimes(1);
+			expect(dgram.createSocket).toHaveBeenCalledWith("udp4");
 
-			expect(sockSend).toBeCalledTimes(1);
-			expect(sockSend).toBeCalledWith(buf, 0, 22, 8125, "localhost", expect.any(Function));
+			expect(sockSend).toHaveBeenCalledTimes(1);
+			expect(sockSend).toHaveBeenCalledWith(
+				buf,
+				0,
+				22,
+				8125,
+				"localhost",
+				expect.any(Function)
+			);
 
-			expect(sockClose).toBeCalledTimes(1);
+			expect(sockClose).toHaveBeenCalledTimes(1);
 		});
 	});
 
@@ -349,8 +356,10 @@ describe("Test StatsDReporter class", () => {
 
 			registry.observe("test.histogram", 7, { action: "auth" });
 
-			expect(reporter.send).toBeCalledTimes(1);
-			expect(reporter.send).toBeCalledWith(Buffer.from("test.histogram:7|ms|#action:auth"));
+			expect(reporter.send).toHaveBeenCalledTimes(1);
+			expect(reporter.send).toHaveBeenCalledWith(
+				Buffer.from("test.histogram:7|ms|#action:auth")
+			);
 		});
 	});
 });

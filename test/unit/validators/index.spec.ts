@@ -29,8 +29,8 @@ describe("Test Validators resolver", () => {
 	});
 
 	it("should throw error if not found by name", () => {
-		expect(() => Validators.resolve("xyz")).toThrowError(BrokerOptionsError);
-		expect(() => Validators.resolve({ type: "xyz" })).toThrowError(BrokerOptionsError);
+		expect(() => Validators.resolve("xyz")).toThrow(BrokerOptionsError);
+		expect(() => Validators.resolve({ type: "xyz" })).toThrow(BrokerOptionsError);
 	});
 });
 
@@ -40,7 +40,7 @@ describe("Test Validators register", () => {
 	it("should throw error if type if not correct", () => {
 		expect(() => {
 			Validators.resolve("MyCustom");
-		}).toThrowError(BrokerOptionsError);
+		}).toThrow(BrokerOptionsError);
 	});
 
 	it("should register new type", () => {

@@ -24,8 +24,8 @@ describe("Test LocalDiscoverer 'discoverNode' method", () => {
 
 		await discoverer.discoverNode("node-1");
 
-		expect(broker.transit.discoverNode).toBeCalledTimes(1);
-		expect(broker.transit.discoverNode).toBeCalledWith("node-1");
+		expect(broker.transit.discoverNode).toHaveBeenCalledTimes(1);
+		expect(broker.transit.discoverNode).toHaveBeenCalledWith("node-1");
 
 		await discoverer.stop();
 	});
@@ -50,8 +50,8 @@ describe("Test LocalDiscoverer 'discoverAllNodes' method", () => {
 
 		await discoverer.discoverAllNodes();
 
-		expect(broker.transit.discoverNodes).toBeCalledTimes(1);
-		expect(broker.transit.discoverNodes).toBeCalledWith();
+		expect(broker.transit.discoverNodes).toHaveBeenCalledTimes(1);
+		expect(broker.transit.discoverNodes).toHaveBeenCalledWith();
 
 		await discoverer.stop();
 	});
@@ -79,10 +79,10 @@ describe("Test LocalDiscoverer 'sendLocalNodeInfo' method", () => {
 
 		await discoverer.sendLocalNodeInfo("node-3");
 
-		expect(broker.transit.sendNodeInfo).toBeCalledTimes(1);
-		expect(broker.transit.sendNodeInfo).toBeCalledWith(info, "node-3");
+		expect(broker.transit.sendNodeInfo).toHaveBeenCalledTimes(1);
+		expect(broker.transit.sendNodeInfo).toHaveBeenCalledWith(info, "node-3");
 
-		expect(broker.transit.tx.makeBalancedSubscriptions).toBeCalledTimes(0);
+		expect(broker.transit.tx.makeBalancedSubscriptions).toHaveBeenCalledTimes(0);
 
 		await discoverer.stop();
 	});
@@ -99,10 +99,10 @@ describe("Test LocalDiscoverer 'sendLocalNodeInfo' method", () => {
 
 		await discoverer.sendLocalNodeInfo();
 
-		expect(broker.transit.sendNodeInfo).toBeCalledTimes(1);
-		expect(broker.transit.sendNodeInfo).toBeCalledWith(info, undefined);
+		expect(broker.transit.sendNodeInfo).toHaveBeenCalledTimes(1);
+		expect(broker.transit.sendNodeInfo).toHaveBeenCalledWith(info, undefined);
 
-		expect(broker.transit.tx.makeBalancedSubscriptions).toBeCalledTimes(1);
+		expect(broker.transit.tx.makeBalancedSubscriptions).toHaveBeenCalledTimes(1);
 
 		await discoverer.stop();
 	});

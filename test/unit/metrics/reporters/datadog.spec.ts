@@ -97,11 +97,11 @@ describe("Test Datadog Reporter class", () => {
 			reporter.init(fakeRegistry);
 
 			expect(reporter.timer).toBeDefined();
-			expect(reporter.flush).toBeCalledTimes(0);
+			expect(reporter.flush).toHaveBeenCalledTimes(0);
 
 			clock.tick(5500);
 
-			expect(reporter.flush).toBeCalledTimes(1);
+			expect(reporter.flush).toHaveBeenCalledTimes(1);
 		});
 
 		it("should generate defaultLabels", () => {
@@ -156,8 +156,8 @@ describe("Test Datadog Reporter class", () => {
 
 			await reporter.flush();
 
-			expect(reporter.generateDatadogSeries).toBeCalledTimes(1);
-			expect(fetch).toBeCalledTimes(0);
+			expect(reporter.generateDatadogSeries).toHaveBeenCalledTimes(1);
+			expect(fetch).toHaveBeenCalledTimes(0);
 		});
 
 		it("should call generateDatadogSeries method & fetch", async () => {
@@ -173,15 +173,18 @@ describe("Test Datadog Reporter class", () => {
 
 			await reporter.flush();
 
-			expect(reporter.generateDatadogSeries).toBeCalledTimes(1);
-			expect(fetch).toBeCalledTimes(1);
-			expect(fetch).toBeCalledWith("https://api.datadoghq.com/api/v1/series?api_key=12345", {
-				body: '{"series":[{"a":5},{"a":6}]}',
-				headers: {
-					"Content-Type": "application/json"
-				},
-				method: "post"
-			});
+			expect(reporter.generateDatadogSeries).toHaveBeenCalledTimes(1);
+			expect(fetch).toHaveBeenCalledTimes(1);
+			expect(fetch).toHaveBeenCalledWith(
+				"https://api.datadoghq.com/api/v1/series?api_key=12345",
+				{
+					body: '{"series":[{"a":5},{"a":6}]}',
+					headers: {
+						"Content-Type": "application/json"
+					},
+					method: "post"
+				}
+			);
 		});
 	});
 

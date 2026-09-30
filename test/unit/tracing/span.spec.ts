@@ -59,8 +59,8 @@ describe("Test Tracing Span", () => {
 			expect(span.logs).toEqual([]);
 			expect(span.tags).toEqual({});
 
-			expect(tracer.shouldSample).toBeCalledTimes(1);
-			expect(tracer.shouldSample).toBeCalledWith(span);
+			expect(tracer.shouldSample).toHaveBeenCalledTimes(1);
+			expect(tracer.shouldSample).toHaveBeenCalledWith(span);
 		});
 
 		it("should use options", () => {
@@ -115,7 +115,7 @@ describe("Test Tracing Span", () => {
 				c: 1000
 			});
 
-			expect(tracer.shouldSample).toBeCalledTimes(0);
+			expect(tracer.shouldSample).toHaveBeenCalledTimes(0);
 		});
 
 		it("should use options and service as string", () => {
@@ -169,7 +169,7 @@ describe("Test Tracing Span", () => {
 				c: 1000
 			});
 
-			expect(tracer.shouldSample).toBeCalledTimes(0);
+			expect(tracer.shouldSample).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -189,10 +189,10 @@ describe("Test Tracing Span", () => {
 
 			expect(span.startTime).toBe(10203040);
 
-			expect(dateNow).toBeCalledTimes(1);
-			expect(now).toBeCalledTimes(1);
-			expect(fakeTracer.spanStarted).toBeCalledTimes(1);
-			expect(fakeTracer.spanStarted).toBeCalledWith(span);
+			expect(dateNow).toHaveBeenCalledTimes(1);
+			expect(now).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.spanStarted).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.spanStarted).toHaveBeenCalledWith(span);
 		});
 
 		it("should set the given time as startTime", () => {
@@ -205,10 +205,10 @@ describe("Test Tracing Span", () => {
 
 			expect(span.startTime).toBe(55555555);
 
-			expect(dateNow).toBeCalledTimes(0);
-			expect(now).toBeCalledTimes(1);
-			expect(fakeTracer.spanStarted).toBeCalledTimes(1);
-			expect(fakeTracer.spanStarted).toBeCalledWith(span);
+			expect(dateNow).toHaveBeenCalledTimes(0);
+			expect(now).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.spanStarted).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.spanStarted).toHaveBeenCalledWith(span);
 		});
 	});
 
@@ -403,9 +403,9 @@ describe("Test Tracing Span", () => {
 			expect(span.finishTime).toBe(10203040);
 			expect(span.duration).toBe(40);
 
-			expect(now).toBeCalledTimes(2);
-			expect(fakeTracer.spanFinished).toBeCalledTimes(1);
-			expect(fakeTracer.spanFinished).toBeCalledWith(span);
+			expect(now).toHaveBeenCalledTimes(2);
+			expect(fakeTracer.spanFinished).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.spanFinished).toHaveBeenCalledWith(span);
 		});
 
 		it("should set the given time as finishTime", () => {
@@ -420,9 +420,9 @@ describe("Test Tracing Span", () => {
 			expect(span.finishTime).toBe(10203030);
 			expect(span.duration).toBe(30);
 
-			expect(now).toBeCalledTimes(1);
-			expect(fakeTracer.spanFinished).toBeCalledTimes(1);
-			expect(fakeTracer.spanFinished).toBeCalledWith(span);
+			expect(now).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.spanFinished).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.spanFinished).toHaveBeenCalledWith(span);
 		});
 	});
 
@@ -445,8 +445,8 @@ describe("Test Tracing Span", () => {
 			const res = span.startSpan("child-span");
 
 			expect(res).toBe(subSpan);
-			expect(fakeTracer.startSpan).toBeCalledTimes(1);
-			expect(fakeTracer.startSpan).toBeCalledWith("child-span", {
+			expect(fakeTracer.startSpan).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.startSpan).toHaveBeenCalledWith("child-span", {
 				traceID: "12345678-abcdef",
 				parentID: "12345678-abcdef",
 				sampled: true
@@ -464,8 +464,8 @@ describe("Test Tracing Span", () => {
 			});
 
 			expect(res).toBe(subSpan);
-			expect(fakeTracer.startSpan).toBeCalledTimes(1);
-			expect(fakeTracer.startSpan).toBeCalledWith("child-span", {
+			expect(fakeTracer.startSpan).toHaveBeenCalledTimes(1);
+			expect(fakeTracer.startSpan).toHaveBeenCalledWith("child-span", {
 				traceID: "12345678-abcdef",
 				parentID: "12345678-abcdef",
 				sampled: false,

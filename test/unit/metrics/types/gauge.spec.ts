@@ -38,7 +38,7 @@ describe("Test Base Metric class", () => {
 			expect(item.name).toBe("test.gauge");
 			expect(item.rate).toBeUndefined();
 
-			expect(registry.changed).toBeCalledTimes(0);
+			expect(registry.changed).toHaveBeenCalledTimes(0);
 		});
 
 		it("should create with custom options", () => {
@@ -57,7 +57,7 @@ describe("Test Base Metric class", () => {
 			expect(item.name).toBe("test.gauge");
 			expect(item.rate).toBe(true);
 
-			expect(registry.changed).toBeCalledTimes(0);
+			expect(registry.changed).toHaveBeenCalledTimes(0);
 		});
 	});
 
@@ -68,19 +68,19 @@ describe("Test Base Metric class", () => {
 		it("should call set method", () => {
 			item.set.mockClear();
 			item.increment();
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(1, undefined, undefined);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(1, undefined, undefined);
 
 			item.set.mockClear();
 			const now = Date.now();
 			item.increment({ a: 5 }, 3, now);
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(4, { a: 5 }, now);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(4, { a: 5 }, now);
 
 			item.set.mockClear();
 			item.increment();
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(5, undefined, undefined);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(5, undefined, undefined);
 		});
 	});
 
@@ -92,19 +92,19 @@ describe("Test Base Metric class", () => {
 		it("should call set method", () => {
 			item.set.mockClear();
 			item.decrement();
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(9, undefined, undefined);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(9, undefined, undefined);
 
 			item.set.mockClear();
 			const now = Date.now();
 			item.decrement({ a: 5 }, 3, now);
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(6, { a: 5 }, now);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(6, { a: 5 }, now);
 
 			item.set.mockClear();
 			item.decrement();
-			expect(item.set).toBeCalledTimes(1);
-			expect(item.set).toBeCalledWith(5, undefined, undefined);
+			expect(item.set).toHaveBeenCalledTimes(1);
+			expect(item.set).toHaveBeenCalledWith(5, undefined, undefined);
 		});
 	});
 
@@ -130,14 +130,14 @@ describe("Test Base Metric class", () => {
 				rate: fakeRate
 			});
 
-			expect(MetricRate).toBeCalledTimes(1);
-			expect(MetricRate).toBeCalledWith(item, item.values.get(""), 1);
+			expect(MetricRate).toHaveBeenCalledTimes(1);
+			expect(MetricRate).toHaveBeenCalledWith(item, item.values.get(""), 1);
 
-			expect(rateUpdate).toBeCalledTimes(1);
-			expect(rateUpdate).toBeCalledWith(3);
+			expect(rateUpdate).toHaveBeenCalledTimes(1);
+			expect(rateUpdate).toHaveBeenCalledWith(3);
 
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(3, undefined, undefined);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(3, undefined, undefined);
 		});
 
 		it("should store a labeled value", () => {
@@ -154,14 +154,14 @@ describe("Test Base Metric class", () => {
 				rate: fakeRate
 			});
 
-			expect(MetricRate).toBeCalledTimes(1);
-			expect(MetricRate).toBeCalledWith(item, item.values.get("5"), 1);
+			expect(MetricRate).toHaveBeenCalledTimes(1);
+			expect(MetricRate).toHaveBeenCalledWith(item, item.values.get("5"), 1);
 
-			expect(rateUpdate).toBeCalledTimes(1);
-			expect(rateUpdate).toBeCalledWith(3);
+			expect(rateUpdate).toHaveBeenCalledTimes(1);
+			expect(rateUpdate).toHaveBeenCalledWith(3);
 
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(3, { a: 5 }, undefined);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(3, { a: 5 }, undefined);
 		});
 
 		it("should update the labeled value", () => {
@@ -178,13 +178,13 @@ describe("Test Base Metric class", () => {
 				rate: fakeRate
 			});
 
-			expect(MetricRate).toBeCalledTimes(0);
+			expect(MetricRate).toHaveBeenCalledTimes(0);
 
-			expect(rateUpdate).toBeCalledTimes(1);
-			expect(rateUpdate).toBeCalledWith(8);
+			expect(rateUpdate).toHaveBeenCalledTimes(1);
+			expect(rateUpdate).toHaveBeenCalledWith(8);
 
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(8, { a: 5 }, 12345);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(8, { a: 5 }, 12345);
 		});
 
 		it("should reset the labeled value", () => {
@@ -199,13 +199,13 @@ describe("Test Base Metric class", () => {
 				rate: fakeRate
 			});
 
-			expect(MetricRate).toBeCalledTimes(0);
+			expect(MetricRate).toHaveBeenCalledTimes(0);
 
-			expect(rateUpdate).toBeCalledTimes(1);
-			expect(rateUpdate).toBeCalledWith(0);
+			expect(rateUpdate).toHaveBeenCalledTimes(1);
+			expect(rateUpdate).toHaveBeenCalledWith(0);
 
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(0, { a: 5 }, 23456);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(0, { a: 5 }, 23456);
 			expect(item.values.size).toBe(2);
 		});
 
@@ -229,11 +229,11 @@ describe("Test Base Metric class", () => {
 				rate: fakeRate
 			});
 
-			expect(MetricRate).toBeCalledTimes(0);
-			expect(rateUpdate).toBeCalledTimes(0);
+			expect(MetricRate).toHaveBeenCalledTimes(0);
+			expect(rateUpdate).toHaveBeenCalledTimes(0);
 
-			expect(item.changed).toBeCalledTimes(1);
-			expect(item.changed).toBeCalledWith(null, null, 34567);
+			expect(item.changed).toHaveBeenCalledTimes(1);
+			expect(item.changed).toHaveBeenCalledWith(null, null, 34567);
 			expect(item.values.size).toBe(2);
 		});
 	});

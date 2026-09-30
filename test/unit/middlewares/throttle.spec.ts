@@ -58,30 +58,30 @@ describe("Test ThrottleMiddleware", () => {
 			const ctx = Context.create(broker, endpoint);
 			const newHandler = mw.localEvent.call(broker, handler, event);
 
-			expect(event.handler).toBeCalledTimes(0);
+			expect(event.handler).toHaveBeenCalledTimes(0);
 
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(1);
+			expect(event.handler).toHaveBeenCalledTimes(1);
 
 			clock.tick(1000);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(1);
+			expect(event.handler).toHaveBeenCalledTimes(1);
 
 			clock.tick(2000);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(1);
+			expect(event.handler).toHaveBeenCalledTimes(1);
 
 			clock.tick(2000);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(2);
+			expect(event.handler).toHaveBeenCalledTimes(2);
 
 			clock.tick(2000);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(2);
+			expect(event.handler).toHaveBeenCalledTimes(2);
 
 			clock.tick(3000);
 			newHandler(ctx);
-			expect(event.handler).toBeCalledTimes(3);
+			expect(event.handler).toHaveBeenCalledTimes(3);
 		});
 	});
 });

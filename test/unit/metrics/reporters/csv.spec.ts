@@ -106,14 +106,14 @@ describe("Test CSVReporter class", () => {
 			reporter.init(fakeRegistry);
 
 			expect(reporter.timer).toBeDefined();
-			expect(reporter.flush).toBeCalledTimes(0);
+			expect(reporter.flush).toHaveBeenCalledTimes(0);
 
 			expect(utils.makeDirs).toHaveBeenCalledTimes(1);
 			expect(utils.makeDirs).toHaveBeenCalledWith("/metrics");
 
 			clock.tick(2500);
 
-			expect(reporter.flush).toBeCalledTimes(1);
+			expect(reporter.flush).toHaveBeenCalledTimes(1);
 		});
 
 		it("should not start timer but create directory", () => {
@@ -129,14 +129,14 @@ describe("Test CSVReporter class", () => {
 			reporter.init(fakeRegistry);
 
 			expect(reporter.timer).toBeUndefined();
-			expect(reporter.flush).toBeCalledTimes(0);
+			expect(reporter.flush).toHaveBeenCalledTimes(0);
 
 			expect(utils.makeDirs).toHaveBeenCalledTimes(1);
 			expect(utils.makeDirs).toHaveBeenCalledWith("/metrics");
 
 			clock.tick(2500);
 
-			expect(reporter.flush).toBeCalledTimes(0);
+			expect(reporter.flush).toHaveBeenCalledTimes(0);
 		});
 	});
 
