@@ -1,0 +1,11 @@
+{
+	// ts-jest compiler options: transpile-only (fast) CommonJS output for the
+	// specs, without touching the options the `src` build uses.
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"isolatedModules": true,
+		"esModuleInterop": true
+	}
+}

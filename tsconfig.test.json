@@ -1,0 +1,15 @@
+{
+	// Type gate for the shared test helpers.
+	//
+	// The specs themselves are transpiled by ts-jest with `diagnostics: false`:
+	// they were originally written as JavaScript and deliberately exercise
+	// type-violating cases (`new Context()` without args, mocks assigned to
+	// strict class members, partial endpoint objects, ...). Hardening all of
+	// them is a separate effort, so they are intentionally kept out of this gate.
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"noEmit": true
+	},
+	"include": ["types/extends.d.ts", "src/**/*.ts", "test/helpers/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
+}

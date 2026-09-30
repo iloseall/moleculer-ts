@@ -83,7 +83,9 @@ module.exports = [
 		files: ["test/**/*.{js,ts}", "dev/**/*.{js,ts}", "benchmark/**/*.{js,ts}", "examples/**/*.{js,ts}"],
 		rules: {
 			"no-console": ["off"],
-			"no-unused-vars": ["off"]
+			// Specs keep imports/variables around on purpose (fixtures, WIP cases).
+			"no-unused-vars": ["off"],
+			"@typescript-eslint/no-unused-vars": ["off"]
 		}
 	}
 ];

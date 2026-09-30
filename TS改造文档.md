@@ -224,7 +224,10 @@ localAction?: (
 |---|---|
 | `tsc -p tsconfig.json` | **0 error**（1.5s） |
 | `tsc -p tsconfig.examples.json`（src + 全部 examples） | **0 error** |
-| `npx jest` | **136 suites / 2346 passed / 4 skipped** |
+| `npx jest`（全部 spec 为 `.ts` 后） | **137 suites / 2360 passed / 0 failed / 4 pending** |
+| `npm run test:tscheck`（`test/helpers/**` 类型门禁） | **0 error** |
+| ESLint `test`（`--rule prettier endOfLine auto` 口径） | **0 problem** |
+| ESLint `examples src`（同上口径） | **0 error / 0 warning** |
 | `npm run build` | 通过，`dist/` 与 `src` **1:1**（133 js + 133 d.ts + runner-esm.mjs） |
 | `npm run test:ts`（build + tsd + hello-world 编译 + ts-node 运行） | 通过（tsd 0 error，示例服务正常启停） |
 | `npm run test:esm` | 通过（3 个服务启动成功） |
@@ -251,7 +254,9 @@ localAction?: (
 |---|---|
 | `build` / `clean` / `prepublishOnly` | 新增；`prepublishOnly` 确保发布前一定构建 |
 | `files` | `src` → `dist` |
-| jest | 新增 `ts-jest` transform（`isolatedModules: true`，仅转译不做类型检查）；测试文件**全部未改** |
+| jest | 新增 `ts-jest` transform（`diagnostics: false`，仅转译不做类型检查）；**136 个 `.spec.js` 已迁移为 `.spec.ts`**（见第七章） |
+| `test:unit` / `test:int` | `--testMatch` 由 `*.spec.js` 改为 `*.spec.ts` |
+| `test:tscheck` | 新增：`tsc -p tsconfig.test.json`，即 `test/helpers/**` 的类型门禁 |
 | `tsd.compilerOptions` | 增加 `esModuleInterop: true`（不影响 src 配置） |
 | `dev` / `demo` / `bench` / `perf` / `memleak` | 改走 `tsx`，可直接解析 `.ts` |
 | `demo:client-server:server` / `demo:client-server:client` | 新增，运行示例 |
@@ -274,12 +279,94 @@ localAction?: (
 ### 工程配置
 
 - **ESLint**：接入 `typescript-eslint`，为 `**/*.ts` 增加规则块；CJS 场景、`any`、`declare namespace`、
-  遗留 `@ts-ignore` 等按原状保留；`test / dev / benchmark / examples` 的 `.ts` 与 `.js` 共用放宽规则（允许 `console`）
+  遗留 `@ts-ignore` 等按原状保留；`test / dev / benchmark / examples` 的 `.ts` 与 `.js` 共用放宽规则
+  （允许 `console`、允许未使用变量 —— 含 `@typescript-eslint/no-unused-vars`，见 7.5）
 - **CI**：`ci.yml` 增加 Build 与 `Type-check examples` 步骤；`publish.yml` 增加 Build 步骤
 
 ---
 
-## 七、示例改造（`examples/client-server`）
+## 七、测试文件的 TypeScript 化（jest 保持不变）
+
+测试运行器仍是 **jest 29 + ts-jest 29**，不引入 node:test：只把测试文件本身从 `.js` 改为 `.ts`，
+并把原先分散的测试工具收敛成一套统一的 helper 层。
+
+### 7.1 范围与结果
+
+| 项 | 数量 |
+|---|---|
+| `test/unit/**/*.spec.js` → `.spec.ts` | 121 |
+| `test/integration/*.spec.js` → `.spec.ts` | 15 |
+| `*.spec.js.snap` → `*.spec.ts.snap` | 15（分布在 6 个 `__snapshots__` 目录） |
+| 配套 helper / fixture 转 `.ts` | `test/integration/helpers.js`、`test/unit/__factories/*`（3 个） |
+| 删除（内容已被 `test/helpers/*` 取代，全仓库 0 引用） | `test/unit/utils.js` |
+| 保持 `.js` | `test/services/*.js`（5 个服务 fixture） |
+| 保持 `.js`（不在迁移范围） | `test/e2e/*`（docker）、`test/esm/*`（runner）、`test/leak-detection/*.spc.js`、`test/typescript/*` |
+
+**零测试丢失校验**：逐文件比对 HEAD 的 `.spec.js` 与迁移后的 `.spec.ts`，`it(` 计数 **2353 = 2353**，
+`protectReject` 引用数也一致；4 个 pending 是迁移前就存在的 `describe.skip` / `it.skip`
+（`unit/utils.spec.ts`、`unit/middlewares/context-tracker.spec.ts` ×2、`integration/circuit-breaker.spec.ts`）。
+
+### 7.2 `test/services/*.js` 为什么刻意保持 `.js`
+
+它们不是测试文件，而是被 `test/unit/service-broker.spec.ts` 以**文件名字符串**加载的服务 fixture：
+
+- `broker.loadService("./test/services/math.service.js")`
+- 断言里写死了具体文件名：`expect(broker.loadService).toHaveBeenCalledWith(path.normalize("test/services/users.service.js"))`
+- 还有「重复加载应 throw」的用例依赖同名文件的加载语义
+
+转成 `.ts` 会同时改变加载路径与断言内容，因此保留 `.js`（并仍在 jest 的 `coveragePathIgnorePatterns` 中）。
+
+### 7.3 帮助层（四个文件， spec 的统一入口）
+
+| 文件 | 职责 |
+|---|---|
+| `test/helpers/test.ts` | jest 门面：`describe` / `it` / `before` / `after` / `mock`；**`before`/`after` 映射为 jest 的 `beforeAll`/`afterAll`**（jest 没有 `before`/`after` 这个名字，首次跑会报 `TypeError: (0 , test_1.before) is not a function`） |
+| `test/helpers/expect.ts` | 包装 jest 原生 `expect`（注册 `toBeAnyOf` 后默认导出） |
+| `test/helpers/module-mock.ts` | `autoMock` / `autoShape` / `installMock` / `factoryMock` / `requireActual` / `interopDefault`，内部转发 `jest.mock`、`jest.createMockFromModule`、`jest.requireActual` |
+| `test/helpers/utils.ts` | `protectReject` + `extendExpect`（注册 `toBeAnyOf`） |
+| `test/helpers/matchers.d.ts` | 为运行期注册的 `toBeAnyOf` 补声明聚合（`declare module "expect"`），让类型门禁识别它 |
+| `test/helpers/expect.spec.ts` | helper 层自测（14 项） |
+
+spec 一律从 `../../helpers/test` 与 `../../helpers/expect` 导入，不直接碰 `@jest/globals`，
+便于将来再换运行器时只改这一层。
+
+### 7.4 迁移中踩到的坑（后续改弊值时必须遵守）
+
+1. **延迟 `require()` 规则**：需要 mock 的模块，其 `require()` 必须写在 `autoMock(require.resolve("x"))` **之后**。
+2. **`interopDefault` 陷阱**：当被测模块内部是 `require("pkg")` 而非 ESM `import` 时（如 `src/transporters/mqtt.ts`），
+   spec 侧**不能**用 `interopDefault(require("pkg"))` —— automock 下 `mod.default` 与顶层成员是**两个不同 mock**，
+   补丁必须打在模块导出本身。mqtt 案例的表现是 worker 崩溃（`Cannot read properties of undefined (reading 'on')`）。
+   同类 symptom（「调用打进 automock 返回 undefined」）按同一思路排查。
+3. **`expect` 是 jest 原生实现**，因此：`toBeAnyOf` 接受**数组**（`expect(x).toBeAnyOf(["a","b"])`）、
+   恢复 spy 用 `spy.mockRestore()`（jest 的 mock context 上没有 `mock.restore`）。
+4. **`import * as ns` 可写**：ts-jest 的 `__importStar` 因 `__esModule` 返回真实 exports 对象，
+   `ns.fn = mock.fn()` 与 `mock.method(ns, "fn")` 都可用，**不需要**任何 `require.cache` hack。
+5. **`before`/`after` 必须映射**，见 7.3。
+
+### 7.5 类型门禁与转译配置
+
+| 文件 | 说明 |
+|---|---|
+| `tsconfig.jest.json`（新增） | ts-jest 专用：继承根配置，覆盖 `module: commonjs` / `moduleResolution: node` / `isolatedModules: true` / `esModuleInterop: true`；把已废弃的 `isolatedModules` 选项从 jest transform 里挪出，消除告警，同时不影响 `src` 构建配置 |
+| `tsconfig.test.json`（新增） | **只 gate `test/helpers/**`**（外加 `src/**/*.ts` 与 `types/extends.d.ts`），命令 `npm run test:tscheck`。136 个 spec **故意不进**这道门禁：它们原为 JS，且刻意包含类型违规用例（`new Context()` 无参、mock 赋给严格类成员、部分 endpoint 对象等），全面收紧是独立工作量 |
+| `package.json` → `jest.testMatch` | `["**/*.spec.ts", "**/*.spec.js"]`（保留 `.js` 以兼容 `test/leak-detection/*.spc.js` 之外的历史 spec） |
+| `package.json` → `jest.coveragePathIgnorePatterns` | 移除已删除的 `/test/unit/utils.js` |
+| `eslint.config.js` | `test / dev / benchmark / examples` 的放宽块增加 `"@typescript-eslint/no-unused-vars": "off"`（与该块原有的 `no-unused-vars: off` 对齐：spec 会因夹具、WIP 用例保留未使用的导入与变量） |
+
+### 7.6 顺带完成的 lint 收敛
+
+同一份代码在 `.js` 下不被 `prefer-const` 约束，改成 `.ts` 后开始报 —— 迁移前 `npx eslint test` 是 **0 problem**
+（已用 HEAD 版本的 spec 实测对齐），迁移后一度出现约 1580 处问题（`prefer-const` 1407、未使用变量 80、
+失效的 eslint-disable 指令 40、`prettier` 59、尾随空格 1）。
+
+处理方式：`npx eslint test --fix` 做**机械修复**（`let → const`、格式化、删失效指令），
+剩余 4 处「`let x;` 在 `describe` 顶层声明、`before()` 里赋值」的写法手工改为声明即初始化
+（`service-broker.spec.ts` 3 处、`tracing/span.spec.ts` 1 处），未使用变量按 7.5 的放宽规则处理。
+收敛后 `eslint test` 回到 **0 problem**，且全量测试与覆盖率不变。
+
+---
+
+## 八、示例改造（`examples/client-server`）
 
 `server.js` / `client.js` → `server.ts` / `client.ts`，除语法迁移外还修正了**在新版本 API 下已跑不通的写法**：
 
@@ -333,24 +420,27 @@ npm run demo:client-server:client
 
 ---
 
-## 八、需要的知悉项
+## 九、需要的知悉项
 
 1. **`strict` 仍为 `false`**（显式写死），后续可逐目录开启 `strictNullChecks` 等作为独立任务推进。
 2. **本机 `npm run lint` 仍会报大量 `prettier Delete ␍`**：Windows 工作区 `core.autocrlf=true` 造成的既有现象，
    非 prettier 规则错误为 0；提交后仓库内容为 LF，Linux CI 不受影响。用
    `--rule '{"prettier/prettier":["error",{"endOfLine":"auto"}]}'` 复核时 `src` 为 0 error / 0 warning。
 3. **产物不再是「逐字节相同」**：`esModuleInterop` 会引入 `__importDefault` / `__importStar` 辅助调用。
-   对象引用、`instanceof`、单例语义均不变（jest 2346 项断言与覆盖率与改造前一致可佐证）。
+   对象引用、`instanceof`、单例语义均不变（jest 2360 项断言与覆盖率与改造前一致可佐证）。
 4. **测试工具链是升级 TS 6/7 的真正风险点**，而非语法：当前用 `ts-jest ^29`，
    6.0/7.0 支持取决于 ts-jest 是否跟进；长期可考虑 Node 原生类型剥离或 swc。
 5. 调试时若用 `tsc xxx.ts` 单文件编译：TS 6.0 起目录内存在 tsconfig 时会报 `TS5112`，需加 `--ignoreConfig`。
+6. **测试的运行器始终是 jest**：曾尝试迁移到 Node 原生 `node:test`，因缺少链式 `expect` API、
+   `mock.module` 需实验标志且无 hoisting、快照格式不兼容而放弃；唯一沉淀是规格化的 helper 层（见第七章）。
 
 ---
 
-## 九、后续可选项
+## 十、后续可选项
 
 - 逐目录开启 `strict` / `strictNullChecks`，渐进清偿类型债
-- 迁移 153 个测试文件到 TypeScript（当前保持 `.js` + `ts-jest`）
+- 把 136 个 spec 逐步纳入类型门禁（当前只 gate `test/helpers/**`，见 7.5）
+- `test/services/*.js` 5 个 fixture 若要 `.ts` 化，需同步改 `service-broker.spec.ts` 里的加载路径与文件名断言
 - 把历史 `@ts-ignore`（15 处）逐步替换为真实类型修复
 - `export =` → ESM 导出（会改变公共 `.d.ts` 形态，需同步 `index.d.ts` 与 tsd 用例）
 - `test/e2e`（shell + docker 驱动）未调整，其内部使用发布包，无需改动

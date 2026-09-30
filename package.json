@@ -32,8 +32,9 @@
     "pperf": "node --inspect --expose-gc benchmark/perf-runner.js",
     "memleak": "tsx benchmark/memleak-test.js",
     "test": "jest --coverage --forceExit",
-    "test:unit": "jest --testMatch \"**/unit/**/*.spec.js\" --coverage",
-    "test:int": "jest --testMatch \"**/integration/**/*.spec.js\" --coverage",
+    "test:unit": "jest --testMatch \"**/unit/**/*.spec.ts\" --coverage",
+    "test:int": "jest --testMatch \"**/integration/**/*.spec.ts\" --coverage",
+    "test:tscheck": "tsc -p tsconfig.test.json",
     "test:e2e": "cd test/e2e && ./start.sh",
     "test:leak": "jest --testMatch \"**/leak-detection/**/*.spc.js\" --runInBand",
     "test:ts": "npm run build && tsd && tsc -p test/typescript/hello-world && ts-node -P test/typescript/hello-world/tsconfig.json test/typescript/hello-world/index.ts",
@@ -242,16 +243,18 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/test/services/",
-      "/test/typescript/",
-      "/test/unit/utils.js"
+      "/test/typescript/"
+    ],
+    "testMatch": [
+      "**/*.spec.ts",
+      "**/*.spec.js"
     ],
     "transform": {
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "isolatedModules": true,
           "diagnostics": false,
-          "tsconfig": "<rootDir>/../tsconfig.json"
+          "tsconfig": "<rootDir>/../tsconfig.jest.json"
         }
       ]
     },
