@@ -1,13 +1,10 @@
 import { describe, it, before, after, mock } from "../../helpers/test";
 import expect from "../../helpers/expect";
+import { interopDefault } from "../../helpers/module-mock";
 
+import lolex from "@sinonjs/fake-timers";
 import ServiceBroker from "../../../src/service-broker";
 import MemoryLRUCacher from "../../../src/cachers/memory-lru";
-import { Clock } from "clock-mock";
-
-// const lolex = require("@sinonjs/fake-timers");
-
-const clock = new Clock();
 
 describe("Test MemoryLRUCacher constructor", () => {
 	it("should create an empty options", () => {
@@ -371,13 +368,34 @@ describe("Test MemoryLRUCacher clean", () => {
 });
 
 describe("Test MemoryLRUCacher expired method", () => {
-	clock.advance(1);
+	let clock:any;
+	let cacher:any;
+	let broker:any;
 
-	const broker = new ServiceBroker({ logger: false });
-	const cacher = new MemoryLRUCacher({
-		ttl: 60
+	// `lru-cache` 在模块加载时就捕获了 `global.performance`（它用 `performance.now()` 计算 TTL），
+	// 而 `lolex.install()` 是**整体替换** `global.performance`：若只是 install，先前加载的 lru-cache
+	// 仍持有旧的 performance 引用，TTL 便不会跟随假时钟（实测如此）。因此这里在装好假时钟之后清空
+	// 模块注册表并重新加载 cacher，让它拿到被 fake 的 performance —— 等价于"原地改写 performance.now"
+	// 那种做法的效果。
+	before(async () => {
+		clock = lolex.install();
+		// 起点不能是 0：lru-cache 把 `starts[index] === 0` 当成"该条目没有 TTL"
+		// （源码里 `if (!ttl || !start) return Infinity`，且 `isStale` 里 `!!s` 直接短路），
+		// 于是首条记录永不过期。原 clock-mock 版本那句 `clock.advance(1)` 就是为跳过 0，
+		// 这里用 `tick(1)` 等价表达（会同时把 performance.now() 推离 0）。
+		clock.tick(1);
+		jest.resetModules();
+		const ExpiredCacher = interopDefault(require("../../../src/cachers/memory-lru"));
+		broker = new ServiceBroker({ logger: false });
+		cacher = new ExpiredCacher({
+			ttl: 60
+		});
+		cacher.init(broker); // for empty logger
 	});
-	cacher.init(broker); // for empty logger
+
+	after(async () => {
+		clock.uninstall();
+	});
 
 	const key1 = "tst123";
 	const key2 = "posts123";
@@ -391,22 +409,14 @@ describe("Test MemoryLRUCacher expired method", () => {
 	};
 	const data2 = "Data2";
 
-	before(async () => {
-		clock.enter();
-	});
-
-	after(async () => {
-		clock.exit();
-	});
-
 	it("should save the data with key", () => {
 		cacher.set(key1, data1);
-		clock.advance(35 * 1000);
+		clock.tick(35 * 1000);
 		cacher.set(key2, data2);
 	});
 
 	it("should give undefined for key1", () => {
-		clock.advance(30 * 1000);
+		clock.tick(30 * 1000);
 
 		return cacher.get(key1).then(obj => {
 			expect(obj).toBeUndefined();
@@ -420,7 +430,7 @@ describe("Test MemoryLRUCacher expired method", () => {
 	});
 
 	it("should give back data 2 for key2", () => {
-		clock.advance(65 * 1000);
+		clock.tick(65 * 1000);
 		return cacher.get(key2).then(obj => {
 			expect(obj).toBeUndefined();
 		});
