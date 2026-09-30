@@ -1,9 +1,11 @@
 "use strict";
 
 const _ = require("lodash");
-const ServiceBroker = require("../src/service-broker");
-const { MoleculerRetryableError } = require("../src/errors");
-const { randomInt } = require("../src/utils");
+// This script is part of the `cluster.js` worker pair and stays plain JS so it can
+// be launched by node itself. Run `npm run build` before it.
+const ServiceBroker = require("../dist/service-broker");
+const { MoleculerRetryableError } = require("../dist/errors");
+const { randomInt } = require("../dist/utils");
 
 // Create broker
 const broker = new ServiceBroker({

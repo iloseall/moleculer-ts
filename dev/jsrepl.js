@@ -1,4 +1,6 @@
-const ServiceBroker = require("../src/service-broker");
+// Interactive REPL: kept as plain JS (needs stdin), so it resolves the built output.
+// Run `npm run build` before it.
+const ServiceBroker = require("../dist/service-broker");
 
 const broker = new ServiceBroker({ logger: true });
 broker.createService({

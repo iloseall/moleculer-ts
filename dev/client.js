@@ -4,8 +4,10 @@ const _ = require("lodash");
 const kleur = require("kleur");
 const fs = require("fs");
 
-const ServiceBroker = require("../src/service-broker");
-const { randomInt } = require("../src/utils");
+// This script is part of the `cluster.js` worker pair and stays plain JS so it can
+// be launched by node itself. Run `npm run build` before it.
+const ServiceBroker = require("../dist/service-broker");
+const { randomInt } = require("../dist/utils");
 
 // Create broker
 const broker = new ServiceBroker({

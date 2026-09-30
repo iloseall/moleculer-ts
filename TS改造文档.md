@@ -260,6 +260,7 @@ localAction?: (
 | `tsd.compilerOptions` | 增加 `esModuleInterop: true`（不影响 src 配置） |
 | `dev` / `demo` / `bench` / `perf` / `memleak` | 改走 `tsx`，可直接解析 `.ts` |
 | `demo:client-server:server` / `demo:client-server:client` | 新增，运行示例 |
+| `lint` / `lint:fix` | 范围加入 `dev`（第九章；`dev` 现有 0 error / 3 个既有 warning） |
 | `test:ts` / `test:esm` / `test:examples` | 前置 `npm run build` |
 
 ### 示例与类型测试的类型检查门禁
@@ -420,12 +421,84 @@ npm run demo:client-server:client
 
 ---
 
-## 九、需要的知悉项
+## 九、dev/ 开发脚本（78 个：70 → `.ts`，8 保持 `.js`）
+
+`dev/` 是开发期试验脚本的集合（原为 78 个 `.js`，绝大多数不在任何自动化覆盖内）。本轮按「**能否被 TS 化**」而非「代码长短」做判定，结果为 **70 个转 `.ts`**、**8 个保持 `.js`**。
+
+### 9.1 判定标准：命中任一条就保持 `.js`
+
+1. **会被非 tsx 环境按「路径/文件名字符串」加载**：`index.js`（`require("./" + name)` 派发器，且 `package.json` 的 `dev` 脚本写死 `tsx watch dev/index.js`）、`cluster.js`（`cluster.fork` 的 worker 目标是 `./client.js` 字符串）。
+2. **本身就在示范「原生 JS 语义」**：`native-service.js`（纯 JS 服务定义写法），转 TS 即失去示范意义。
+3. **无法自动化验证、或必须按路径直接读取**：`jsrepl.js`（交互式 REPL，需要 stdin）、`dev.config.js`（运行时配置文件）、`empty.service.js`（空 fixture）、`client.js` / `server.js`（cluster 体系成员，且依赖缺失的 `./RedisHeartbeat` 与多个远程传输器）。
+
+### 9.2 分组结果（33 + 37 + 8 = 78，全覆盖）
+
+| 组 | 数量 | 文件 | 验证方式 |
+|---|---|---|---|
+| **A：转 `.ts`，可本地冒烟** | 33 | `action-hooks, async-local-storage, breaker, bulkhead, cache, caller, debounce-throttle, duplex-streaming, errorHandler, es6-class, event-store, event-validator, hook-wildcard, i18n-validator, internal-errors, internal, issue-1121, issue-1137, issue-1241, issue-1333, issue-546, logger, method-mw, mw-order, perf, retries, SafeJsonSerializer, saga, schema-custom-merge, serializer-register, timeout, validator-async, validator` | 迁移前后逐个 `tsx` 跑，比对退出码与输出 |
+| **B：转 `.ts`，需外部 infra** | 37 | `base, bigfile-sender, bigfile.receiver, broadcast-groups, buffer, circular, compress, custom-context, dev, direct-call, encrypt, event-error, event-wildcard, gossip-viz, headers, inter-ns, issue-1100-receiver, issue-1100-sender, issue-1132, issue-777, lifecycle, loglevel, metrics, middleware_v2, nats-wildcard, remote-deps, sharding, shared-obj, stream-caller, stream-demo, stream-echo, stream-java, stream-obj, stream-receiver, stream-sender, tracing, tracking` | 静态三层：语法 / 引用可达 / lint |
+| **C：保持 `.js`，引用改 `dist`** | 8 | `index.js, empty.service.js, native-service.js, dev.config.js, cluster.js, client.js, server.js, jsrepl.js` | 引用可达校验 + 运行前置 `npm run build` |
+
+### 9.3 两种引用策略（为什么 A/B 与 C 不一样）
+
+| | A/B 组（`.ts`） | C 组（`.js`） |
+|---|---|---|
+| 模块引用 | 仍 `../src/*` | 改 `../dist/*` |
+| 运行器 | `tsx`（跑 `.ts` 的唯一方式） | 原生 `node` |
+| 语义 | 改 `src` 立即生效（开发态所需） | 读构建产物，**运行前必须先 `npm run build`** |
+| 先例 | `examples/*.ts` | 根 `index.js`（本就 `require("./dist/...")`） |
+
+C 组实际改写的共 **6 处**：`client.js` 2 处（`service-broker` / `utils`）、`server.js` 3 处（`service-broker` / `errors` / `utils`）、`jsrepl.js` 1 处（`service-broker`）；其余 5 个文件本就不引用 `src`。C 组未改动的 `client.js` / `server.js` 里 `require("..")` / `require("../")` 无需处理 —— 根 `index.js` 已指向 `./dist/*`。
+
+### 9.4 运行方式
+
+```bash
+# A/B 组：走派发器（tsx 能解析 .ts）或直接跑单文件
+npm run dev validator          # = tsx watch dev/index.js validator
+npx tsx dev/validator.ts
+
+# C 组：原生 node，先构建
+npm run build
+node dev/client.js
+node dev/jsrepl.js
+```
+
+### 9.5 迁移形态与刻意保留的 `require()`
+
+形态与 `examples/` 同源 codemod：`const X = require("../src/y")` → `import X from "../src/y"`、`const { a } = require("../src/y")` → `import { a } from "../src/y"`、`module.exports = X` → `export default X`。
+
+**在 `.ts` 里刻意保留 `require()` 的 7 个文件（12 处）**，原因与第二章「刻意保留为 `require()` 的三类」一致（`import = require()` 在 esbuild/tsx 下与 `require()` 语义不同，属性访问与带初始化的调用一律不动）：
+
+| 文件 | 保留内容 | 原因 |
+|---|---|---|
+| `compress.ts` / `encrypt.ts` | `require("..").Middlewares` | 属性访问命名空间 |
+| `SafeJsonSerializer.ts` | `require("..").Serializers.Base` | 同上 |
+| `metrics.ts` | `require("../src/metrics/reporters").CSV` | 同上（同名成员与目录同名） |
+| `tracing.ts` | `require("dd-trace").init({...})`、局部 `require("http")` | 副作用顺序 + 惰性加载 |
+| `issue-1137.ts` | `require("../").Validators.Base` 等 4 处 | 复现 issue 场景，保持原样 |
+| `issue-1333.ts` | `require("moleculer").Validators.Base` 等 2 处 | 同上（`moleculer` 未安装，本就是坏引用） |
+
+### 9.6 验证结果
+
+- **A 组行为对比**：迁移前后各跑一遍（`tsx`，统一超时口径），**33/33** 退出码与归一化输出一致（长期运行的 broker 脚本超时视为正常）。
+- **B 组行为对比**：同样 **37/37** 一致（退出码全等；输出差异仅剩 `at ...` 栈帧噪声）。
+- **语法/引用静态校验**：70 个 `.ts` 全部通过 `esbuild.transform`；相对引用里唯一解析不到的是 `i18n-validator.ts → ../src/validator`（**迁移前就存在的坏引用**，`src/validator.ts` 从不存在，按「只记录不修」处理）。
+- **`eslint dev`**：**0 error** / 3 warning（3 个 `security/detect-possible-timing-attacks`，已用 HEAD 的 `.js` 复核同为 3 个，非本次引入）；`dev` 已并入 `npm run lint` 范围。
+- **C 组引用可达**：`../dist/*` **6/6** 可达（`dist/service-broker.js` / `errors.js` / `utils.js` 均导出预期成员）。
+- **回归**：`npm test` → 137 suites / 2360 passed / 4 skipped（与基线一致）；`npm run build` 通过。
+
+### 9.7 迁移踩坑
+
+**`prefer-const` 在 `.js` 下不报、改成 `.ts` 后开始报**（同 7.6）。`eslint dev --fix` 机械收敛后仅剩 `buffer.ts` 一处 `no-useless-assignment`（原写法 `let serializer` 声明后两分支都重新赋值），已改为直接初始化的 `const`，语义不变。此外 `--fix` 顺带把 `dev/` 全部脚本统一为 LF（内容无变化）。
+
+---
+
+## 十、需要的知悉项
 
 1. **`strict` 仍为 `false`**（显式写死），后续可逐目录开启 `strictNullChecks` 等作为独立任务推进。
 2. **本机 `npm run lint` 仍会报大量 `prettier Delete ␍`**：Windows 工作区 `core.autocrlf=true` 造成的既有现象，
    非 prettier 规则错误为 0；提交后仓库内容为 LF，Linux CI 不受影响。用
-   `--rule '{"prettier/prettier":["error",{"endOfLine":"auto"}]}'` 复核时 `src` 为 0 error / 0 warning。
+   `--rule '{"prettier/prettier":["error",{"endOfLine":"auto"}]}'` 复核时 `src` 为 0 error / 0 warning、`dev` 为 0 error / 3 warning（timing-attack 误报，非本次引入）。
 3. **产物不再是「逐字节相同」**：`esModuleInterop` 会引入 `__importDefault` / `__importStar` 辅助调用。
    对象引用、`instanceof`、单例语义均不变（jest 2360 项断言与覆盖率与改造前一致可佐证）。
 4. **测试工具链是升级 TS 6/7 的真正风险点**，而非语法：当前用 `ts-jest ^29`，
@@ -436,7 +509,7 @@ npm run demo:client-server:client
 
 ---
 
-## 十、后续可选项
+## 十一、后续可选项
 
 - 逐目录开启 `strict` / `strictNullChecks`，渐进清偿类型债
 - 把 136 个 spec 逐步纳入类型门禁（当前只 gate `test/helpers/**`，见 7.5）
@@ -444,3 +517,5 @@ npm run demo:client-server:client
 - 把历史 `@ts-ignore`（15 处）逐步替换为真实类型修复
 - `export =` → ESM 导出（会改变公共 `.d.ts` 形态，需同步 `index.d.ts` 与 tsd 用例）
 - `test/e2e`（shell + docker 驱动）未调整，其内部使用发布包，无需改动
+- `dev/` 的 A/B 两组（70 个 `.ts`）目前不在任何类型门禁内（无 tsconfig 覆盖），如需可新增 `tsconfig.dev.json` 并纳入 `test:tscheck` 同款流程
+- `dev/` 的历史坏引用（`./RedisHeartbeat`、`./examples/*.service.js`、`require("moleculer")`、`../src/validator`）按本次口径只记录未修，可作为独立小任务清理
