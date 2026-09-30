@@ -342,6 +342,42 @@ const opts: TracingActionOptions = _.defaultsDeep(
 | `test:ts` | 末段运行器由 `ts-node` 改走 `tsx --tsconfig …`，并**移除 `ts-node` 依赖**（它只服务这一个脚本；`jest-config` 仅把它列为 optional peer）。类型检查强度不变 —— 前一段 `tsc -p test/typescript/hello-world` 已覆盖该目录的类型把关，`tsx` 只负责运行 |
 | `test:ts` / `test:esm` / `test:examples` | 前置 `npm run build` |
 
+### 依赖升级（2026-09 一轮）
+
+按「安全 → 小版本 → OTel 组 → 主版本逐个」四批推进，每批后都跑同一套门禁（`tsc -p tsconfig.json` / `npm run build` / `npm test` /
+`test:tscheck` / `test:examples` / `test:ts` / `eslint src test`）。
+
+| 批次 | 内容 | 结果 |
+|---|---|---|
+| **A 安全** | `npm audit fix`（非破坏路径）+ `joi 18.2.3→18.2.9` + 传递漏洞源头 `eslint 10.11` / `mqtt 5.16` / `@platformatic/kafka 2.12.1` / `supertest 7.3` | 公告 **14 → 2**（7 high → 0） |
+| **B 小版本** | 运行时 `ipaddr.js 2.5.0`、`lru-cache` 声明对齐 `^11.5.3`；工具 `tsx 4.23.15` / `prettier 3.9.9` / `lockfile-lint 5.0.1` / `globals 17.12` / `eslint-plugin-security 4.1`；序列化 `cbor-x 1.6.6` / `msgpack5 6.1.0` | 全绿 |
+| **C OTel 组** | `@opentelemetry/{sdk-node,instrumentation,exporter-trace-otlp-proto,exporter-metrics-otlp-proto} → 0.222.0`、`auto-instrumentations-node → 0.80`（0.x 语义，必须同批升） | 全绿（`test:examples` 覆盖示例类型；实跑需 collector） |
+| **D 主版本** | `npm-check-updates 23.1`、`@types/node 26.6`、`dd-trace 6.18`、`dotenv 18.0`、`ioredis 6.0`、`amqplib 2.2` | 全绿 |
+
+**主版本逐个的语义核对（本轮最花时间的部分）**：
+
+| 包 | 风险点 | 核对结果 |
+|---|---|---|
+| `dd-trace` 5→6 | `tracing/exporters/datadog.ts` 依赖 dd-trace **内部路径**（`packages/dd-trace/src/{opentracing/span_context,noop/span_context,id}`）与 `scope._spans` 私有字段；spec 用 `require.resolve` 直接引用这些路径，一旦移除会**崩在加载阶段**而非断言失败 | 三条内部路径在 6.18 中**仍存在**；`tracer.init` 正常；`scope._spans` 仍可自建（exporter 里本就是 `\|\| {}`）；spec 22/22 通过 |
+| `dotenv` 17→18 | 被 `src/runner.ts` / `runner-esm.mjs`（发布出去的 CLI）懒加载，而**仓库没有 runner 的 spec** | 用行为探针在 17 / 18 上各跑一遍：变量注入、不覆盖已有 env、缺文件返回 `error:true` 不抛、`parse` 全部一致；差异仅两处 —— 18 **移除了 `decrypt` / `_configVault` / `_parseVault`**（仓库未使用）并**不再打印 tip 日志**（对 runner 是改善）；另外 `npm run test:esm`（真实走 runner）通过 |
+| `ioredis` 5→6 | 三个集成（cacher / discoverer / transporter）+ `Redis`/`Cluster`/`ClusterNode`/`ClusterOptions`/`RedisOptions` 类型导入 + redlock 用法 | `npm ls ioredis` 仅一份 6.0.0（redlock 4.2 只依赖 bluebird，不拉 ioredis）；`tsc`、tsd 类型用例、redis 三个 spec **100/100** 全过 |
+| `amqplib` 0.10→2.2 | 跨两个大版本，AMQP 传输器 | 2.x 仍是 CJS（`main: channel_api.js`，Promise 版主入口；回调版移到 `amqplib/callback_api`），而仓库代码本就是 Promise 风格 → `connect()` 返回 Promise、拒绝路径正常；spec 25/25 通过 |
+| `@types/node` 25→26 | 全 `src/**` 类型 | `tsc -p tsconfig.json` **0 error**，未暴露新错误 |
+| `npm-check-updates` 19→23 | 仅 `npm run deps` | `ncu 23.1.0` 可用，且用它复核了整份依赖表 |
+
+**结论**：`npx ncu` 现在只剩 `typescript ^6.0.3 → ^7.0.2`（peer 阻塞，见知悉项 5）；`npm audit` 剩 **2 条 moderate**，
+均来自 `jaeger-client → uuid`，**无可用修复**（唯一"修复"是降级到 3.10.0，semver-major 且更旧）。
+
+**明确未做**：`redlock` 只有 `5.0.0-beta.2`（无正式版，而它被 `src/cachers/redis.ts` 用了 25 处，不宜压 beta），保持 4.2.0。
+
+**顺带清理**：移除 `@types/pino` —— 它已是 npm 上的 deprecated stub（"pino provides its own type definitions"），
+仓库唯一的 pino 类型引用（`src/loggers/pino.ts` 的 `DestinationStream`）来自 **pino 自身**的类型声明；根 tsconfig 的
+`"types": ["node"]` 也早已把它排除在编译之外（只有不继承根配置的 `examples/typescript` 与 `test/typescript/hello-world`
+会"自动包含全部 `@types/*`"，那里没有任何 pino 类型引用）。移除后全量门禁与 137 suites 不变。
+
+**本机无法验证的部分**：需要外部服务的集成（RabbitMQ / NATS / Kafka / MQTT / etcd / Redis 真实连接）与 OTel collector ——
+仓库有 `test/docker-compose.yml` 可起容器；由于 GitHub Actions 已在仓库设置里禁用，这些只能本地跑。
+
 ### 示例与类型测试的类型检查门禁
 
 | 文件 | 说明 |
@@ -621,6 +657,10 @@ node dev/jsrepl.js
 7. **测试的运行器始终是 jest**：曾尝试迁移到 Node 原生 `node:test`，因缺少链式 `expect` API、
    `mock.module` 需实验标志且无 hoisting、快照格式不兼容而放弃；唯一沉淀是规格化的 helper 层（见第七章）。
    jest 自身已从 29.7.0 升到 **30.5.2**（见 7.7），runner 选型不变。
+8. **`jaeger-client` 的 `uuid` 公告（moderate）无可用修复**：它是 devDependency，只影响 Jaeger exporter 的集成/示例；
+   若要强行消除，只能 npm `overrides` 强制 `uuid ≥11.1.1`（绕过 jaeger-client 自己的依赖声明，需自测）。
+9. **依赖生态的两个硬上限**：`typescript` 卡在 6.0.3（peer 阻塞，见 5）、`redlock` 卡在 4.2.0（上游只有 `5.0.0-beta.2`）。
+   除这两项外，`npx ncu` 已无任何可升级项（见第六章「依赖升级」）。
 
 ---
 
