@@ -6,9 +6,10 @@
 
 import { QueueIsFullError } from "../errors";
 import { METRIC } from "../metrics";
+import type { ActionSchema, EventSchema } from "../service";
 
 function bulkheadMiddleware(broker) {
-	function wrapActionBulkheadMiddleware(handler, action) {
+	function wrapActionBulkheadMiddleware(handler, action: ActionSchema) {
 		const service = action.service;
 
 		const opts = Object.assign({}, this.options.bulkhead || {}, action.bulkhead || {});
@@ -136,7 +137,7 @@ function bulkheadMiddleware(broker) {
 		return handler;
 	}
 
-	function wrapEventBulkheadMiddleware(handler, event) {
+	function wrapEventBulkheadMiddleware(handler, event: EventSchema) {
 		const service = event.service;
 
 		const opts = Object.assign({}, this.options.bulkhead || {}, event.bulkhead || {});

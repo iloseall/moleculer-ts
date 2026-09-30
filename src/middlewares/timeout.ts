@@ -7,9 +7,10 @@
 import { TimeoutError, RequestTimeoutError } from "../errors";
 import { Stream } from "stream";
 import { METRIC } from "../metrics";
+import type { ActionSchema } from "../service";
 
 function timeoutMiddleware(broker) {
-	function wrapTimeoutMiddleware(handler, action) {
+	function wrapTimeoutMiddleware(handler, action: ActionSchema) {
 		const actionTimeout = action.timeout;
 		const actionName = action.name;
 		const service = action.service ? action.service.fullName : null;

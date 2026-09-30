@@ -6,14 +6,25 @@
 
 import _ from "lodash";
 import { isFunction, isPlainObject, safetyObject } from "../utils";
+import type {
+	ActionSchema,
+	EventSchema,
+	TracingActionOptions,
+	TracingEventOptions
+} from "../service";
 
 function TracingMiddleware(broker) {
 	const tracer = broker.tracer;
 
-	function tracingLocalActionMiddleware(handler, action) {
-		let opts = action.tracing;
-		if (opts === true || opts === false) opts = { enabled: !!opts };
-		opts = _.defaultsDeep({}, opts, { enabled: true });
+	function tracingLocalActionMiddleware(handler, action: ActionSchema) {
+		// `action.tracing` may be a boolean shorthand or an options object; normalize both.
+		const opts: TracingActionOptions = _.defaultsDeep(
+			{},
+			typeof action.tracing === "boolean"
+				? { enabled: action.tracing }
+				: action.tracing || {},
+			{ enabled: true }
+		);
 
 		if (opts.enabled) {
 			return function tracingLocalActionMiddleware(ctx) {
@@ -135,12 +146,15 @@ function TracingMiddleware(broker) {
 		return handler;
 	}
 
-	function tracingLocalEventMiddleware(handler, event) {
+	function tracingLocalEventMiddleware(handler, event: EventSchema) {
 		const service = event.service;
 
-		let opts = event.tracing;
-		if (opts === true || opts === false) opts = { enabled: !!opts };
-		opts = _.defaultsDeep({}, opts, { enabled: true });
+		// `event.tracing` may be a boolean shorthand or an options object; normalize both.
+		const opts: TracingEventOptions = _.defaultsDeep(
+			{},
+			typeof event.tracing === "boolean" ? { enabled: event.tracing } : event.tracing || {},
+			{ enabled: true }
+		);
 
 		if (opts.enabled) {
 			return function tracingLocalEventMiddleware(ctx) {

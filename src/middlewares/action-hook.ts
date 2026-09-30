@@ -10,6 +10,7 @@
 
 import _ from "lodash";
 import { isFunction, isString, match } from "../utils";
+import type { ActionSchema } from "../service";
 
 function actionHookMiddleware(broker) {
 	function callHook(hook, service, ctx, res?) {
@@ -63,7 +64,7 @@ function actionHookMiddleware(broker) {
 		return hooks;
 	}
 
-	function wrapActionHookMiddleware(handler, action) {
+	function wrapActionHookMiddleware(handler, action: ActionSchema) {
 		const name = action.rawName || action.name;
 		const hooks = action.service && action.service.schema ? action.service.schema.hooks : null;
 		if (hooks || action.hooks) {

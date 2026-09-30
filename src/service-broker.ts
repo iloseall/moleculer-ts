@@ -14,7 +14,7 @@ import type { MetricRegistryOptions } from "./metrics/registry";
 import type { Middleware, MiddlewareCallHandlerOptions } from "./middleware";
 import type ServiceRegistry from "./registry";
 import type BaseSerializer from "./serializers/base";
-import type { ServiceSchema, ServiceSettingSchema } from "./service";
+import type { BulkheadOptions, ServiceSchema, ServiceSettingSchema } from "./service";
 import type { TracerOptions } from "./tracing/tracer";
 import type BaseTransporter from "./transporters/base";
 import type BaseValidator from "./validators/base";
@@ -167,7 +167,7 @@ declare namespace ServiceBroker {
 
 		circuitBreaker?: BrokerCircuitBreakerOptions;
 
-		bulkhead?: Record<string, any>;
+		bulkhead?: BulkheadOptions;
 
 		transit?: Transit.TransitOptions;
 

@@ -216,6 +216,59 @@ localAction?: (
 
 两者**改造前就已无法运行**，属于示例陈旧，不属于本次迁移目标；已用注释标注，留待独立任务处理。
 
+### 15. 补齐 `ActionSchema` / `EventSchema` 的运行时字段（并收口隐式 `any` 绕过）
+
+`ActionSchema` 同时承担两种角色：用户写的**输入 schema**，以及 `Service._createAction()` 产出并贯穿注册表 / 端点 / `ctx` 的**运行时 action 记录**。后者会原地补上 `service`、`rawName` 与绑定后的 `handler`；同理 `EventSchema` 会被 `_createEvent()` 补上 `service`。但上游类型只声明了 `service?`，**漏了 4 个运行时真会被读的字段**：
+
+| 成员 | 改造前状况 | 处理 |
+|---|---|---|
+| `service?: Service` | 上游 `src/service.d.ts` 就有，但**无任何说明**，看着像"用户该填的字段" | 加 `@internal` 文档：由 `_createAction()` 注入（`action.service = this`）；定义会先 `cloneDeep`，写了也会被真实实例覆盖 |
+| `rawName?: string` | `_createAction()` 会注入（`action.rawName = action.name \|\| name`，随后 `name` 被加上 `<fullName>.` 前缀），但类型里**没有声明** | 补声明 + `@internal` |
+| `timeout?: number` | 上游类型里没有，但 `middlewares/timeout.ts` 会读 `action.timeout`（`if (actionTimeout != null) ctx.options.timeout = actionTimeout`）→ **用户写 `actions: { x: { timeout: 5000 } }` 会被对象字面量的 excess property check 直接拒绝** | 补 `timeout?: number` + 注释：未设置时回落到 `BrokerOptions.requestTimeout`，`0`/负数表示禁用 |
+| `EventSchema.bulkhead` / `EventSchema.tracing` | 上游类型同样没有，但 bulkhead / tracing 中间件在**事件路径**上会读 `event.bulkhead`、`event.tracing`；`TracingEventOptions` 早就定义了却全库无人引用（就是漏了这两个字段的旁证） | 补 `bulkhead?: BulkheadOptions;` 与 `tracing?: boolean \| TracingEventOptions;` |
+| `BulkheadOptions`（新增接口） | `ActionSchema.bulkhead`、`BrokerOptions.bulkhead` 原先是 `Record<string, any>`（上游本有 `BulkheadOptions`，`.d.ts` 合并进源码时丢了） | 按 bulkhead 中间件实际读取的 `opts.enabled / concurrency / maxQueueSize` 定义 `export interface BulkheadOptions`，供 `ActionSchema` / `EventSchema` / `BrokerOptions` 三处共用 |
+
+`EventSchema` 同源（`_createEvent()` 注入 `event.service`，供 `ctx.service` 使用），一并加注释；两个接口也补了"同一 shape 复用为运行时记录"的说明。
+
+配套事实：`tsconfig` 全仓都**没开 `stripInternal`**，因此 `@internal` 只作文档语义，`service` / `rawName` 等字段仍完整保留在产出的 `dist/*.d.ts` 中，不会影响既有消费者。
+
+#### 15.1 顺带收口 7 处"隐式 `any` 绕过"
+
+上面这些字段以前**能被读到却不报错**，只是因为中间件内部函数的参数没写类型（全仓 `strict: false`，隐式 `any` 不报错）。补完字段后给 action / event 参数加了显式标注：
+
+| 文件 | 函数 | 标注 |
+|---|---|---|
+| `middlewares/timeout.ts` | `wrapTimeoutMiddleware` | `action: ActionSchema` |
+| `middlewares/action-hook.ts` | `wrapActionHookMiddleware` | `action: ActionSchema` |
+| `middlewares/retry.ts` | `wrapRetryMiddleware` | `action: ActionSchema` |
+| `middlewares/tracing.ts` | `tracingLocalActionMiddleware` / `tracingLocalEventMiddleware` | `action: ActionSchema` / `event: EventSchema` |
+| `middlewares/bulkhead.ts` | `wrapActionBulkheadMiddleware` / `wrapEventBulkheadMiddleware` | `action: ActionSchema` / `event: EventSchema` |
+
+`handler` 与 `ctx` 仍保持隐式 `any`（`ctx` 上有 `ctx._retryAttempts`、`ctx.startHrTime` 这类内部字段，收口它们属于"逐步开 `strict`"的范畴，不在本次范围）。
+
+**只有 `tracing.ts` 需要改逻辑**：原来 `let opts = action.tracing;` 之所以能过，是因为 `opts` 被推断成 `any`；标注后 `opts` 变成 `boolean | TracingActionOptions`，属性访问全部报 `TS2339`。因此按原有语义显式归一化：
+
+```ts
+// 改前（依赖 opts: any）
+let opts = action.tracing;
+if (opts === true || opts === false) opts = { enabled: !!opts };
+opts = _.defaultsDeep({}, opts, { enabled: true });
+```
+```ts
+// 改后（四种输入逐一等价）
+const opts: TracingActionOptions = _.defaultsDeep(
+	{},
+	typeof action.tracing === "boolean" ? { enabled: action.tracing } : action.tracing || {},
+	{ enabled: true }
+);
+```
+
+四种输入的合并结果与改前完全一致：`true → enabled: true`、`false → enabled: false`（`defaultsDeep` 不会覆盖已有值）、`undefined → 默认 enabled: true`、对象 → 原样合并；`opts` 全程只读，`let → const` 无副作用。tracing 相关 spec 全绿可佐证。
+
+**验证**：`tsc -p tsconfig.json` **0 error**；负向验证 —— 故意把 `action-hook.ts` 里的 `action.rawName` 写成 `action.rawNameTEMP`，立刻报 `TS2339: Property 'rawNameTEMP' does not exist on type 'ActionSchema<...>'`，证明这些读取现在真的受类型检查（而不是被 `any` 放行）；`npm test` 137 suites / **2360 passed** / 4 skipped 与基线一致；`npm run build`、`test:tscheck`、`test:examples`、`test:ts` 全绿；`eslint src`（`endOfLine:auto` 口径）**0 problem**。
+
+> 相关但本次未改：① 中间件里的 `ctx` 仍是隐式 `any`；② `registry/action-catalog.ts`、`registry/service-catalog.ts` 用 `Omit<ActionSchema, "handler" | "remoteHandler" | "service">` 描述"可序列化的纯 schema"，是否把 `rawName` 也并入 `Omit` 属公开类型议题；③ 更彻底的"输入 schema / 运行时 `Action`"类型拆分见第十一章。
+
 ---
 
 ## 五、门禁验证（改造后全量运行）
@@ -519,3 +572,5 @@ node dev/jsrepl.js
 - `test/e2e`（shell + docker 驱动）未调整，其内部使用发布包，无需改动
 - `dev/` 的 A/B 两组（70 个 `.ts`）目前不在任何类型门禁内（无 tsconfig 覆盖），如需可新增 `tsconfig.dev.json` 并纳入 `test:tscheck` 同款流程
 - `dev/` 的历史坏引用（`./RedisHeartbeat`、`./examples/*.service.js`、`require("moleculer")`、`../src/validator`）按本次口径只记录未修，可作为独立小任务清理
+- 把 `ActionSchema` 拆成"输入 schema"与运行时 `Action`（`service: Service`、`rawName: string`、`handler` 必填）两个类型（见 4.15），可让 `Middleware.localAction` / `Context.action` 的语义更准；属公开类型调整，需同步 `index.d.ts`、tsd 用例与 catalog 的 `Omit<...>`
+- 中间件内部的 `ctx` 仍是隐式 `any`（`ctx._retryAttempts`、`ctx.startHrTime`、`ctx.service.actions[action.rawName]` 等，见 4.15.1），收口需先给 `Context` 补内部字段或引入内部类型

@@ -105,6 +105,25 @@ declare namespace Service {
 		};
 	}
 
+	/**
+	 * Bulkhead (concurrency limiter) options. Read by the bulkhead middleware from
+	 * `BrokerOptions.bulkhead` (global default), `ActionSchema.bulkhead` and
+	 * `EventSchema.bulkhead` (per action/event override).
+	 */
+	export interface BulkheadOptions {
+		enabled?: boolean;
+		concurrency?: number;
+		maxQueueSize?: number;
+	}
+
+	/**
+	 * An action definition, as written in a service schema.
+	 *
+	 * NOTE: the same shape is reused for the *runtime* action record. `Service._createAction()`
+	 * deep-clones the definition and then adds the runtime-only members (`service`, `rawName`
+	 * and the bound `handler`), so this interface is the union of "what you write" and
+	 * "what the registry/middlewares see". Those runtime-only members are marked `@internal`.
+	 */
 	export interface ActionSchema<TThis = Service> {
 		name?: string;
 		/**
@@ -119,11 +138,24 @@ declare namespace Service {
 		 */
 		protected?: boolean;
 		params?: ActionParams;
+		/**
+		 * @internal
+		 * Runtime back-reference to the owning service, injected by
+		 * `Service._createAction()` (`action.service = this`). Do not set it in a schema:
+		 * the definition is deep-cloned first, so the copy always carries the real
+		 * service instance. Read by middlewares (`action.service.fullName`,
+		 * `action.service.schema.hooks`) and used to fill `ctx.service`.
+		 */
 		service?: Service;
 		cache?: boolean | ActionCacheOptions;
 		handler?: ActionHandler<TThis>;
+		/**
+		 * Per-action timeout in milliseconds, read by the timeout middleware. When unset,
+		 * `BrokerOptions.requestTimeout` is used instead; `0` (or negative) disables it.
+		 */
+		timeout?: number;
 		tracing?: boolean | TracingActionOptions;
-		bulkhead?: Record<string, any>;
+		bulkhead?: BulkheadOptions;
 		circuitBreaker?: BrokerCircuitBreakerOptions;
 		retryPolicy?: RetryPolicyOptions;
 		fallback?: string | FallbackHandler;
@@ -133,6 +165,15 @@ declare namespace Service {
 
 		// For internal purposes only!
 		remoteHandler?: ActionHandler<TThis>;
+
+		/**
+		 * @internal
+		 * Runtime field injected by `Service._createAction()`: the action name as written
+		 * in the schema, i.e. without the `<service fullName>.` prefix that `name` gets at
+		 * registration time. Read by middlewares (`action.rawName || action.name`) and
+		 * used for local re-calls (`ctx.service.actions[action.rawName]`).
+		 */
+		rawName?: string;
 	}
 
 	export type ActionHandler<TThis = Service> = (
@@ -182,12 +223,26 @@ declare namespace Service {
 
 	export type EventSchemaHandler = (ctx: Context<any, any>) => void | Promise<void>;
 
+	/**
+	 * An event definition, as written in a service schema. As with `ActionSchema`, the
+	 * runtime copy created by `Service._createEvent()` adds an internal `service` field.
+	 */
 	export interface EventSchema {
 		name?: string;
 		group?: string;
 		params?: ActionParams;
+		/**
+		 * @internal
+		 * Runtime back-reference to the owning service, injected by
+		 * `Service._createEvent()` (`event.service = this`). Do not set it in a schema.
+		 * Used to fill `ctx.service` for event handlers.
+		 */
 		service?: Service;
 		context?: boolean;
+		/** Per-event bulkhead override, read by the bulkhead middleware (`event.bulkhead`). */
+		bulkhead?: BulkheadOptions;
+		/** Per-event tracing settings, read by the tracing middleware (`event.tracing`). */
+		tracing?: boolean | TracingEventOptions;
 		debounce?: number;
 		throttle?: number;
 		strategy?: string | typeof Strategy;

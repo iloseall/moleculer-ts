@@ -5,9 +5,10 @@
  */
 
 import { METRIC } from "../metrics";
+import type { ActionSchema } from "../service";
 
 function RetryMiddleware(broker) {
-	function wrapRetryMiddleware(handler, action) {
+	function wrapRetryMiddleware(handler, action: ActionSchema) {
 		const actionName = action.name;
 		const service = action.service ? action.service.fullName : null;
 		// Merge action option and broker options
