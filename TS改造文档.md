@@ -375,6 +375,38 @@ const opts: TracingActionOptions = _.defaultsDeep(
 `"types": ["node"]` 也早已把它排除在编译之外（只有不继承根配置的 `examples/typescript` 与 `test/typescript/hello-world`
 会"自动包含全部 `@types/*`"，那里没有任何 pino 类型引用）。移除后全量门禁与 137 suites 不变。
 
+**无用依赖清理（2026-09）**：用「排除 package.json 自身声明」的引用扫描逐包核对，移除 7 个零引用依赖 ——
+`avsc`（仓库没有 Avro 序列化器）、`lockfile-lint`（无任何脚本/工作流调用）、`@types/bunyan`（bunyan 只用 `require`，
+无类型导入）、`v8-natives`、`winston-context`（仅 CHANGELOG 里的**用户侧示例**）、`eslint-plugin-node`（配置里那行是注释掉的）、
+`joi`（仅 `dev/issue-1137.ts` 用；该脚本已加 NOTE，改为**按需安装** `npm i -D joi`，与 `dev/` 里其它可选集成的处理方式一致）。
+
+同时确认了这几类"看着像零引用、但必须保留"的陷阱：
+
+| 包 | 为什么必须留 |
+|---|---|
+| `eslint-config-prettier` | `eslint-plugin-prettier/recommended.js` 在加载时直接 `require("eslint-config-prettier")` —— 实测删掉后 `eslint` 直接 exit 2（已恢复） |
+| `jest-util` | ts-jest 运行时 `require("jest-util")`；jest 30 把它嵌套在 `node_modules/jest/node_modules` 下，必须显式声明 |
+| `@types/node` | 由 tsconfig 的 `"types": ["node"]` 使用，不是文本引用 |
+| `npm-check-updates` | 通过 `ncu` 命令使用（不是包名），`npm run deps` |
+| `prettier` | `eslint-plugin-prettier` 的 peer + `prettier.config.js` |
+| `nodemon` | `npm run perf` |
+| `jest-diff` | `test/e2e/utils.js`（需 docker 的 e2e） |
+| `supertest` | `test/unit/metrics/reporters/prometheus.spec.ts`（CI 会跑） |
+
+**`clock-mock` 尝试移除未成功（保留 `^2.0.4`）**：它只服务 `test/unit/cachers/memory-lru.spec.ts` 一处（`new Clock()` /
+`enter()` / `exit()` / `advance()`），看起来与 `@sinonjs/fake-timers` 重复，但两者语义**不等价**：
+`lru-cache` 在模块加载时就捕获了 `global.performance`（TTL 用 `performance.now()` 计时），而 `@sinonjs/fake-timers`
+的 `install()` 会**整体替换** `global.performance`，捕获到的旧引用因此看不到假时钟（实测 TTL 不生效）；
+`clock-mock` 则是**原地改写** `performance.now`，所以能生效。已实测：改用 `lolex.install()` + 原地补丁 `performance.now`
+可让 30/31 个用例通过，剩余 1 个（首个键在 65s 时过期）仍有偏差，因此本轮**回退保留 `clock-mock`**，未改动 spec。
+若仍要去掉这个依赖，可行路径是在加载 `lru-cache` **之前**安装假时钟（`jest.isolateModules` / `resetModules` 后重新
+`require` cacher），属于 spec 结构性改写，建议单独立项。
+
+仍有可精简候选（未动）：`jest-diff`（仅需 docker 的 `test/e2e`）。
+
+另发现一个**既有问题**（非本次引入）：`benchmark/memleak-test.js:4` 依赖未安装也未声明的 `memwatch-next`（上游已停更），
+即 `npm run memleak` 目前跑不通。
+
 **本机无法验证的部分**：需要外部服务的集成（RabbitMQ / NATS / Kafka / MQTT / etcd / Redis 真实连接）与 OTel collector ——
 仓库有 `test/docker-compose.yml` 可起容器；由于 GitHub Actions 已在仓库设置里禁用，这些只能本地跑。
 

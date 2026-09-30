@@ -1,3 +1,7 @@
+// NOTE: this experiment needs the `joi` package, which is no longer a devDependency
+// (it was only used here). Install it on demand before running this script:
+//   npm i -D joi
+// Same rule as the other optional integrations a `dev/` script may pull in.
 import ServiceBroker from "../src/service-broker";
 import _ from "lodash";
 
