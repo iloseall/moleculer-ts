@@ -2223,7 +2223,7 @@ describe("Test Transit._sendRequest", () => {
 				.then(() => expect(stream.isPaused()).toBeTruthy())
 				.delay(80)
 				.then(() => {
-					expect(stream.isPaused()).toBeFalsy();
+					expect(stream.readableEnded).toBe(true);
 					expect(transit.publish).toHaveBeenCalledTimes(
 						Math.ceil(randomData.length / transit.opts.maxChunkSize) + 1
 					);
